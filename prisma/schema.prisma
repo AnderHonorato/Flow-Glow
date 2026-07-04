@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// -------------------- ENUMS --------------------
+
+enum PapelUsuario {
+  CLIENTE
+  ADMINISTRADOR
+}
+
+enum StatusPedido {
+  PENDENTE
+  PROCESSANDO
+  APROVADO
+  RECUSADO
+  REEMBOLSADO
+}
+
+enum TipoFormaPagamento {
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  PIX
+  BOLETO
+}
+
+enum NivelTutorial {
+  INICIANTE
+  INTERMEDIARIO
+  AVANCADO
+}
+
+enum TipoAnexo {
+  IMAGEM
+  VIDEO
+}
+
+// -------------------- USUÁRIO E PERFIL --------------------
+
+model Usuario {
+  id                       String       @id @default(uuid())
+  nomeCompleto             String
+  email                    String       @unique
+  senhaHash                String
+  papel                    PapelUsuario @default(CLIENTE)
+  fotoPerfilUrl            String?
+  whatsapp                 String?
+  emailVerificado          Boolean      @default(false)
+  tokenVerificacaoEmail    String?
+  tentativasLogin          Int          @default(0)
+  bloqueadoAte             DateTime?
+  tokenRecuperacaoHash     String?
+  tokenRecuperacaoExpiraEm DateTime?
+  criadoEm                 DateTime     @default(now())
+  atualizadoEm             DateTime     @updatedAt
+
+  endereco          Endereco?
+  formasPagamento   FormaPagamento[]
+  pedidos           Pedido[]
+  comentarios       Comentario[]
+  conversas         Conversa[]
+  mensagensEnviadas Mensagem[]
+
+  @@map("usuarios")
+}
+
+model Endereco {
+  id          String  @id @default(uuid())
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  estado      String
+  usuario     Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId   String  @unique
+
+  @@map("enderecos")
+}
+
+// Nunca guardamos número de cartão, CVV ou validade aqui — apenas o token
+// que o gateway devolve depois da tokenização (exigência do padrão PCI-DSS).
+model FormaPagamento {
+  id                   String             @id @default(uuid())
+  tipo                 TipoFormaPagamento
+  tokenGateway         String?
+  ultimosQuatroDigitos String?
+  bandeira             String?
+  principal            Boolean            @default(false)
+  usuario              Usuario            @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId            String
+  criadoEm             DateTime           @default(now())
+
+  @@map("formas_pagamento")
+}
+
+// -------------------- CATÁLOGO --------------------
+
+model Categoria {
+  id        String     @id @default(uuid())
+  nome      String     @unique
+  slug      String     @unique
+  tutoriais Tutorial[]
+
+  @@map("categorias")
+}
+
+model Tutorial {
+  id                  String        @id @default(uuid())
+  titulo              String
+  slug                String        @unique
+  descricaoCurta      String
+  descricaoCompleta   String
+  preco               Decimal       @db.Decimal(10, 2)
+  precoPromocional    Decimal?      @db.Decimal(10, 2)
+  imagemCapaUrl       String
+  videoPreviaUrl      String?
+  cupomDesconto       String?
+  destaquePromocional Boolean       @default(false)
+  cidade              String?
+  estado              String?
+  distanciaKm         Int?
+  nivel               NivelTutorial @default(INICIANTE)
+  ativo               Boolean       @default(true)
+  categoria           Categoria     @relation(fields: [categoriaId], references: [id])
+  categoriaId         String
+  modulos             Modulo[]
+  itensPedido         ItemPedido[]
+  comentarios         Comentario[]
+  criadoEm            DateTime      @default(now())
+  atualizadoEm        DateTime      @updatedAt
+
+  @@index([categoriaId])
+  @@map("tutoriais")
+}
+
+model Modulo {
+  id             String   @id @default(uuid())
+  titulo         String
+  ordem          Int
+  videoUrl       String
+  duracaoMinutos Int
+  gratuito       Boolean  @default(false)
+  tutorial       Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  tutorialId     String
+
+  @@map("modulos")
+}
+
+// -------------------- PEDIDOS E PAGAMENTO --------------------
+
+model Pedido {
+  id                 String       @id @default(uuid())
+  usuario            Usuario      @relation(fields: [usuarioId], references: [id])
+  usuarioId          String
+  status             StatusPedido @default(PENDENTE)
+  valorTotal         Decimal      @db.Decimal(10, 2)
+  idTransacaoGateway String?
+  itens              ItemPedido[]
+  criadoEm           DateTime     @default(now())
+  atualizadoEm       DateTime     @updatedAt
+
+  @@index([usuarioId])
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id            String   @id @default(uuid())
+  pedido        Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  pedidoId      String
+  tutorial      Tutorial @relation(fields: [tutorialId], references: [id])
+  tutorialId    String
+  precoUnitario Decimal  @db.Decimal(10, 2)
+
+  @@map("itens_pedido")
+}
+
+// -------------------- COMENTÁRIOS E AVALIAÇÕES --------------------
+
+model Comentario {
+  id         String            @id @default(uuid())
+  nota       Int
+  texto      String
+  usuario    Usuario           @relation(fields: [usuarioId], references: [id])
+  usuarioId  String
+  tutorial   Tutorial          @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  tutorialId String
+  anexos     AnexoComentario[]
+  criadoEm   DateTime          @default(now())
+  editadoEm  DateTime          @updatedAt
+
+  @@unique([usuarioId, tutorialId])
+  @@map("comentarios")
+}
+
+model AnexoComentario {
+  id           String     @id @default(uuid())
+  tipo         TipoAnexo
+  url          String
+  comentario   Comentario @relation(fields: [comentarioId], references: [id], onDelete: Cascade)
+  comentarioId String
+
+  @@map("anexos_comentario")
+}
+
+// -------------------- CHAT --------------------
+
+model Conversa {
+  id           String     @id @default(uuid())
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
+  usuarioId    String
+  mensagens    Mensagem[]
+  criadoEm     DateTime   @default(now())
+  atualizadoEm DateTime   @updatedAt
+
+  @@map("conversas")
+}
+
+model Mensagem {
+  id          String          @id @default(uuid())
+  texto       String?
+  conversa    Conversa        @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  conversaId  String
+  remetente   Usuario         @relation(fields: [remetenteId], references: [id])
+  remetenteId String
+  lida        Boolean         @default(false)
+  anexos      AnexoMensagem[]
+  criadoEm    DateTime        @default(now())
+
+  @@index([conversaId])
+  @@map("mensagens")
+}
+
+model AnexoMensagem {
+  id         String    @id @default(uuid())
+  tipo       TipoAnexo
+  url        String
+  mensagem   Mensagem  @relation(fields: [mensagemId], references: [id], onDelete: Cascade)
+  mensagemId String
+
+  @@map("anexos_mensagem")
+}
+
+// -------------------- CUPONS --------------------
+
+model Cupom {
+  id                 String   @id @default(uuid())
+  codigo             String   @unique
+  descontoPercentual Int
+  ativo              Boolean  @default(true)
+  validoAte          DateTime
+  criadoEm           DateTime @default(now())
+
+  @@map("cupons")
+}
+
+// -------------------- ANÚNCIOS --------------------
+
+model Anuncio {
+  id        String   @id @default(uuid())
+  titulo    String
+  imagemUrl String
+  linkUrl   String
+  ordem     Int      @default(0)
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  @@map("anuncios")
+}
