@@ -25,7 +25,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       );
     }
 
-    const { nomeCompleto, cpf, email, senha } = validacao.data;
+    const { nomeCompleto, cpf, email, senha, cep, logradouro, numero, complemento, bairro, cidade, estado } = validacao.data;
 
     // Verifica se o e-mail já está cadastrado.
     const usuarioExistente = await prisma.usuario.findUnique({
@@ -52,6 +52,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
         email,
         senhaHash,
         tokenVerificacaoEmail: tokenVerificacao,
+        endereco: {
+          create: { cep, logradouro, numero, complemento: complemento || null, bairro, cidade, estado },
+        },
       },
     });
 

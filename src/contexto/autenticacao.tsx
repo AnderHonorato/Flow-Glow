@@ -27,10 +27,18 @@ interface ContextoAutenticacao {
   login: (email: string, senha: string) => Promise<{ sucesso: boolean; erro?: string }>;
   cadastro: (dados: {
     nomeCompleto: string;
+    cpf: string;
     email: string;
     senha: string;
     confirmacaoSenha: string;
     aceitouTermos: boolean;
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
   }) => Promise<{ sucesso: boolean; erro?: string }>;
   logout: () => Promise<void>;
   verificarEmail: (token: string) => Promise<{ sucesso: boolean; erro?: string }>;
@@ -201,10 +209,18 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
 
   async function cadastro(dados: {
     nomeCompleto: string;
+    cpf: string;
     email: string;
     senha: string;
     confirmacaoSenha: string;
     aceitouTermos: boolean;
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
   }): Promise<{ sucesso: boolean; erro?: string }> {
     try {
       const resposta = await fetch("/api/auth/cadastro", {

@@ -10,6 +10,13 @@ export const esquemaCadastro = z.object({
     .regex(/[0-9]/, "A senha deve conter pelo menos 1 número"),
   confirmacaoSenha: z.string(),
   aceitouTermos: z.boolean().refine(v => v === true, { message: "Você precisa aceitar os termos de uso" }),
+  cep: z.string().regex(/^\d{8}$/, "CEP deve ter 8 dígitos"),
+  logradouro: z.string().min(2, "Logradouro obrigatório"),
+  numero: z.string().min(1, "Número obrigatório"),
+  complemento: z.string().optional(),
+  bairro: z.string().min(1, "Bairro obrigatório"),
+  cidade: z.string().min(1, "Cidade obrigatória"),
+  estado: z.string().length(2, "Estado deve ter 2 letras"),
 }).refine(d => d.senha === d.confirmacaoSenha, { message: "As senhas não conferem", path: ["confirmacaoSenha"] });
 
 export const esquemaLogin = z.object({

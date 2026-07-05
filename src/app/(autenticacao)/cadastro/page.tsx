@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRound, Mail, UserRound, UserPlus } from "lucide-react";
+import { CreditCard, KeyRound, Mail, MapPin, UserRound, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -12,18 +12,42 @@ export default function PaginaCadastro() {
   const { cadastro, carregando } = useAutenticacao();
 
   const [nomeCompleto, setNomeCompleto] = useState("");
+  const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmacaoSenha, setConfirmacaoSenha] = useState("");
   const [aceitouTermos, setAceitouTermos] = useState(false);
+  const [cep, setCep] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+
+  async function buscarCep(cepBruto: string) {
+    const limpo = cepBruto.replace(/\D/g, "").slice(0, 8);
+    if (limpo.length !== 8) return;
+    try {
+      const r = await fetch(`/api/cep/${limpo}`);
+      const d = await r.json();
+      if (d.sucesso) {
+        setLogradouro(d.dados.logradouro || "");
+        setBairro(d.dados.bairro || "");
+        setCidade(d.dados.cidade || "");
+        setEstado(d.dados.estado || "");
+        setComplemento(d.dados.complemento || "");
+      }
+    } catch {}
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErro("");
 
-    if (!nomeCompleto || !email || !senha || !confirmacaoSenha) {
+    if (!nomeCompleto || !cpf || !email || !senha || !confirmacaoSenha || !cep || !logradouro || !numero || !bairro || !cidade || !estado) {
       setErro("Preencha todos os campos.");
       return;
     }
@@ -46,10 +70,18 @@ export default function PaginaCadastro() {
     setEnviando(true);
     const resultado = await cadastro({
       nomeCompleto,
+      cpf: cpf.replace(/\D/g, ""),
       email,
       senha,
       confirmacaoSenha,
       aceitouTermos,
+      cep: cep.replace(/\D/g, ""),
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado: estado.toUpperCase().slice(0, 2),
     });
     setEnviando(false);
 
@@ -90,6 +122,46 @@ export default function PaginaCadastro() {
           autoComplete="name"
           icone={<UserRound className="h-4 w-4" aria-hidden />}
         />
+
+        <CampoTexto
+          rotulo="CPF"
+          type="text"
+          value={cpf}
+          onChange={(e) => {
+            const numeros = e.target.value.replace(/\D/g, "").slice(0, 11);
+            setCpf(numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
+          }}
+          placeholder="000.000.000-00"
+          autoComplete="off"
+          icone={<CreditCard className="h-4 w-4" aria-hidden />}
+        />
+
+        <div className="rounded-lg border border-[#eadfd5] p-4 space-y-3">
+          <p className="text-sm font-bold text-[#2a211d] flex items-center gap-2">
+            <MapPin className="h-4 w-4" /> Endereço de entrega
+          </p>
+          <CampoTexto
+            rotulo="CEP"
+            type="text"
+            value={cep}
+            onChange={(e) => { setCep(e.target.value.replace(/\D/g, "").slice(0, 8)); }}
+            onBlur={() => buscarCep(cep)}
+            placeholder="00000000"
+            autoComplete="postal-code"
+          />
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2">
+              <CampoTexto rotulo="Logradouro" value={logradouro} onChange={e => setLogradouro(e.target.value)} placeholder="Rua" />
+            </div>
+            <CampoTexto rotulo="Número" value={numero} onChange={e => setNumero(e.target.value)} placeholder="123" />
+          </div>
+          <CampoTexto rotulo="Complemento" value={complemento} onChange={e => setComplemento(e.target.value)} placeholder="Apto, bloco (opcional)" />
+          <CampoTexto rotulo="Bairro" value={bairro} onChange={e => setBairro(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <CampoTexto rotulo="Cidade" value={cidade} onChange={e => setCidade(e.target.value)} />
+            <CampoTexto rotulo="Estado" value={estado} onChange={e => setEstado(e.target.value.toUpperCase().slice(0, 2))} placeholder="UF" />
+          </div>
+        </div>
 
         <CampoTexto
           rotulo="E-mail"
