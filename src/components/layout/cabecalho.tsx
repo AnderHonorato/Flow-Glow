@@ -152,10 +152,10 @@ export function Cabecalho() {
 
       {/* Drawer lateral mobile */}
       {menuAberto && (
-        <div className="fixed inset-0 z-[70] bg-[rgba(30,25,22,0.38)] md:hidden"
+        <div className="fixed inset-0 z-[70] bg-black/50 md:hidden"
           role="dialog" aria-modal="true"
           onClick={(e) => { if (e.target === e.currentTarget) setMenuAberto(false); }}>
-          <div className="ml-auto flex h-full w-[min(88vw,20rem)] flex-col bg-[var(--color-papel)] shadow-2xl animate-[slideIn_200ms_ease]">
+          <div className="ml-auto flex h-full w-[min(88vw,20rem)] flex-col bg-white shadow-2xl">
             <div className="flex h-14 items-center justify-between border-b border-[var(--color-linha)] px-4">
               <span className="font-serif text-lg font-bold">Studio Glow</span>
               <button type="button" onClick={fecharMenu}
@@ -186,12 +186,6 @@ export function Cabecalho() {
         </div>
       )}
 
-      <style jsx>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-      `}</style>
     </header>
   );
 }
