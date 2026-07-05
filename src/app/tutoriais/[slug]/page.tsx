@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Cabecalho, Rodape } from "@/components/layout";
-import { BarraLocalizacao } from "@/components/layout/barra-localizacao";
 import { AtualizadorTempoReal } from "@/components/layout/atualizador-tempo-real";
 import { Botao, Cartao } from "@/components/ui";
 import BotaoComprar from "./botao-comprar";
@@ -79,7 +78,6 @@ export default async function PaginaTutorial({
   return (
     <>
       <Cabecalho />
-      <BarraLocalizacao />
       <main>
         <section className="divisoria-curva mx-auto mt-5 max-w-7xl border border-[var(--color-linha)] bg-[var(--color-papel)]">
           <div className="mx-auto grid max-w-7xl gap-7 px-4 py-6 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-9">

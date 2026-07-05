@@ -285,3 +285,7 @@
  GET / 500 in 584ms (next.js: 510ms, proxy.ts: 7ms, application-code: 67ms)
 ✓ Compiled in 282ms
 ✓ Compiled in 1075ms
+✓ Compiled in 4.6s
+✓ Compiled in 772ms
+✓ Compiled in 1675ms
+✓ Compiled in 1635ms

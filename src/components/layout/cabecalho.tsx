@@ -19,6 +19,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AvatarUsuario, Botao, Marca } from "@/components/ui";
+import { SeloLocalizacao } from "@/components/layout/barra-localizacao";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { usePreferencias } from "@/contexto/preferencias";
 import { useCarrinho } from "@/hooks/use-carrinho";
@@ -196,6 +197,9 @@ export function Cabecalho() {
               />
             </label>
           </form>
+
+          {/* Selo de localização compacto dentro do cabeçalho */}
+          <SeloLocalizacao />
 
           <div className="ml-auto hidden items-center gap-1 md:flex">
             <button
