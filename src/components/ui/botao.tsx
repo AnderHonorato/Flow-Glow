@@ -10,13 +10,13 @@ interface BotaoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const estilosVariante = {
   primario:
-    "liquid-button border border-white/30 bg-[var(--color-berry)] text-white shadow-[0_10px_28px_rgba(175,49,95,0.18)] hover:bg-[var(--color-berry-escuro)]",
+    "pincelada group border border-[#b98a2d]/30 bg-[#b98a2d] text-white shadow-[0_10px_28px_rgba(185,138,45,0.22)] hover:bg-[#a07822]",
   secundario:
     "liquid-button border border-white/25 bg-[var(--color-sage)] text-white shadow-[0_10px_24px_rgba(31,122,118,0.16)] hover:bg-[var(--color-sage-escuro)]",
   contorno:
-    "border border-[var(--color-linha-forte)] bg-[color-mix(in_srgb,var(--color-papel)_78%,transparent)] text-[var(--color-texto)] backdrop-blur-md hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]",
+    "group border border-[#eadfd5] bg-white text-[#2a211d] hover:border-[#b98a2d] hover:text-[#b98a2d]",
   fantasma:
-    "text-[var(--color-texto)] hover:bg-[color-mix(in_srgb,var(--color-papel)_78%,transparent)] hover:text-[var(--color-berry)]",
+    "group text-[#2a211d] hover:bg-[#f6f2ec] hover:text-[#b98a2d]",
   perigo:
     "liquid-button border border-white/25 bg-red-600 text-white shadow-[0_10px_24px_rgba(185,28,28,0.18)] hover:bg-red-700",
 };
@@ -38,17 +38,19 @@ export function Botao({
 }: BotaoProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 cursor-pointer
-        active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0
-        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-berry)]
+      className={`pincelada-botao relative inline-flex items-center justify-center gap-2 overflow-hidden font-semibold transition-all duration-300 cursor-pointer
+        active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
+        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b98a2d]
         ${estilosVariante[variante]}
         ${estilosTamanho[tamanho]}
         ${className}`}
       disabled={disabled || carregando}
       {...props}
     >
+      {/* Efeito de rabisco de maquiagem no hover */}
+      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-white/0 via-white/25 to-white/0 transition-transform duration-500 group-hover:translate-x-full" />
       {carregando && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />}
-      {children}
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
     </button>
   );
 }
