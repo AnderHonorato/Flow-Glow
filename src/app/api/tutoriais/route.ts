@@ -82,6 +82,9 @@ function serializarTutorial(tutorial: {
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
     const { searchParams } = request.nextUrl;
+    const pagina = Math.max(1, parseInt(searchParams.get("pagina") || "1", 10));
+    const limite = Math.min(50, Math.max(1, parseInt(searchParams.get("limite") || "12", 10)));
+    const pular = (pagina - 1) * limite;
     const categoria = searchParams.get("categoria");
     const nivel = searchParams.get("nivel");
     const ordenar = searchParams.get("ordenar") || "recentes";
@@ -139,15 +142,20 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
     if (ordenar === "distancia") ordem = [{ bombando: "desc" }, { distanciaKm: "asc" }];
     if (ordenar === "avaliacao") ordem = [{ bombando: "desc" }, { criadoEm: "desc" }];
 
-    const tutoriais = await prisma.tutorial.findMany({
-      where: { AND: filtros } as never,
-      orderBy: ordem as never,
-      include: {
-        categoria: { select: { nome: true, slug: true } },
-        comentarios: { select: { nota: true } },
-        _count: { select: { comentarios: true } },
-      },
-    });
+    const [total, tutoriais] = await Promise.all([
+      prisma.tutorial.count({ where: { AND: filtros } as never }),
+      prisma.tutorial.findMany({
+        where: { AND: filtros } as never,
+        orderBy: ordem as never,
+        skip: pular,
+        take: limite,
+        include: {
+          categoria: { select: { nome: true, slug: true } },
+          comentarios: { select: { nota: true } },
+          _count: { select: { comentarios: true } },
+        },
+      }),
+    ]);
 
     const resultado = tutoriais.map(serializarTutorial);
 
@@ -160,7 +168,13 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
       });
     }
 
-    return NextResponse.json({ sucesso: true, dados: resultado });
+    return NextResponse.json({
+      sucesso: true,
+      dados: resultado,
+      total,
+      pagina,
+      totalPaginas: Math.ceil(total / limite),
+    });
   } catch (erro) {
     console.error("Erro ao listar tutoriais:", erro);
     return NextResponse.json(

@@ -52,12 +52,11 @@ function aplicarTema(tema: Tema): void {
 
 function temaInicial(): Tema {
   if (!temJanela()) return "claro";
-
   const consentiu = window.localStorage.getItem(CHAVE_CONSENTIMENTO) === "aceito";
   const temaSalvo = consentiu ? window.localStorage.getItem(CHAVE_TEMA) : null;
   if (temaSalvo === "claro" || temaSalvo === "escuro") return temaSalvo;
-
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "escuro" : "claro";
+  // Forçar tema claro como padrão absoluto
+  return "claro";
 }
 
 function localizacaoSalva(): LocalizacaoUsuario | null {

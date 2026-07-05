@@ -83,6 +83,8 @@ function ConteudoTutoriais() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [filtrosMobile, setFiltrosMobile] = useState(false);
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
 
   useEffect(() => {
     setBusca(searchParams.get("busca") || "");
@@ -111,6 +113,8 @@ function ConteudoTutoriais() {
         if (nivel) params.set("nivel", nivel);
         if (precoMin) params.set("precoMin", precoMin);
         if (precoMax) params.set("precoMax", precoMax);
+        params.set("pagina", String(pagina));
+        params.set("limite", "12");
 
         const [resTutoriais, resCategorias] = await Promise.all([
           fetch(`/api/tutoriais?${params.toString()}`),
@@ -120,8 +124,10 @@ function ConteudoTutoriais() {
         const dadosT = await resTutoriais.json();
         const dadosC = await resCategorias.json();
 
-        if (dadosT.sucesso) setTutoriais(dadosT.dados);
-        else setErro(dadosT.erro || "Erro ao carregar anúncios.");
+        if (dadosT.sucesso) {
+          setTutoriais(dadosT.dados);
+          setTotalPaginas(dadosT.totalPaginas || 1);
+        } else setErro(dadosT.erro || "Erro ao carregar anúncios.");
 
         if (dadosC.sucesso) setCategorias(dadosC.dados);
       } catch {
@@ -142,10 +148,16 @@ function ConteudoTutoriais() {
     filtroCategoria,
     nivel,
     ordenar,
+    pagina,
     precoMax,
     precoMin,
     somenteBombando,
     somentePromocao,
+  ]);
+
+  // Reseta para página 1 quando os filtros mudam
+  useEffect(() => { setPagina(1); }, [
+    busca, distanciaMax, filtroCategoria, nivel, ordenar, precoMax, precoMin, somenteBombando, somentePromocao,
   ]);
 
   const nomeCategoriaAtual = useMemo(() => {
@@ -501,6 +513,44 @@ function ConteudoTutoriais() {
                   );
                 })}
               </div>
+            )}
+
+            {/* Paginação */}
+            {totalPaginas > 1 && (
+              <nav className="mt-8 flex items-center justify-center gap-1" aria-label="Paginação">
+                <button
+                  type="button"
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  disabled={pagina === 1}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#eadfd5] bg-white text-sm font-medium text-[#2a211d] hover:border-[var(--color-berry)] disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Página anterior"
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setPagina(num)}
+                    className={`inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg border text-sm font-medium ${
+                      num === pagina
+                        ? "border-[var(--color-berry)] bg-[var(--color-berry)] text-white"
+                        : "border-[#eadfd5] bg-white text-[#2a211d] hover:border-[var(--color-berry)]"
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  disabled={pagina === totalPaginas}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#eadfd5] bg-white text-sm font-medium text-[#2a211d] hover:border-[var(--color-berry)] disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Próxima página"
+                >
+                  ›
+                </button>
+              </nav>
             )}
           </section>
         </div>

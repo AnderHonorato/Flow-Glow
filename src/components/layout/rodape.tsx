@@ -6,7 +6,7 @@ const NUMERO_WHATSAPP = "5511999999999";
 
 export function Rodape() {
   return (
-    <footer className="mt-auto border-t border-[var(--color-linha)] bg-[var(--color-texto)] text-white">
+    <footer className="mt-auto border-t border-white/10 bg-[#2a211d] text-white">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr]">
           <div>
