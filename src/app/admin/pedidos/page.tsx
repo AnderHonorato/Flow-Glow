@@ -8,7 +8,7 @@ const coresStatus: Record<string, string> = { PENDENTE: "bg-yellow-100 text-yell
 
 export default function PaginaAdminPedidos() {
   const { accessToken } = useAutenticacao();
-  const [pedidos, setPedidos] = useState<{id:string;status:string;valorTotal:number;usuario:{nomeCompleto:string;email:string};itens:{tutorial:string;preco:number}[];criadoEm:string}[]>([]);
+  const [pedidos, setPedidos] = useState<{id:string;status:string;valorTotal:number;comprovanteUrl:string|null;usuario:{nomeCompleto:string;email:string};itens:{tutorial:string;preco:number}[];criadoEm:string}[]>([]);
   useEffect(() => { fetch("/api/admin/pedidos", { headers: { Authorization: `Bearer ${accessToken}` } }).then(r => r.json()).then(d => { if (d.sucesso) setPedidos(d.dados); }); }, [accessToken]);
   return (
     <div>

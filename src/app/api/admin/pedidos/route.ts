@@ -27,6 +27,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
         id: p.id,
         status: p.status,
         valorTotal: Number(p.valorTotal),
+        comprovanteUrl: p.comprovanteUrl,
         usuario: p.usuario,
         itens: p.itens.map((i) => ({
           tutorial: i.tutorial.titulo,

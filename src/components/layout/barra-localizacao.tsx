@@ -1,72 +1,138 @@
 "use client";
 
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 
+interface DadosLocalizacao {
+  cidade: string;
+  cep: string;
+  logradouro: string;
+  bairro: string;
+  estado: string;
+  origem: "gps" | "cadastro";
+}
+
 export function useCidadeUsuario() {
   const { usuario, accessToken } = useAutenticacao();
-  const [cidade, setCidade] = useState("");
-  const [cep, setCep] = useState("");
+  const [dados, setDados] = useState<DadosLocalizacao | null>(null);
 
-  const buscarEndereco = useCallback(async () => {
-    if (!usuario || !accessToken) return;
+  const buscarDoCadastro = useCallback(async () => {
+    if (!usuario || !accessToken) return null;
     try {
-      const resposta = await fetch("/api/usuarios/endereco", {
+      const r = await fetch("/api/usuarios/endereco", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const dados = await resposta.json();
-      if (dados.sucesso && dados.dados) {
-        setCidade(dados.dados.cidade || "");
-        setCep(dados.dados.cep || "");
+      const d = await r.json();
+      if (d.sucesso && d.dados?.cidade) {
+        return { ...d.dados, origem: "cadastro" as const };
       }
     } catch {}
+    return null;
   }, [usuario, accessToken]);
 
-  useEffect(() => {
-    buscarEndereco();
-  }, [buscarEndereco]);
-
-  // Escuta evento customizado para atualizar em tempo real
-  // quando o usuário salva o endereço na página de perfil
-  useEffect(() => {
-    function aoAtualizarEndereco() {
-      buscarEndereco();
+  const buscarPorGps = useCallback(async (): Promise<DadosLocalizacao | null> => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) return null;
+    try {
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 8000,
+          enableHighAccuracy: false,
+        });
+      });
+      const { latitude, longitude } = pos.coords;
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=1&accept-language=pt-BR`
+      );
+      const d = await r.json();
+      const addr = d.address || {};
+      return {
+        cidade: addr.city || addr.town || addr.municipality || addr.suburb || "",
+        cep: addr.postcode || "",
+        logradouro: addr.road || "",
+        bairro: addr.suburb || addr.neighbourhood || "",
+        estado: addr.state || "",
+        origem: "gps",
+      };
+    } catch {
+      return null;
     }
-    window.addEventListener("endereco-atualizado", aoAtualizarEndereco);
-    return () => window.removeEventListener("endereco-atualizado", aoAtualizarEndereco);
-  }, [buscarEndereco]);
+  }, []);
 
-  return { cidade, cep };
+  useEffect(() => {
+    async function init() {
+      const gps = await buscarPorGps();
+      if (gps?.cidade) {
+        setDados(gps);
+        // Salva no perfil automaticamente
+        if (accessToken) {
+          fetch("/api/usuarios/endereco", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              cep: gps.cep.replace(/\D/g, "").slice(0, 8) || "00000000",
+              logradouro: gps.logradouro || "Endereço",
+              numero: "S/N",
+              bairro: gps.bairro || "",
+              cidade: gps.cidade,
+              estado: gps.estado || "",
+            }),
+          }).catch(() => {});
+        }
+        return;
+      }
+      const cadastro = await buscarDoCadastro();
+      if (cadastro) setDados(cadastro);
+    }
+    init();
+  }, [buscarDoCadastro, buscarPorGps, accessToken]);
+
+  // Escuta evento para atualizar em tempo real
+  useEffect(() => {
+    const handler = () => { buscarDoCadastro().then(d => d && setDados(d)); };
+    window.addEventListener("endereco-atualizado", handler);
+    return () => window.removeEventListener("endereco-atualizado", handler);
+  }, [buscarDoCadastro]);
+
+  return { dados, atualizar: () => buscarDoCadastro().then(d => d && setDados(d)) };
 }
 
 export function SeloLocalizacao() {
   const { usuario } = useAutenticacao();
-  const { cidade, cep } = useCidadeUsuario();
+  const { dados } = useCidadeUsuario();
 
-  const cepFormatado = cep.replace(/\D/g, "").slice(0, 8);
-  const cepExibicao =
-    cepFormatado.length === 8
-      ? `${cepFormatado.slice(0, 5)}-${cepFormatado.slice(5)}`
-      : cep;
+  const cepFormatado = dados?.cep?.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d{3})/, "$1-$2") || "";
 
-  // Sempre mostra o selo, mesmo sem endereço — incentiva o cadastro
-  const temEndereco = !!(cidade || cepExibicao);
+  if (!dados?.cidade) {
+    if (!usuario) return null;
+    return (
+      <Link
+        href="/perfil"
+        className="hidden items-center gap-1.5 rounded-full border border-[#eadfd5] bg-white px-3 py-1.5 text-xs font-medium text-[#715f55] hover:text-[var(--color-berry)] transition-colors sm:flex"
+      >
+        <MapPin className="h-3.5 w-3.5 shrink-0" />
+        Adicionar endereço
+      </Link>
+    );
+  }
 
   return (
-    <div className="hidden min-w-0 items-center rounded-full border border-[#eadfd5] bg-white px-3 py-1.5 text-xs sm:flex">
-      {temEndereco ? (
-        <Link href="/perfil" className="flex items-center gap-1.5 truncate font-medium text-[#2a211d] hover:text-[var(--color-berry)] transition-colors">
-          <MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--color-berry)]" />
-          {[cidade, cepExibicao ? `CEP ${cepExibicao}` : null].filter(Boolean).join(" · ")}
-        </Link>
-      ) : usuario ? (
-        <Link href="/perfil" className="flex items-center gap-1.5 truncate font-medium text-[#715f55] hover:text-[var(--color-berry)] transition-colors">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
-          Adicionar endereço
-        </Link>
-      ) : null}
-    </div>
+    <Link
+      href="/perfil"
+      className="hidden items-center gap-1.5 rounded-full border border-[#eadfd5] bg-white px-3 py-1.5 text-xs transition-colors hover:border-[var(--color-berry)] sm:flex"
+    >
+      {dados.origem === "gps" ? (
+        <Navigation className="h-3.5 w-3.5 shrink-0 text-[var(--color-sage)]" />
+      ) : (
+        <MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--color-berry)]" />
+      )}
+      <span className="truncate font-medium text-[#2a211d]">
+        {[dados.cidade, cepFormatado ? `CEP ${cepFormatado}` : null].filter(Boolean).join(" · ")}
+      </span>
+    </Link>
   );
 }

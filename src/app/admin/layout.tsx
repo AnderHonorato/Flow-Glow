@@ -8,6 +8,7 @@ import {
   PackageCheck,
   ShieldCheck,
   ShoppingBag,
+  Tag,
   Ticket,
   UsersRound,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { Marca } from "@/components/ui";
 const linksAdmin = [
   { href: "/admin/painel", texto: "Visão geral", icone: BarChart3 },
   { href: "/admin/tutoriais", texto: "Tutoriais", icone: ShoppingBag },
+  { href: "/admin/categorias", texto: "Categorias", icone: Tag },
   { href: "/admin/anuncios", texto: "Banners", icone: Megaphone },
   { href: "/admin/cupons", texto: "Cupons", icone: Ticket },
   { href: "/admin/usuarios", texto: "Usuários", icone: UsersRound },

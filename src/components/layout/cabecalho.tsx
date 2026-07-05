@@ -204,16 +204,6 @@ export function Cabecalho() {
           <div className="ml-auto hidden items-center gap-1 md:flex">
             <button
               type="button"
-              onClick={solicitarLocalizacao}
-              className="icon-hover relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-texto)] transition hover:bg-[color-mix(in_srgb,var(--color-papel)_76%,transparent)]"
-              title={localizacao ? "Localizacao ativada" : erroLocalizacao || "Usar minha localizacao"}
-              aria-label="Usar minha localizacao"
-              disabled={carregandoLocalizacao}
-            >
-              <MapPin className={`h-5 w-5 ${localizacao ? "text-[var(--color-sage)]" : ""}`} />
-            </button>
-            <button
-              type="button"
               onClick={alternarTema}
               className="icon-hover inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-texto)] transition hover:bg-[color-mix(in_srgb,var(--color-papel)_76%,transparent)]"
               aria-label={tema === "escuro" ? "Ativar tema claro" : "Ativar tema escuro"}

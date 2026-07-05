@@ -2,24 +2,15 @@ import { z } from "zod";
 
 // A senha exige no mínimo 8 caracteres, ao menos 1 número e 1 letra maiúscula.
 export const esquemaCadastro = z.object({
-  nomeCompleto: z
-    .string()
-    .min(3, "Nome deve ter pelo menos 3 caracteres")
-    .max(200, "Nome muito longo"),
+  nomeCompleto: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(200),
+  cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos"),
   email: z.string().email("E-mail inválido"),
-  senha: z
-    .string()
-    .min(8, "A senha deve ter no mínimo 8 caracteres")
+  senha: z.string().min(8, "A senha deve ter no mínimo 8 caracteres")
     .regex(/[A-Z]/, "A senha deve conter pelo menos 1 letra maiúscula")
     .regex(/[0-9]/, "A senha deve conter pelo menos 1 número"),
   confirmacaoSenha: z.string(),
-  aceitouTermos: z.boolean().refine((val) => val === true, {
-    message: "Você precisa aceitar os termos de uso e a política de privacidade",
-  }),
-}).refine((dados) => dados.senha === dados.confirmacaoSenha, {
-  message: "As senhas não conferem",
-  path: ["confirmacaoSenha"],
-});
+  aceitouTermos: z.boolean().refine(v => v === true, { message: "Você precisa aceitar os termos de uso" }),
+}).refine(d => d.senha === d.confirmacaoSenha, { message: "As senhas não conferem", path: ["confirmacaoSenha"] });
 
 export const esquemaLogin = z.object({
   email: z.string().email("E-mail inválido"),

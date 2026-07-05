@@ -45,11 +45,13 @@ enum TipoAnexo {
 model Usuario {
   id                       String       @id @default(uuid())
   nomeCompleto             String
+  cpf                      String?      @unique
   email                    String       @unique
   senhaHash                String
   papel                    PapelUsuario @default(CLIENTE)
   fotoPerfilUrl            String?
   whatsapp                 String?
+  contaPausada             Boolean      @default(false)
   emailVerificado          Boolean      @default(false)
   tokenVerificacaoEmail    String?
   tentativasLogin          Int          @default(0)
@@ -164,6 +166,7 @@ model Pedido {
   status             StatusPedido @default(PENDENTE)
   valorTotal         Decimal      @db.Decimal(10, 2)
   idTransacaoGateway String?
+  comprovanteUrl     String?
   itens              ItemPedido[]
   criadoEm           DateTime     @default(now())
   atualizadoEm       DateTime     @updatedAt
