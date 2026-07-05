@@ -10,7 +10,7 @@ export function BannerConsentimento() {
   if (consentimento !== "pendente") return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-3xl rounded-lg border border-white/55 bg-white/82 p-3 shadow-[0_18px_54px_rgba(20,28,42,0.18)] backdrop-blur-xl dark:border-white/12 dark:bg-[#111827]/86 sm:p-4">
+    <div className="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-3xl rounded-xl border border-[#eadfd5] bg-white p-4 shadow-[0_18px_54px_rgba(20,28,42,0.18)] sm:p-5">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex gap-3">
           <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-berry)] text-white">

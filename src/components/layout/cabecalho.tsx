@@ -238,7 +238,7 @@ export function Cabecalho() {
                 <button
                   type="button"
                   onClick={sair}
-                  className="icon-hover inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-texto-suave)] transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                  className="icon-hover inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-texto-suave)] transition hover:bg-red-50 hover:text-red-600"
                   aria-label="Sair"
                   title="Sair"
                 >
