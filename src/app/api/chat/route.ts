@@ -11,6 +11,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     }
 
     const { texto } = await request.json();
+    if (!texto || !String(texto).trim()) {
+      return NextResponse.json(
+        { sucesso: false, erro: "Mensagem vazia." },
+        { status: 400 }
+      );
+    }
 
     // Busca ou cria uma conversa para este usuário.
     let conversa = await prisma.conversa.findFirst({
@@ -25,12 +31,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     const mensagem = await prisma.mensagem.create({
       data: {
-        texto,
+        texto: String(texto).trim(),
         conversaId: conversa.id,
         remetenteId: usuarioId,
       },
       include: {
-        remetente: { select: { nomeCompleto: true, fotoPerfilUrl: true } },
+        remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
       },
     });
 
@@ -68,10 +74,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
     const conversas = await prisma.conversa.findMany({
       where: onde as never,
       include: {
-        usuario: { select: { nomeCompleto: true, fotoPerfilUrl: true } },
+        usuario: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true } },
         mensagens: {
           include: {
-            remetente: { select: { nomeCompleto: true, fotoPerfilUrl: true } },
+            remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
           },
           orderBy: { criadoEm: "asc" },
         },

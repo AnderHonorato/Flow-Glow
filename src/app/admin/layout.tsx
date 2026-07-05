@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { Marca } from "@/components/ui";
 
 const linksAdmin = [
   { href: "/admin/painel", texto: "Visão geral", icone: BarChart3 },
@@ -34,11 +35,10 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
       <aside className="hidden w-72 shrink-0 border-r border-white/10 bg-[var(--color-texto)] text-white lg:flex lg:flex-col">
         <div className="border-b border-white/10 p-5">
           <Link href="/admin/painel" className="flex items-center gap-2">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[var(--color-berry)]">
-              <ShieldCheck className="h-5 w-5" aria-hidden />
-            </span>
-            <span className="font-serif text-lg font-bold text-[var(--color-ouro-claro)]">
-              Studio Admin
+            <Marca inversa />
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs font-bold text-white/70">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
+              Admin
             </span>
           </Link>
         </div>

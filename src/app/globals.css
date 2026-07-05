@@ -1,38 +1,70 @@
 @import "tailwindcss";
 
-/* ============================================
-   Studio Glow — Identidade Visual
-   Todas as cores declaradas diretamente (sem alias var())
-   para garantir resolução no navegador.
-   ============================================ */
+/* MCA Flow & Glow - identidade visual */
 
 @theme inline {
-  --color-fundo: #f6f2ec;
-  --color-papel: #fffaf5;
-  --color-texto: #2a211d;
-  --color-texto-suave: #715f55;
-  --color-berry: #9a3655;
-  --color-berry-claro: #bf647c;
-  --color-berry-escuro: #76263e;
-  --color-sage: #4e6b5b;
-  --color-sage-escuro: #3d5749;
-  --color-ouro: #b98a2d;
-  --color-ouro-claro: #d9b45d;
-  --color-linha: #eadfd5;
-  --color-linha-forte: #d8c8bb;
+  --color-fundo: #f4f7f5;
+  --color-papel: #ffffff;
+  --color-texto: #172033;
+  --color-texto-suave: #617085;
+  --color-berry: #af315f;
+  --color-berry-claro: #d7658a;
+  --color-berry-escuro: #842146;
+  --color-sage: #1f7a76;
+  --color-sage-escuro: #165c59;
+  --color-ouro: #b9923d;
+  --color-ouro-claro: #e0c06a;
+  --color-linha: #dfe7e6;
+  --color-linha-forte: #bfcbcb;
   --color-background: var(--color-fundo);
   --color-foreground: var(--color-texto);
-  --font-sans: var(--fonte-inter);
-  --font-serif: var(--fonte-fraunces);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
 }
 
-/* Garante que todos os apelidos usados no código também existam como
-   variáveis CSS no :root — evita fundo transparente em bg-[var(...)]. */
 :root {
-  --color-bege: #eadfd5;
-  --color-bege-escuro: #d8c8bb;
-  --color-dourado: #b98a2d;
-  --color-dourado-claro: #d9b45d;
+  --color-fundo: #f4f7f5;
+  --color-papel: #ffffff;
+  --color-texto: #172033;
+  --color-texto-suave: #617085;
+  --color-berry: #af315f;
+  --color-berry-claro: #d7658a;
+  --color-berry-escuro: #842146;
+  --color-sage: #1f7a76;
+  --color-sage-escuro: #165c59;
+  --color-ouro: #b9923d;
+  --color-ouro-claro: #e0c06a;
+  --color-linha: #dfe7e6;
+  --color-linha-forte: #bfcbcb;
+  --color-bege: #e9efed;
+  --color-bege-escuro: #cdd8d7;
+  --color-dourado: #b9923d;
+  --color-dourado-claro: #e0c06a;
+  --gradiente-marca: #af315f;
+  --gradiente-fundo: #f4f7f5;
+  --sombra-glass: 0 16px 44px rgba(23, 32, 51, 0.12);
+}
+
+:root[data-theme="escuro"] {
+  --color-fundo: #0f1625;
+  --color-papel: #172033;
+  --color-texto: #f4f7fb;
+  --color-texto-suave: #aab8ca;
+  --color-berry: #f06a98;
+  --color-berry-claro: #ff91b4;
+  --color-berry-escuro: #c94373;
+  --color-sage: #56c4bd;
+  --color-sage-escuro: #319b96;
+  --color-ouro: #e5bd5d;
+  --color-ouro-claro: #f5d98a;
+  --color-linha: #2b3850;
+  --color-linha-forte: #42516a;
+  --color-bege: #243149;
+  --color-bege-escuro: #3b4961;
+  --color-dourado: #e5bd5d;
+  --color-dourado-claro: #f5d98a;
+  --gradiente-fundo: #0f1625;
+  --sombra-glass: 0 18px 52px rgba(0, 0, 0, 0.32);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -51,40 +83,133 @@ html {
 }
 
 body {
-  background:
-    linear-gradient(180deg, rgba(255, 250, 245, 0.82), rgba(246, 242, 236, 0.96)),
-    var(--color-fundo);
+  background: var(--color-fundo);
   color: var(--color-texto);
   font-family: var(--fonte-inter), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--fonte-fraunces), ui-serif, Georgia, serif;
 }
 
-button, input, textarea, select {
+button,
+input,
+textarea,
+select {
   font: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid #9a3655;
+  outline: 2px solid var(--color-berry);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 ::selection {
-  background: rgba(154, 54, 85, 0.18);
+  background: color-mix(in srgb, var(--color-berry) 24%, transparent);
 }
 
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f6f2ec; }
-::-webkit-scrollbar-thumb { background: #d8c8bb; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #bf647c; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-fundo);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-linha-forte);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-berry-claro);
+}
 
 @keyframes entrada-suave {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.animar-entrada { animation: entrada-suave 420ms ease both; }
+
+.animar-entrada {
+  animation: entrada-suave 420ms ease both;
+}
+
+.liquid-glass {
+  border: 1px solid color-mix(in srgb, var(--color-linha) 72%, white 28%);
+  background: color-mix(in srgb, var(--color-papel) 84%, transparent);
+  box-shadow: var(--sombra-glass);
+  backdrop-filter: blur(18px) saturate(142%);
+  -webkit-backdrop-filter: blur(18px) saturate(142%);
+}
+
+:root[data-theme="escuro"] .liquid-glass {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--color-papel) 78%, transparent);
+}
+
+.liquid-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 0.72;
+}
+
+.liquid-button > * {
+  position: relative;
+}
+
+.header-tab {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--color-texto) 72%, transparent);
+}
+
+.header-tab:hover,
+.header-tab-active {
+  border-color: color-mix(in srgb, var(--color-berry) 26%, transparent);
+  background: color-mix(in srgb, var(--color-papel) 72%, transparent);
+  color: var(--color-berry);
+}
+
+.icon-hover svg {
+  transition: color 180ms ease, opacity 180ms ease, stroke-width 180ms ease;
+}
+
+.icon-hover:hover svg {
+  color: var(--color-berry);
+  opacity: 0.94;
+  stroke-width: 2.35;
+}
+
+.divisoria-curva {
+  border-radius: 22px 22px 34px 34px;
+  overflow: hidden;
+}
+
+:root[data-theme="escuro"] input,
+:root[data-theme="escuro"] textarea,
+:root[data-theme="escuro"] select {
+  color-scheme: dark;
+}

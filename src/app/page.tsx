@@ -1,213 +1,185 @@
+"use client";
+
 import {
   BadgePercent,
+  ChevronRight,
   Clock3,
-  MapPin,
-  MessageCircle,
-  PlayCircle,
-  Search,
-  ShieldCheck,
-  Sparkles,
+  Flame,
+  ShoppingBag,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Cabecalho, Rodape } from "@/components/layout";
 import { Botao, Cartao } from "@/components/ui";
+import type { TutorialCard } from "@/tipos";
 
-const categoriasDestaque = [
-  { nome: "Maquiagem", slug: "maquiagem", icone: Sparkles },
-  { nome: "Skincare", slug: "skincare", icone: ShieldCheck },
-  { nome: "Sobrancelha", slug: "sobrancelha", icone: Search },
-  { nome: "Cabelo", slug: "cabelo", icone: PlayCircle },
-  { nome: "Unhas", slug: "unhas", icone: BadgePercent },
-  { nome: "Noivas", slug: "noivas", icone: Clock3 },
-];
-
-const exemplos = [
-  {
-    titulo: "Maquiagem Pele Real para Eventos",
-    slug: "maquiagem-pele-real-eventos",
-    etiqueta: "Promoção",
-    preco: "R$ 99,90",
-    distancia: "4 km",
-    imagem:
-      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    titulo: "Design de Sobrancelhas Natural",
-    slug: "design-sobrancelhas-natural",
-    etiqueta: "Cupom SOBR10",
-    preco: "R$ 79,90",
-    distancia: "18 km",
-    imagem:
-      "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    titulo: "Unhas Minimalistas de Salão",
-    slug: "unhas-minimalistas-salao",
-    etiqueta: "Cupom UNHAS15",
-    preco: "R$ 69,90",
-    distancia: "19 km",
-    imagem:
-      "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=900&q=80",
-  },
-];
-
-const recursos = [
-  {
-    titulo: "Compra simples",
-    descricao: "Carrinho, checkout simulado e liberação de conteúdo para testes.",
-    icone: BadgePercent,
-  },
-  {
-    titulo: "Filtros úteis",
-    descricao: "Busque por categoria, preço, promoção, cupom e distância.",
-    icone: Search,
-  },
-  {
-    titulo: "Atendimento perto",
-    descricao: "Cada anúncio pode mostrar cidade, estado e distância estimada.",
-    icone: MapPin,
-  },
-  {
-    titulo: "Suporte no site",
-    descricao: "Fluxos de conta, recuperação e chat ficam no mesmo ambiente.",
-    icone: MessageCircle,
-  },
-];
+function formatarReal(valor: number): string {
+  return valor.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
 
 export default function PaginaInicial() {
+  const [itens, setItens] = useState<TutorialCard[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [atualizadoEm, setAtualizadoEm] = useState("");
+
+  async function carregar(silencioso = false) {
+    if (!silencioso) setCarregando(true);
+    try {
+      const resposta = await fetch("/api/tutoriais?ordenar=recentes", { cache: "no-store" });
+      const dados = await resposta.json();
+      if (dados.sucesso) {
+        setItens(dados.dados);
+        setAtualizadoEm(
+          new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+        );
+      }
+    } catch {}
+    if (!silencioso) setCarregando(false);
+  }
+
+  useEffect(() => {
+    carregar();
+    const intervalo = window.setInterval(() => carregar(true), 5000);
+    return () => window.clearInterval(intervalo);
+  }, []);
+
+  const destaques = [...itens]
+    .sort((a, b) => Number(b.bombando) - Number(a.bombando))
+    .slice(0, 6);
+  const ofertasAtivas = itens.filter(
+    (item) => item.destaquePromocional || item.precoPromocional
+  ).length;
+
   return (
     <>
       <Cabecalho />
 
-      <main className="flex-1">
-        <section className="relative overflow-hidden bg-[var(--color-texto)] text-white">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url(https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1800&q=82)",
-            }}
-            aria-hidden
-          />
-          <div className="absolute inset-0 bg-[rgba(34,24,21,0.56)]" aria-hidden />
-
-          <div className="relative mx-auto flex min-h-[480px] max-w-7xl items-center px-4 py-14 sm:px-6 lg:min-h-[560px] lg:px-8">
-            <div className="max-w-2xl animar-entrada">
-              <span className="mb-4 inline-flex items-center gap-2 rounded-md bg-white/12 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-white/20">
-                <Sparkles className="h-4 w-4" aria-hidden />
-                Catálogo pronto para testar
+      <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <section className="divisoria-curva liquid-glass mb-5 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
+                <ShoppingBag className="h-4 w-4" aria-hidden />
+                Vitrine ao vivo
               </span>
-              <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-                Flow & Glow
+              <h1 className="mt-1 text-2xl font-bold sm:text-4xl">
+                Anuncios de beleza em destaque
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/78 sm:text-lg">
-                Anúncios de beleza com tutoriais, promoções, cupons e filtros para
-                clientes encontrarem a melhor opção sem perder tempo.
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--color-texto-suave)]">
+                Os itens aparecem direto na entrada. Use a busca do cabecalho para encontrar
+                servico, cidade, tecnica ou oferta.
               </p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <Link href="/tutoriais">
-                  <Botao tamanho="grande">
-                    <Search className="h-5 w-5" aria-hidden />
-                    Ver anúncios
-                  </Botao>
-                </Link>
-                <Link href="/login">
-                  <Botao variante="contorno" tamanho="grande" className="border-white/55 bg-white/8 text-white hover:bg-white hover:text-[var(--color-texto)]">
-                    <ShieldCheck className="h-5 w-5" aria-hidden />
-                    Entrar para testar
-                  </Botao>
-                </Link>
-              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <p className="rounded-full bg-[var(--color-papel)] px-3 py-1.5 text-xs font-bold text-[var(--color-texto-suave)] ring-1 ring-[var(--color-linha)]">
+                Atualizado {atualizadoEm || "agora"}
+              </p>
+              <p className="rounded-full bg-[var(--color-papel)] px-3 py-1.5 text-xs font-bold text-[var(--color-texto-suave)] ring-1 ring-[var(--color-linha)]">
+                {ofertasAtivas} ofertas ativas
+              </p>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
-                Exemplos no site
-              </span>
-              <h2 className="mt-1 text-2xl font-bold sm:text-3xl">
-                Anúncios prontos para clicar
-              </h2>
-            </div>
-            <Link href="/tutoriais?promocao=true">
-              <Botao variante="fantasma">
-                <BadgePercent className="h-4 w-4" aria-hidden />
-                Ver promoções
-              </Botao>
-            </Link>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {exemplos.map((exemplo) => (
-              <Link key={exemplo.slug} href={`/tutoriais/${exemplo.slug}`} className="group">
-                <Cartao className="h-full p-0 hover:-translate-y-0.5 hover:border-[var(--color-berry)]">
-                  <div
-                    className="h-44 rounded-t-lg bg-cover bg-center"
-                    style={{ backgroundImage: `url(${exemplo.imagem})` }}
-                  />
-                  <div className="p-4">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <span className="rounded-md bg-[var(--color-berry)]/10 px-2 py-1 text-xs font-bold text-[var(--color-berry)]">
-                        {exemplo.etiqueta}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-texto)]/56">
-                        <MapPin className="h-3.5 w-3.5" aria-hidden />
-                        {exemplo.distancia}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold leading-snug group-hover:text-[var(--color-berry)]">
-                      {exemplo.titulo}
-                    </h3>
-                    <p className="mt-2 text-base font-bold text-[var(--color-texto)]">
-                      {exemplo.preco}
-                    </p>
-                  </div>
-                </Cartao>
-              </Link>
+        {carregando ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-72 animate-pulse rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)]"
+              />
             ))}
           </div>
-        </section>
+        ) : (
+          <section>
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold sm:text-2xl">Itens em destaque</h2>
+                <p className="text-sm text-[var(--color-texto-suave)]">
+                  Fotos, preco, distancia, conteudo e raspadinha ficam dentro do anuncio.
+                </p>
+              </div>
+              <Link href="/tutoriais" className="hidden sm:inline-flex">
+                <Botao variante="fantasma">
+                  Ver catalogo
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </Botao>
+              </Link>
+            </div>
 
-        <section className="border-y border-[var(--color-linha)] bg-[var(--color-papel)]">
-          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold sm:text-3xl">
-              Filtre pelo que importa
-            </h2>
-            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {categoriasDestaque.map((cat) => {
-                const Icone = cat.icone;
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {destaques.map((item) => {
+                const precoAtual = item.precoPromocional || item.preco;
+                const temOferta = item.destaquePromocional || item.precoPromocional;
+
                 return (
-                  <Link key={cat.slug} href={`/tutoriais?categoria=${cat.slug}`}>
-                    <span className="flex h-full items-center gap-2 rounded-lg border border-[var(--color-linha)] bg-white px-3 py-3 text-sm font-semibold text-[var(--color-texto)] transition-colors hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]">
-                      <Icone className="h-4 w-4" aria-hidden />
-                      {cat.nome}
-                    </span>
+                  <Link key={item.id} href={`/tutoriais/${item.slug}`} className="group">
+                    <Cartao className="h-full overflow-hidden p-0 hover:border-[var(--color-berry)]">
+                      <div
+                        className="relative h-44 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${item.imagemCapaUrl})` }}
+                      >
+                        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                          {item.bombando && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-berry)] px-2.5 py-1 text-xs font-bold text-white">
+                              <Flame className="h-3.5 w-3.5" aria-hidden />
+                              Bombando
+                            </span>
+                          )}
+                          {temOferta && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[var(--color-berry)]">
+                              <BadgePercent className="h-3.5 w-3.5" aria-hidden />
+                              Oferta
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="mb-2 flex justify-between gap-2 text-xs font-bold uppercase tracking-wide text-[var(--color-sage)]">
+                          <span>{item.categoria.nome}</span>
+                          {item.distanciaKm !== null && <span>{item.distanciaKm} km</span>}
+                        </div>
+                        <h3 className="text-lg font-bold leading-snug group-hover:text-[var(--color-berry)]">
+                          {item.titulo}
+                        </h3>
+                        <p className="mt-2 line-clamp-2 text-sm text-[var(--color-texto-suave)]">
+                          {item.descricaoCurta}
+                        </p>
+                        <div className="mt-4 flex items-end justify-between gap-3">
+                          <div>
+                            <p className="text-lg font-bold">{formatarReal(precoAtual)}</p>
+                            {item.precoPromocional && (
+                              <p className="text-xs text-[var(--color-texto-suave)] line-through">
+                                {formatarReal(item.preco)}
+                              </p>
+                            )}
+                          </div>
+                          <span className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-papel)] px-2 py-1 text-xs font-bold text-[var(--color-texto-suave)] ring-1 ring-[var(--color-linha)]">
+                            {item.totalAvaliacoes > 0 ? (
+                              <>
+                                <Star className="h-3.5 w-3.5 fill-[var(--color-ouro)] text-[var(--color-ouro)]" aria-hidden />
+                                {item.notaMedia.toFixed(1)}
+                              </>
+                            ) : (
+                              <>
+                                <Clock3 className="h-3.5 w-3.5" aria-hidden />
+                                Novo
+                              </>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </Cartao>
                   </Link>
                 );
               })}
             </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {recursos.map((recurso) => {
-              const Icone = recurso.icone;
-              return (
-                <Cartao key={recurso.titulo}>
-                  <Icone className="mb-3 h-5 w-5 text-[var(--color-sage)]" aria-hidden />
-                  <h3 className="text-base font-bold">{recurso.titulo}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-texto)]/62">
-                    {recurso.descricao}
-                  </p>
-                </Cartao>
-              );
-            })}
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       <Rodape />

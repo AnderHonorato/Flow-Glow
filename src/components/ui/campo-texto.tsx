@@ -26,7 +26,7 @@ export function CampoTexto({
   ...props
 }: CampoTextoProps) {
   const campoId = id || rotulo.toLowerCase().replace(/\s+/g, "-");
-  const classeBase = `w-full rounded-md border bg-white text-[var(--color-texto)] placeholder:text-[var(--color-texto)]/35 transition-all duration-200 ${
+  const classeBase = `w-full rounded-lg border bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] placeholder:text-[var(--color-texto)]/35 shadow-sm backdrop-blur-md transition-all duration-200 ${
     erro
       ? "border-red-500 focus:border-red-500"
       : "border-[var(--color-linha-forte)] focus:border-[var(--color-berry)]"
@@ -53,7 +53,7 @@ export function CampoTexto({
         ) : (
           <input
             id={campoId}
-            className={`${classeBase} h-11 ${icone ? "pl-10" : "px-3.5"} ${
+            className={`${classeBase} h-10 sm:h-11 ${icone ? "pl-10" : "px-3.5"} ${
               sufixo ? "pr-12" : ""
             }`}
             {...(props as InputHTMLAttributes<HTMLInputElement>)}

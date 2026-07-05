@@ -123,6 +123,8 @@ model Tutorial {
   videoPreviaUrl      String?
   cupomDesconto       String?
   destaquePromocional Boolean       @default(false)
+  bombando            Boolean       @default(false)
+  fotosGaleria        String[]      @default([])
   cidade              String?
   estado              String?
   distanciaKm         Int?

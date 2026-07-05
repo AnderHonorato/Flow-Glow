@@ -1,0 +1,153 @@
+(node:12348) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+⨯ TypeError: Cannot read properties of undefined (reading 'length')
+    at PaginaTutorial (src\app\tutoriais\[slug]\page.tsx:166:37)
+  164 |         <section className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[...
+  165 |           <div className="space-y-8">
+> 166 |             {(tutorial.fotosGaleria.length > 0 || tutorial.imagemCapaUrl) && (
+      |                                     ^
+  167 |               <section>
+  168 |                 <h2 className="text-2xl font-bold">Fotos</h2>
+  169 |                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"> {
+  digest: '3470236122'
+}
+[browser] Uncaught TypeError: Cannot read properties of undefined (reading 'length')
+    at PaginaTutorial (src\app\tutoriais\[slug]\page.tsx:166:37)
+    at resolveErrorDev (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:1919:150)
+    at processFullStringRow (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2434:29)
+    at processFullBinaryRow (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2393:9)
+    at processBinaryChunk (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2502:221)
+    at progress (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2689:13)
+  164 |         <section className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[...
+  165 |           <div className="space-y-8">
+> 166 |             {(tutorial.fotosGaleria.length > 0 || tutorial.imagemCapaUrl) && (
+      |                                     ^
+  167 |               <section>
+  168 |                 <h2 className="text-2xl font-bold">Fotos</h2>
+  169 |                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RenderFromTemplateContext>
+      <ScrollAndMaybeFocusHandler cacheNode={{rsc:{...}, ...}}>
+        <InnerScrollAndFocusHandlerOld focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>
+          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+            <LoadingBoundary name="/" loading={null}>
+              <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+                <HTTPAccessFallbackErrorBoundary pathname="/login" notFound={{...}} forbidden={undefined} ...>
+                  <RedirectBoundary>
+                    <RedirectErrorBoundary router={{...}}>
+                      <InnerLayoutRouter url="/login" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
+                        <SegmentViewNode type="layout" pagePath="(autentica...">
+                          <SegmentTrieNode>
+                          <script>
+                          <script>
+                          <LayoutAutenticacao>
+                            <div
++                             className="min-h-screen bg-[var(--color-fundo)] px-4 py-6 sm:py-10"
+-                             className="yt-ext-hidden"
+-                             id="yt-ext-info-bar"
+                            >
++                             <div
++                               className="mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center gap-8 l..."
++                             >
+-                             Skipping ads...
+                      ...
+          ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at throwOnHydrationMismatch (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:3318:56)
+    at beginWork (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:6758:918)
+    at runWithFiberInDEV (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:965:74)
+    at performUnitOfWork (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9555:97)
+    at workLoopConcurrentByScheduler (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9551:58)
+    at renderRootConcurrent (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9534:71)
+    at performWorkOnRoot (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_1amofcm._.js:2647:64)
+    at div (<anonymous>)
+    at LayoutAutenticacao (src\app\(autenticacao)\layout.tsx:13:7)
+  11 |   return (
+  12 |     <div className="min-h-screen bg-[var(--color-fundo)] px-4 py-6 sm:py-10">
+> 13 |       <div className="mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center ...
+     |       ^
+  14 |         <section className="hidden overflow-hidden rounded-lg border border-[var(--color-l...
+  15 |           <div
+  16 |             className="h-[34rem] bg-cover bg-center"
+[browser] Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template). 
+    at completeWork (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:6945:102)
+    at runWithFiberInDEV (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:965:74)
+    at completeUnitOfWork (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9622:23)
+    at performUnitOfWork (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9557:28)
+    at workLoopConcurrentByScheduler (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9551:58)
+    at renderRootConcurrent (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9534:71)
+    at performWorkOnRoot (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:9061:150)
+    at performWorkOnRootViaSchedulerTask (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:10255:9)
+    at MessagePort.performWorkUntilDeadline (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_1amofcm._.js:2647:64) (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js:6945:102)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+⨯ TypeError: Cannot read properties of undefined (reading 'length')
+    at PaginaTutorial (src\app\tutoriais\[slug]\page.tsx:166:37)
+  164 |         <section className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[...
+  165 |           <div className="space-y-8">
+> 166 |             {(tutorial.fotosGaleria.length > 0 || tutorial.imagemCapaUrl) && (
+      |                                     ^
+  167 |               <section>
+  168 |                 <h2 className="text-2xl font-bold">Fotos</h2>
+  169 |                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"> {
+  digest: '3470236122'
+}
+[browser] Uncaught TypeError: Cannot read properties of undefined (reading 'length')
+    at PaginaTutorial (src\app\tutoriais\[slug]\page.tsx:166:37)
+    at resolveErrorDev (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:1919:150)
+    at processFullStringRow (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2434:29)
+    at processFullBinaryRow (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2393:9)
+    at processBinaryChunk (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2502:221)
+    at progress (file://C:/Projetos/Andamento/Vendas Online/.next/dev/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js:2689:13)
+  164 |         <section className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:grid-cols-[...
+  165 |           <div className="space-y-8">
+> 166 |             {(tutorial.fotosGaleria.length > 0 || tutorial.imagemCapaUrl) && (
+      |                                     ^
+  167 |               <section>
+  168 |                 <h2 className="text-2xl font-bold">Fotos</h2>
+  169 |                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+Persisting failed: Unable to open static sorted file referenced from 00000653.meta
+
+Caused by:
+    0: Unable to open static sorted file 00000652.sst
+    1: Failed to open SST file C:\Projetos\Andamento\Vendas Online\.next\dev\cache/turbopack\v16.2.10\00000652.sst
+    2: O sistema não pode encontrar o arquivo especificado. (os error 2)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)

@@ -58,8 +58,11 @@ async function semear() {
     where: { email: "admin@studioglow.com.br" },
     update: {
       nomeCompleto: "Administrador Flow & Glow",
+      senhaHash: senhaAdminHash,
       papel: "ADMINISTRADOR",
       emailVerificado: true,
+      tentativasLogin: 0,
+      bloqueadoAte: null,
     },
     create: {
       nomeCompleto: "Administrador Flow & Glow",
@@ -75,7 +78,10 @@ async function semear() {
     where: { email: "cliente@studioglow.com.br" },
     update: {
       nomeCompleto: "Cliente Teste",
+      senhaHash: senhaClienteHash,
       emailVerificado: true,
+      tentativasLogin: 0,
+      bloqueadoAte: null,
     },
     create: {
       nomeCompleto: "Cliente Teste",

@@ -11,8 +11,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
     const { conversaId, texto } = await request.json();
+    if (!conversaId || !texto || !String(texto).trim()) {
+      return NextResponse.json({ sucesso: false, erro: "Dados incompletos." }, { status: 400 });
+    }
     const mensagem = await prisma.mensagem.create({
-      data: { texto, conversaId, remetenteId: adminId },
+      data: { texto: String(texto).trim(), conversaId, remetenteId: adminId },
+      include: {
+        remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
+      },
     });
     return NextResponse.json({ sucesso: true, dados: mensagem }, { status: 201 });
   } catch {

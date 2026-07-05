@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from "react";
+import { usePreferencias } from "@/contexto/preferencias";
 import type { ItemCarrinho } from "@/tipos";
 
 interface ContextoCarrinho {
@@ -9,6 +10,8 @@ interface ContextoCarrinho {
   removerDoCarrinho: (tutorialId: string) => void;
   limparCarrinho: () => void;
   total: number;
+  quantidadeItens: number;
+  estaNoCarrinho: (tutorialId: string) => boolean;
 }
 
 const Contexto = createContext<ContextoCarrinho | null>(null);
@@ -23,24 +26,55 @@ function salvarCarrinho(itens: ItemCarrinho[]) {
 
 function carregarCarrinho(): ItemCarrinho[] {
   if (typeof window !== "undefined") {
-    const dados = localStorage.getItem(CHAVE_STORAGE);
-    return dados ? JSON.parse(dados) : [];
+    try {
+      const dados = localStorage.getItem(CHAVE_STORAGE);
+      const itens = dados ? JSON.parse(dados) : [];
+      return Array.isArray(itens) ? itens : [];
+    } catch {
+      localStorage.removeItem(CHAVE_STORAGE);
+      return [];
+    }
   }
   return [];
 }
 
 export function ProvedorCarrinho({ children }: { children: ReactNode }) {
+  const { preferenciasPermitidas } = usePreferencias();
   const [itens, setItens] = useState<ItemCarrinho[]>([]);
+  const [hidratado, setHidratado] = useState(false);
 
   useEffect(() => {
-    setItens(carregarCarrinho());
-  }, []);
+    if (!preferenciasPermitidas) {
+      setHidratado(true);
+      return;
+    }
+
+    setItens((atuais) => (atuais.length > 0 ? atuais : carregarCarrinho()));
+    setHidratado(true);
+  }, [preferenciasPermitidas]);
+
+  useEffect(() => {
+    if (!hidratado || !preferenciasPermitidas) return;
+    salvarCarrinho(itens);
+  }, [hidratado, itens, preferenciasPermitidas]);
+
+  useEffect(() => {
+    if (!preferenciasPermitidas) return;
+
+    function sincronizar(evento: StorageEvent) {
+      if (evento.key === CHAVE_STORAGE) {
+        setItens(carregarCarrinho());
+      }
+    }
+
+    window.addEventListener("storage", sincronizar);
+    return () => window.removeEventListener("storage", sincronizar);
+  }, [preferenciasPermitidas]);
 
   const adicionarAoCarrinho = useCallback((item: ItemCarrinho) => {
     setItens((prev) => {
       if (prev.some((i) => i.tutorialId === item.tutorialId)) return prev;
       const novo = [...prev, item];
-      salvarCarrinho(novo);
       return novo;
     });
   }, []);
@@ -48,21 +82,32 @@ export function ProvedorCarrinho({ children }: { children: ReactNode }) {
   const removerDoCarrinho = useCallback((tutorialId: string) => {
     setItens((prev) => {
       const novo = prev.filter((i) => i.tutorialId !== tutorialId);
-      salvarCarrinho(novo);
       return novo;
     });
   }, []);
 
   const limparCarrinho = useCallback(() => {
     setItens([]);
-    salvarCarrinho([]);
   }, []);
 
   const total = itens.reduce((acc, item) => acc + (item.precoPromocional || item.preco), 0);
+  const quantidadeItens = itens.length;
+  const estaNoCarrinho = useCallback(
+    (tutorialId: string) => itens.some((item) => item.tutorialId === tutorialId),
+    [itens]
+  );
 
   return (
     <Contexto.Provider
-      value={{ itens, adicionarAoCarrinho, removerDoCarrinho, limparCarrinho, total }}
+      value={{
+        itens,
+        adicionarAoCarrinho,
+        removerDoCarrinho,
+        limparCarrinho,
+        total,
+        quantidadeItens,
+        estaNoCarrinho,
+      }}
     >
       {children}
     </Contexto.Provider>

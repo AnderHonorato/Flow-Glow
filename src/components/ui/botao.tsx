@@ -10,20 +10,20 @@ interface BotaoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const estilosVariante = {
   primario:
-    "bg-[var(--color-berry)] text-white hover:bg-[var(--color-berry-escuro)] shadow-[0_8px_18px_rgba(123,43,60,0.18)]",
+    "liquid-button border border-white/30 bg-[var(--color-berry)] text-white shadow-[0_10px_28px_rgba(175,49,95,0.18)] hover:bg-[var(--color-berry-escuro)]",
   secundario:
-    "bg-[var(--color-sage)] text-white hover:bg-[var(--color-sage-escuro)] shadow-[0_8px_18px_rgba(65,91,75,0.16)]",
+    "liquid-button border border-white/25 bg-[var(--color-sage)] text-white shadow-[0_10px_24px_rgba(31,122,118,0.16)] hover:bg-[var(--color-sage-escuro)]",
   contorno:
-    "border border-[var(--color-linha-forte)] bg-white text-[var(--color-texto)] hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]",
+    "border border-[var(--color-linha-forte)] bg-[color-mix(in_srgb,var(--color-papel)_78%,transparent)] text-[var(--color-texto)] backdrop-blur-md hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]",
   fantasma:
-    "text-[var(--color-texto)] hover:bg-[var(--color-papel)] hover:text-[var(--color-berry)]",
+    "text-[var(--color-texto)] hover:bg-[color-mix(in_srgb,var(--color-papel)_78%,transparent)] hover:text-[var(--color-berry)]",
   perigo:
-    "bg-red-600 text-white hover:bg-red-700 shadow-[0_8px_18px_rgba(185,28,28,0.16)]",
+    "liquid-button border border-white/25 bg-red-600 text-white shadow-[0_10px_24px_rgba(185,28,28,0.18)] hover:bg-red-700",
 };
 
 const estilosTamanho = {
-  pequeno: "min-h-9 px-3 text-sm rounded-md",
-  medio: "min-h-10 px-4 text-sm rounded-md",
+  pequeno: "min-h-8 px-3 text-sm rounded-lg",
+  medio: "min-h-10 px-4 text-sm rounded-lg",
   grande: "min-h-11 px-5 text-base rounded-lg",
 };
 

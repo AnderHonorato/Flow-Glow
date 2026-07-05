@@ -3,7 +3,7 @@
 import { Star } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
-import { Botao, CampoTexto, Cartao } from "@/components/ui";
+import { AvatarUsuario, Botao, CampoTexto, Cartao } from "@/components/ui";
 import type { ComentarioDetalhe } from "@/tipos";
 
 interface SecaoComentariosProps {
@@ -131,9 +131,10 @@ export default function SecaoComentarios({
         {comentarios.map((comentario) => (
           <Cartao key={comentario.id}>
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--color-papel)] text-sm font-bold text-[var(--color-berry)]">
-                {comentario.usuario.nomeCompleto.charAt(0)}
-              </div>
+              <AvatarUsuario
+                nome={comentario.usuario.nomeCompleto}
+                fotoUrl={comentario.usuario.fotoPerfilUrl}
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-bold">{comentario.usuario.nomeCompleto}</span>

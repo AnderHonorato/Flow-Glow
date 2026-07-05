@@ -13,6 +13,7 @@ import type { RespostaApi } from "@/tipos";
 // O refresh token também é rotacionado — o anterior é invalidado e um novo é gerado.
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
+    const persistirSessao = request.headers.get("x-preferencias-permitidas") === "sim";
     const refreshToken = await obterRefreshTokenDoCookie();
 
     if (!refreshToken) {
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       email: payload.email,
       papel: payload.papel,
     });
-    await definirCookieRefreshToken(novoRefreshToken);
+    await definirCookieRefreshToken(novoRefreshToken, persistirSessao);
 
     return NextResponse.json({
       sucesso: true,

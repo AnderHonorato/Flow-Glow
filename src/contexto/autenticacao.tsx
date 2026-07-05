@@ -8,6 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { usePreferencias } from "@/contexto/preferencias";
 
 interface UsuarioSessao {
   id: string;
@@ -36,18 +37,24 @@ interface ContextoAutenticacao {
   recuperarSenha: (email: string) => Promise<{ sucesso: boolean; erro?: string }>;
   redefinirSenha: (token: string, senha: string, confirmacaoSenha: string) => Promise<{ sucesso: boolean; erro?: string }>;
   renovarToken: () => Promise<boolean>;
+  atualizarUsuario: (dados: Partial<UsuarioSessao>) => void;
 }
 
 const Contexto = createContext<ContextoAutenticacao | null>(null);
 
-function salvarToken(token: string): void {
+function salvarToken(token: string, persistir: boolean): void {
   if (typeof window !== "undefined") {
-    localStorage.setItem("accessToken", token);
+    if (persistir) {
+      localStorage.setItem("accessToken", token);
+    } else {
+      localStorage.removeItem("accessToken");
+    }
   }
 }
 
 function obterTokenSalvo(): string | null {
   if (typeof window !== "undefined") {
+    if (localStorage.getItem("mca_cookie_consent") !== "aceito") return null;
     return localStorage.getItem("accessToken");
   }
   return null;
@@ -60,9 +67,23 @@ function removerTokenSalvo(): void {
 }
 
 export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
+  const { preferenciasPermitidas } = usePreferencias();
   const [usuario, setUsuario] = useState<UsuarioSessao | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+
+  const atualizarUsuario = useCallback((dados: Partial<UsuarioSessao>) => {
+    setUsuario((atual) => (atual ? { ...atual, ...dados } : atual));
+  }, []);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    if (preferenciasPermitidas) {
+      salvarToken(accessToken, true);
+    } else {
+      removerTokenSalvo();
+    }
+  }, [accessToken, preferenciasPermitidas]);
 
   // Ao carregar a página, tenta renovar o token automaticamente
   // usando o refresh token armazenado no cookie httpOnly.
@@ -70,6 +91,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     try {
       const resposta = await fetch("/api/auth/renovar-token", {
         method: "POST",
+        headers: { "x-preferencias-permitidas": preferenciasPermitidas ? "sim" : "nao" },
         credentials: "include",
       });
 
@@ -77,7 +99,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
 
       const dados = await resposta.json();
       if (dados.sucesso && dados.dados?.accessToken) {
-        salvarToken(dados.dados.accessToken);
+        salvarToken(dados.dados.accessToken, preferenciasPermitidas);
         setAccessToken(dados.dados.accessToken);
         return true;
       }
@@ -85,7 +107,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     } catch {
       return false;
     }
-  }, []);
+  }, [preferenciasPermitidas]);
 
   // Busca o perfil do usuário logado usando o access token.
   async function buscarPerfil(token: string): Promise<boolean> {
@@ -153,7 +175,10 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     try {
       const resposta = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-preferencias-permitidas": preferenciasPermitidas ? "sim" : "nao",
+        },
         body: JSON.stringify({ email, senha }),
         credentials: "include",
       });
@@ -164,7 +189,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
         return { sucesso: false, erro: dados.erro };
       }
 
-      salvarToken(dados.dados.accessToken);
+      salvarToken(dados.dados.accessToken, preferenciasPermitidas);
       setAccessToken(dados.dados.accessToken);
       setUsuario(dados.dados.usuario);
 
@@ -184,7 +209,10 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     try {
       const resposta = await fetch("/api/auth/cadastro", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-preferencias-permitidas": preferenciasPermitidas ? "sim" : "nao",
+        },
         body: JSON.stringify(dados),
         credentials: "include",
       });
@@ -195,7 +223,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
         return { sucesso: false, erro: resultado.erro };
       }
 
-      salvarToken(resultado.dados.accessToken);
+      salvarToken(resultado.dados.accessToken, preferenciasPermitidas);
       setAccessToken(resultado.dados.accessToken);
       setUsuario(resultado.dados.usuario);
 
@@ -287,6 +315,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
         recuperarSenha,
         redefinirSenha,
         renovarToken,
+        atualizarUsuario,
       }}
     >
       {children}

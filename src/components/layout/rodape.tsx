@@ -1,5 +1,6 @@
 import { Mail, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { Marca } from "@/components/ui";
 
 const NUMERO_WHATSAPP = "5511999999999";
 
@@ -10,12 +11,7 @@ export function Rodape() {
         <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr]">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-berry)] text-xs font-bold">
-                SG
-              </span>
-              <h3 className="font-serif text-xl font-bold text-[var(--color-ouro-claro)]">
-                Flow & Glow
-              </h3>
+              <Marca inversa />
             </div>
             <p className="max-w-sm text-sm leading-relaxed text-white/62">
               Anúncios de beleza, tutoriais e atendimentos selecionados para comprar,

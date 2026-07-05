@@ -11,6 +11,7 @@ const provedorEmail = new ProvedorDeEmailPlaceholder();
 
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
+    const persistirSessao = request.headers.get("x-preferencias-permitidas") === "sim";
     const corpo = await request.json();
     const validacao = esquemaCadastro.safeParse(corpo);
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     const accessToken = gerarAccessToken(payload);
     const refreshToken = gerarRefreshToken(payload);
-    await definirCookieRefreshToken(refreshToken);
+    await definirCookieRefreshToken(refreshToken, persistirSessao);
 
     return NextResponse.json(
       {
@@ -82,6 +83,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
             email: usuario.email,
             papel: usuario.papel,
             emailVerificado: usuario.emailVerificado,
+            fotoPerfilUrl: usuario.fotoPerfilUrl,
+            whatsapp: usuario.whatsapp,
           },
         },
         mensagem:

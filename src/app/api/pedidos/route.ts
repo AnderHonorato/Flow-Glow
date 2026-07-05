@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { RespostaApi } from "@/tipos";
-import { Prisma } from "@/generated/prisma/client";
 
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
-    const { itens } = await request.json();
+    const { itens, cupom } = await request.json();
 
     if (!itens || !Array.isArray(itens) || itens.length === 0) {
       return NextResponse.json(
@@ -59,7 +59,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       );
     }
 
-    // Busca os tutoriais e calcula o valor total.
     const tutoriaisIds = itens.map((i: { tutorialId: string }) => i.tutorialId);
     const tutoriais = await prisma.tutorial.findMany({
       where: { id: { in: tutoriaisIds }, ativo: true },
@@ -72,13 +71,33 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       );
     }
 
-    // Cria o pedido com os itens em uma transação.
+    const subtotal = tutoriais.reduce(
+      (acc, tutorial) => acc + Number(tutorial.precoPromocional || tutorial.preco),
+      0
+    );
+    let descontoPercentual = 0;
+
+    if (cupom) {
+      const cupomAtivo = await prisma.cupom.findUnique({
+        where: { codigo: String(cupom).toUpperCase().trim() },
+      });
+
+      if (!cupomAtivo || !cupomAtivo.ativo || cupomAtivo.validoAte < new Date()) {
+        return NextResponse.json(
+          { sucesso: false, erro: "Cupom inválido ou expirado." },
+          { status: 400 }
+        );
+      }
+
+      descontoPercentual = cupomAtivo.descontoPercentual;
+    }
+
+    const valorTotal = Math.max(0, subtotal - subtotal * (descontoPercentual / 100));
+
     const pedido = await prisma.pedido.create({
       data: {
         usuarioId,
-        valorTotal: new Prisma.Decimal(
-          tutoriais.reduce((acc, t) => acc + Number(t.precoPromocional || t.preco), 0)
-        ),
+        valorTotal: new Prisma.Decimal(valorTotal),
         idTransacaoGateway: `SIMULADO-${Date.now()}`,
         itens: {
           create: tutoriais.map((tutorial) => ({
@@ -89,8 +108,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       },
     });
 
-    // Em produção, aqui chamaríamos o provedor de pagamento real (Mercado Pago).
-    // No modo sandbox/simulação, geramos um código PIX fictício.
     const codigoPix = `studioglow-pix-${pedido.id}-${Date.now()}`;
 
     return NextResponse.json(
@@ -99,6 +116,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
         dados: {
           pedidoId: pedido.id,
           codigoPix,
+          subtotal,
+          descontoPercentual,
+          valorTotal,
         },
       },
       { status: 201 }

@@ -2,31 +2,20 @@
 
 import {
   BadgePercent,
+  Edit3,
+  Flame,
   ImagePlus,
   MapPin,
   Plus,
   Save,
   Search,
   TicketPercent,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
-
-interface TutorialAdmin {
-  id: string;
-  titulo: string;
-  slug: string;
-  preco: number;
-  precoPromocional: number | null;
-  cupomDesconto: string | null;
-  destaquePromocional: boolean;
-  cidade: string | null;
-  estado: string | null;
-  distanciaKm: number | null;
-  imagemCapaUrl: string;
-  categoria: { nome: string; slug: string };
-}
+import type { TutorialCard, TutorialDetalhe } from "@/tipos";
 
 interface Categoria {
   id: string;
@@ -61,28 +50,79 @@ function formatarReal(valor: number): string {
   });
 }
 
+function fotosParaTexto(fotos: string[]): string {
+  return fotos.join("\n");
+}
+
+function textoParaFotos(texto: string): string[] {
+  return texto
+    .split(/\r?\n/)
+    .map((linha) => linha.trim())
+    .filter(Boolean);
+}
+
+function modulosParaTexto(tutorial?: TutorialDetalhe | null): string {
+  return (tutorial?.modulos || [])
+    .map((modulo) =>
+      [
+        modulo.titulo,
+        modulo.duracaoMinutos,
+        modulo.gratuito ? "gratis" : "pago",
+        modulo.videoUrl || "",
+      ].join(" | ")
+    )
+    .join("\n");
+}
+
+function textoParaModulos(texto: string) {
+  return texto
+    .split(/\r?\n/)
+    .map((linha) => linha.trim())
+    .filter(Boolean)
+    .map((linha) => {
+      const [titulo, minutos, tipo, videoUrl] = linha.split("|").map((parte) => parte.trim());
+      return {
+        titulo,
+        duracaoMinutos: Number(minutos) || 10,
+        gratuito: tipo?.toLowerCase().includes("gratis") || tipo?.toLowerCase().includes("gratuito"),
+        videoUrl: videoUrl || null,
+      };
+    });
+}
+
+const estadoInicial = {
+  id: "",
+  titulo: "",
+  slug: "",
+  descricaoCurta: "",
+  descricaoCompleta: "",
+  preco: "",
+  precoPromocional: "",
+  cupomDesconto: "",
+  destaquePromocional: false,
+  bombando: false,
+  categoriaId: "",
+  nivel: "INICIANTE",
+  imagemCapaUrl: "",
+  videoPreviaUrl: "",
+  fotosGaleria: "",
+  cidade: "",
+  estado: "SP",
+  distanciaKm: "",
+  modulosTexto: "",
+};
+
 export default function PaginaAdminTutoriais() {
   const { accessToken } = useAutenticacao();
-  const [tutoriais, setTutoriais] = useState<TutorialAdmin[]>([]);
+  const [tutoriais, setTutoriais] = useState<TutorialCard[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [modalAberto, setModalAberto] = useState(false);
-  const [titulo, setTitulo] = useState("");
-  const [slug, setSlug] = useState("");
-  const [descricaoCurta, setDescricaoCurta] = useState("");
-  const [descricaoCompleta, setDescricaoCompleta] = useState("");
-  const [preco, setPreco] = useState("");
-  const [precoPromocional, setPrecoPromocional] = useState("");
-  const [cupomDesconto, setCupomDesconto] = useState("");
-  const [destaquePromocional, setDestaquePromocional] = useState(false);
-  const [categoriaId, setCategoriaId] = useState("");
-  const [nivel, setNivel] = useState("INICIANTE");
-  const [imagemCapaUrl, setImagemCapaUrl] = useState("");
-  const [cidade, setCidade] = useState("");
-  const [estado, setEstado] = useState("SP");
-  const [distanciaKm, setDistanciaKm] = useState("");
+  const [modo, setModo] = useState<"criar" | "editar">("criar");
+  const [form, setForm] = useState(estadoInicial);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [carregandoEdicao, setCarregandoEdicao] = useState(false);
   const [busca, setBusca] = useState("");
 
   async function carregar() {
@@ -95,76 +135,126 @@ export default function PaginaAdminTutoriais() {
     if (dT.sucesso) setTutoriais(dT.dados);
     if (dC.sucesso) {
       setCategorias(dC.dados);
-      setCategoriaId((atual) => atual || dC.dados[0]?.id || "");
+      setForm((atual) => ({ ...atual, categoriaId: atual.categoriaId || dC.dados[0]?.id || "" }));
     }
   }
 
   useEffect(() => {
     carregar();
+    const intervalo = window.setInterval(carregar, 5000);
+    return () => window.clearInterval(intervalo);
   }, []);
 
   const tutoriaisFiltrados = useMemo(() => {
     if (!busca.trim()) return tutoriais;
     const termo = busca.trim().toLowerCase();
     return tutoriais.filter((tutorial) =>
-      [tutorial.titulo, tutorial.categoria.nome, tutorial.cidade || ""]
+      [
+        tutorial.titulo,
+        tutorial.categoria.nome,
+        tutorial.cidade || "",
+        tutorial.cupomDesconto || "",
+      ]
         .join(" ")
         .toLowerCase()
         .includes(termo)
     );
   }, [busca, tutoriais]);
 
-  function limparFormulario() {
-    setTitulo("");
-    setSlug("");
-    setDescricaoCurta("");
-    setDescricaoCompleta("");
-    setPreco("");
-    setPrecoPromocional("");
-    setCupomDesconto("");
-    setDestaquePromocional(false);
-    setImagemCapaUrl("");
-    setCidade("");
-    setEstado("SP");
-    setDistanciaKm("");
-    setNivel("INICIANTE");
-    setCategoriaId(categorias[0]?.id || "");
+  function atualizar(campo: keyof typeof estadoInicial, valor: string | boolean) {
+    setForm((atual) => ({ ...atual, [campo]: valor }));
   }
 
-  async function criarTutorial() {
+  function abrirCriacao() {
+    setModo("criar");
+    setForm({ ...estadoInicial, categoriaId: categorias[0]?.id || "" });
+    setErro("");
+    setMensagem("");
+    setModalAberto(true);
+  }
+
+  async function abrirEdicao(tutorial: TutorialCard) {
+    setModo("editar");
+    setErro("");
+    setMensagem("");
+    setCarregandoEdicao(true);
+    setModalAberto(true);
+
+    try {
+      const resposta = await fetch(`/api/tutoriais/${tutorial.slug}`);
+      const dados = await resposta.json();
+      if (!dados.sucesso) throw new Error(dados.erro || "Não foi possível abrir o anúncio.");
+      const detalhe = dados.dados as TutorialDetalhe;
+      const categoriaId =
+        categorias.find((categoria) => categoria.slug === detalhe.categoria.slug)?.id ||
+        categorias[0]?.id ||
+        "";
+      setForm({
+        id: detalhe.id,
+        titulo: detalhe.titulo,
+        slug: detalhe.slug,
+        descricaoCurta: detalhe.descricaoCurta,
+        descricaoCompleta: detalhe.descricaoCompleta,
+        preco: String(detalhe.preco).replace(".", ","),
+        precoPromocional: detalhe.precoPromocional ? String(detalhe.precoPromocional).replace(".", ",") : "",
+        cupomDesconto: detalhe.cupomDesconto || "",
+        destaquePromocional: detalhe.destaquePromocional,
+        bombando: detalhe.bombando,
+        categoriaId,
+        nivel: detalhe.nivel,
+        imagemCapaUrl: detalhe.imagemCapaUrl,
+        videoPreviaUrl: detalhe.videoPreviaUrl || "",
+        fotosGaleria: fotosParaTexto(detalhe.fotosGaleria || []),
+        cidade: detalhe.cidade || "",
+        estado: detalhe.estado || "SP",
+        distanciaKm: detalhe.distanciaKm !== null ? String(detalhe.distanciaKm) : "",
+        modulosTexto: modulosParaTexto(detalhe),
+      });
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Erro ao abrir anúncio.");
+    }
+
+    setCarregandoEdicao(false);
+  }
+
+  function montarCorpo() {
+    const precoNumero = numeroOuNulo(form.preco);
+    if (!precoNumero) {
+      throw new Error("Informe um preço válido.");
+    }
+
+    return {
+      ...(modo === "editar" ? { id: form.id } : {}),
+      titulo: form.titulo,
+      slug: form.slug || criarSlug(form.titulo),
+      descricaoCurta: form.descricaoCurta,
+      descricaoCompleta: form.descricaoCompleta,
+      preco: precoNumero,
+      precoPromocional: numeroOuNulo(form.precoPromocional),
+      cupomDesconto: form.cupomDesconto.trim() || null,
+      destaquePromocional: form.destaquePromocional,
+      bombando: form.bombando,
+      categoriaId: form.categoriaId,
+      nivel: form.nivel,
+      imagemCapaUrl: form.imagemCapaUrl.trim() || "/marca/logo.png",
+      videoPreviaUrl: form.videoPreviaUrl.trim() || null,
+      fotosGaleria: textoParaFotos(form.fotosGaleria),
+      cidade: form.cidade.trim() || null,
+      estado: form.estado.trim().toUpperCase() || null,
+      distanciaKm: form.distanciaKm ? Number(form.distanciaKm) : null,
+      modulos: textoParaModulos(form.modulosTexto),
+    };
+  }
+
+  async function salvarTutorial() {
     setErro("");
     setMensagem("");
     setSalvando(true);
 
-    const precoNumero = numeroOuNulo(preco);
-    if (!precoNumero) {
-      setErro("Informe um preço válido.");
-      setSalvando(false);
-      return;
-    }
-
-    const corpo = {
-      titulo,
-      slug: slug || criarSlug(titulo),
-      descricaoCurta,
-      descricaoCompleta,
-      preco: precoNumero,
-      precoPromocional: numeroOuNulo(precoPromocional),
-      cupomDesconto: cupomDesconto.trim() || null,
-      destaquePromocional,
-      categoriaId,
-      nivel,
-      imagemCapaUrl:
-        imagemCapaUrl.trim() ||
-        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80",
-      cidade: cidade.trim() || null,
-      estado: estado.trim().toUpperCase() || null,
-      distanciaKm: distanciaKm ? Number(distanciaKm) : null,
-    };
-
     try {
+      const corpo = montarCorpo();
       const resposta = await fetch("/api/tutoriais", {
-        method: "POST",
+        method: modo === "editar" ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
@@ -173,17 +263,43 @@ export default function PaginaAdminTutoriais() {
       });
       const dados = await resposta.json();
       if (dados.sucesso) {
-        setMensagem("Anúncio criado e publicado.");
+        setMensagem(modo === "editar" ? "Anúncio atualizado." : "Anúncio criado e publicado.");
         setModalAberto(false);
-        limparFormulario();
         await carregar();
       } else {
-        setErro(dados.erro || "Não foi possível criar o anúncio.");
+        setErro(dados.erro || "Não foi possível salvar o anúncio.");
       }
-    } catch {
-      setErro("Erro de conexão ao criar anúncio.");
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Erro de conexão ao salvar anúncio.");
     }
 
+    setSalvando(false);
+  }
+
+  async function desativarTutorial() {
+    if (!form.id) return;
+    setErro("");
+    setSalvando(true);
+    try {
+      const resposta = await fetch("/api/tutoriais", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ id: form.id }),
+      });
+      const dados = await resposta.json();
+      if (dados.sucesso) {
+        setMensagem("Anúncio desativado.");
+        setModalAberto(false);
+        await carregar();
+      } else {
+        setErro(dados.erro || "Não foi possível desativar.");
+      }
+    } catch {
+      setErro("Erro ao desativar anúncio.");
+    }
     setSalvando(false);
   }
 
@@ -195,10 +311,9 @@ export default function PaginaAdminTutoriais() {
             <BadgePercent className="h-4 w-4" aria-hidden />
             Catálogo
           </span>
-          <h1 className="mt-1 text-3xl font-bold">Anúncios</h1>
-          <p className="mt-2 max-w-2xl text-sm text-[var(--color-texto)]/60">
-            Crie anúncios com promoção, cupom, imagem, cidade e distância. A vitrine
-            pública exibe tudo em ordem de postagem.
+          <h1 className="mt-1 text-3xl font-bold">Anúncios e tutoriais</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[var(--color-texto-suave)]">
+            Controle fotos, conteúdo, preço, cupons, km, promoções e destaque bombando.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -206,11 +321,11 @@ export default function PaginaAdminTutoriais() {
             rotulo="Buscar"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            placeholder="Título, categoria ou cidade"
+            placeholder="Título, cupom, categoria ou cidade"
             icone={<Search className="h-4 w-4" aria-hidden />}
           />
           <div className="flex items-end">
-            <Botao onClick={() => setModalAberto(true)} className="w-full sm:w-auto">
+            <Botao onClick={abrirCriacao} className="w-full sm:w-auto">
               <Plus className="h-4 w-4" aria-hidden />
               Novo anúncio
             </Botao>
@@ -219,42 +334,48 @@ export default function PaginaAdminTutoriais() {
       </div>
 
       {mensagem && (
-        <p className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
+        <p className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
           {mensagem}
         </p>
       )}
       {erro && (
-        <p className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+        <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
           {erro}
         </p>
       )}
 
       <div className="grid gap-4 xl:grid-cols-2">
         {tutoriaisFiltrados.map((tutorial) => (
-          <Cartao key={tutorial.id} className="grid gap-4 sm:grid-cols-[9rem_1fr]">
+          <Cartao key={tutorial.id} className="grid gap-4 sm:grid-cols-[9rem_1fr_auto]">
             <div
-              className="h-36 rounded-md bg-cover bg-center sm:h-full"
+              className="h-36 rounded-lg bg-cover bg-center sm:h-full"
               style={{ backgroundImage: `url(${tutorial.imagemCapaUrl})` }}
             />
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap gap-2">
-                <span className="rounded-md bg-[var(--color-sage)]/10 px-2 py-1 text-xs font-bold text-[var(--color-sage)]">
+                {tutorial.bombando && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-berry)] px-2 py-1 text-xs font-bold text-white">
+                    <Flame className="h-3.5 w-3.5" aria-hidden />
+                    Bombando
+                  </span>
+                )}
+                <span className="rounded-md bg-[color-mix(in_srgb,var(--color-sage)_12%,transparent)] px-2 py-1 text-xs font-bold text-[var(--color-sage)]">
                   {tutorial.categoria.nome}
                 </span>
                 {tutorial.cupomDesconto && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-[var(--color-ouro)]/12 px-2 py-1 text-xs font-bold text-[var(--color-texto)]">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[color-mix(in_srgb,var(--color-ouro)_16%,transparent)] px-2 py-1 text-xs font-bold text-[var(--color-texto)]">
                     <TicketPercent className="h-3.5 w-3.5" aria-hidden />
                     {tutorial.cupomDesconto}
                   </span>
                 )}
                 {tutorial.destaquePromocional && (
-                  <span className="rounded-md bg-[var(--color-berry)]/10 px-2 py-1 text-xs font-bold text-[var(--color-berry)]">
+                  <span className="rounded-md bg-[color-mix(in_srgb,var(--color-berry)_12%,transparent)] px-2 py-1 text-xs font-bold text-[var(--color-berry)]">
                     Promoção
                   </span>
                 )}
               </div>
               <h3 className="truncate text-lg font-bold">{tutorial.titulo}</h3>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--color-texto)]/58">
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--color-texto-suave)]">
                 <span className="font-bold text-[var(--color-texto)]">
                   {formatarReal(tutorial.precoPromocional || tutorial.preco)}
                 </span>
@@ -264,13 +385,19 @@ export default function PaginaAdminTutoriais() {
                 {tutorial.distanciaKm !== null && (
                   <span className="inline-flex items-center gap-1">
                     <MapPin className="h-4 w-4" aria-hidden />
-                    {tutorial.cidade}, {tutorial.estado} · {tutorial.distanciaKm} km
+                    {tutorial.cidade}, {tutorial.estado} - {tutorial.distanciaKm} km
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-xs text-[var(--color-texto)]/42">
+              <p className="mt-2 text-xs text-[var(--color-texto-suave)]">
                 /tutoriais/{tutorial.slug}
               </p>
+            </div>
+            <div className="flex items-start sm:justify-end">
+              <Botao variante="contorno" tamanho="pequeno" onClick={() => abrirEdicao(tutorial)}>
+                <Edit3 className="h-4 w-4" aria-hidden />
+                Editar
+              </Botao>
             </div>
           </Cartao>
         ))}
@@ -278,160 +405,208 @@ export default function PaginaAdminTutoriais() {
 
       <Modal
         aberto={modalAberto}
-        titulo="Novo anúncio"
-        descricao="Preencha os dados principais. Depois de salvar, o anúncio entra na vitrine pública."
+        titulo={modo === "editar" ? "Editar anúncio" : "Novo anúncio"}
+        descricao="Tudo que aparece no catálogo público fica controlável aqui."
         onFechar={() => setModalAberto(false)}
       >
-        <div className="grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CampoTexto
-              rotulo="Título"
-              value={titulo}
-              onChange={(e) => {
-                setTitulo(e.target.value);
-                setSlug(criarSlug(e.target.value));
-              }}
-              placeholder="Ex.: Maquiagem para fotos"
-            />
-            <CampoTexto
-              rotulo="Slug"
-              value={slug}
-              onChange={(e) => setSlug(criarSlug(e.target.value))}
-              placeholder="maquiagem-para-fotos"
-            />
+        {carregandoEdicao ? (
+          <div className="py-12 text-center text-sm text-[var(--color-texto-suave)]">
+            Carregando dados do anúncio...
           </div>
-
-          <CampoTexto
-            rotulo="Descrição curta"
-            value={descricaoCurta}
-            onChange={(e) => setDescricaoCurta(e.target.value)}
-            placeholder="Resumo que aparece no card"
-          />
-          <CampoTexto
-            rotulo="Descrição completa"
-            as="textarea"
-            value={descricaoCompleta}
-            onChange={(e) => setDescricaoCompleta(e.target.value)}
-            placeholder="Detalhe o conteúdo, benefício e o que o cliente recebe"
-          />
-
-          <div>
-            <p className="mb-2 text-sm font-semibold">Categoria</p>
-            <div className="flex flex-wrap gap-2">
-              {categorias.map((categoria) => (
-                <button
-                  key={categoria.id}
-                  type="button"
-                  onClick={() => setCategoriaId(categoria.id)}
-                  className={`rounded-md border px-3 py-2 text-sm font-semibold ${
-                    categoriaId === categoria.id
-                      ? "border-[var(--color-berry)] bg-[var(--color-berry)] text-white"
-                      : "border-[var(--color-linha)] bg-white text-[var(--color-texto)]/70 hover:border-[var(--color-berry)]"
-                  }`}
-                >
-                  {categoria.nome}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-2 text-sm font-semibold">Nível</p>
-            <div className="flex flex-wrap gap-2">
-              {niveis.map((opcao) => (
-                <button
-                  key={opcao.valor}
-                  type="button"
-                  onClick={() => setNivel(opcao.valor)}
-                  className={`rounded-md border px-3 py-2 text-sm font-semibold ${
-                    nivel === opcao.valor
-                      ? "border-[var(--color-sage)] bg-[var(--color-sage)] text-white"
-                      : "border-[var(--color-linha)] bg-white text-[var(--color-texto)]/70 hover:border-[var(--color-sage)]"
-                  }`}
-                >
-                  {opcao.rotulo}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CampoTexto
-              rotulo="Preço"
-              value={preco}
-              onChange={(e) => setPreco(e.target.value)}
-              placeholder="149,90"
-              sufixo="R$"
-            />
-            <CampoTexto
-              rotulo="Preço promocional"
-              value={precoPromocional}
-              onChange={(e) => setPrecoPromocional(e.target.value)}
-              placeholder="99,90"
-              sufixo="R$"
-            />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CampoTexto
-              rotulo="Cupom"
-              value={cupomDesconto}
-              onChange={(e) => setCupomDesconto(e.target.value.toUpperCase())}
-              placeholder="GLOW20"
-              icone={<TicketPercent className="h-4 w-4" aria-hidden />}
-            />
-            <label className="flex min-h-11 items-center gap-3 rounded-md border border-[var(--color-linha)] bg-white px-3 py-2 text-sm font-semibold">
-              <input
-                type="checkbox"
-                checked={destaquePromocional}
-                onChange={(e) => setDestaquePromocional(e.target.checked)}
-                className="h-4 w-4 accent-[var(--color-berry)]"
+        ) : (
+          <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <CampoTexto
+                rotulo="Título"
+                value={form.titulo}
+                onChange={(e) => {
+                  atualizar("titulo", e.target.value);
+                  if (modo === "criar") atualizar("slug", criarSlug(e.target.value));
+                }}
+                placeholder="Ex.: Maquiagem para fotos"
               />
-              Destacar como promoção
-            </label>
-          </div>
+              <CampoTexto
+                rotulo="Slug"
+                value={form.slug}
+                onChange={(e) => atualizar("slug", criarSlug(e.target.value))}
+                placeholder="maquiagem-para-fotos"
+              />
+            </div>
 
-          <CampoTexto
-            rotulo="Imagem de capa"
-            value={imagemCapaUrl}
-            onChange={(e) => setImagemCapaUrl(e.target.value)}
-            placeholder="https://..."
-            icone={<ImagePlus className="h-4 w-4" aria-hidden />}
-          />
-
-          <div className="grid gap-4 sm:grid-cols-[1fr_5rem_8rem]">
             <CampoTexto
-              rotulo="Cidade"
-              value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
-              placeholder="São Paulo"
-              icone={<MapPin className="h-4 w-4" aria-hidden />}
+              rotulo="Descrição curta"
+              value={form.descricaoCurta}
+              onChange={(e) => atualizar("descricaoCurta", e.target.value)}
+              placeholder="Resumo que aparece no card"
             />
             <CampoTexto
-              rotulo="UF"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value.toUpperCase().slice(0, 2))}
-              placeholder="SP"
+              rotulo="Conteúdo do anúncio"
+              as="textarea"
+              value={form.descricaoCompleta}
+              onChange={(e) => atualizar("descricaoCompleta", e.target.value)}
+              placeholder="Detalhe o conteúdo, benefício, materiais, entrega e instruções."
             />
-            <CampoTexto
-              rotulo="Distância"
-              value={distanciaKm}
-              onChange={(e) => setDistanciaKm(e.target.value.replace(/\D/g, "").slice(0, 3))}
-              placeholder="8"
-              sufixo="km"
-            />
-          </div>
 
-          <div className="flex flex-col-reverse gap-2 border-t border-[var(--color-linha)] pt-4 sm:flex-row sm:justify-end">
-            <Botao variante="contorno" onClick={() => setModalAberto(false)}>
-              Cancelar
-            </Botao>
-            <Botao onClick={criarTutorial} carregando={salvando}>
-              <Save className="h-4 w-4" aria-hidden />
-              Publicar anúncio
-            </Botao>
+            <div>
+              <p className="mb-2 text-sm font-semibold">Categoria</p>
+              <div className="flex flex-wrap gap-2">
+                {categorias.map((categoria) => (
+                  <button
+                    key={categoria.id}
+                    type="button"
+                    onClick={() => atualizar("categoriaId", categoria.id)}
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+                      form.categoriaId === categoria.id
+                        ? "border-[var(--color-berry)] bg-[var(--color-berry)] text-white"
+                        : "border-[var(--color-linha)] bg-[var(--color-papel)] text-[var(--color-texto-suave)] hover:border-[var(--color-berry)]"
+                    }`}
+                  >
+                    {categoria.nome}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-sm font-semibold">Nível</p>
+              <div className="flex flex-wrap gap-2">
+                {niveis.map((opcao) => (
+                  <button
+                    key={opcao.valor}
+                    type="button"
+                    onClick={() => atualizar("nivel", opcao.valor)}
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+                      form.nivel === opcao.valor
+                        ? "border-[var(--color-sage)] bg-[var(--color-sage)] text-white"
+                        : "border-[var(--color-linha)] bg-[var(--color-papel)] text-[var(--color-texto-suave)] hover:border-[var(--color-sage)]"
+                    }`}
+                  >
+                    {opcao.rotulo}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <CampoTexto
+                rotulo="Preço"
+                value={form.preco}
+                onChange={(e) => atualizar("preco", e.target.value)}
+                placeholder="149,90"
+                sufixo="R$"
+              />
+              <CampoTexto
+                rotulo="Preço promocional"
+                value={form.precoPromocional}
+                onChange={(e) => atualizar("precoPromocional", e.target.value)}
+                placeholder="99,90"
+                sufixo="R$"
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <CampoTexto
+                rotulo="Cupom"
+                value={form.cupomDesconto}
+                onChange={(e) => atualizar("cupomDesconto", e.target.value.toUpperCase())}
+                placeholder="GLOW20"
+                icone={<TicketPercent className="h-4 w-4" aria-hidden />}
+              />
+              <label className="flex min-h-11 items-center gap-3 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.destaquePromocional}
+                  onChange={(e) => atualizar("destaquePromocional", e.target.checked)}
+                  className="h-4 w-4 accent-[var(--color-berry)]"
+                />
+                Promoção
+              </label>
+              <label className="flex min-h-11 items-center gap-3 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.bombando}
+                  onChange={(e) => atualizar("bombando", e.target.checked)}
+                  className="h-4 w-4 accent-[var(--color-berry)]"
+                />
+                Bombando
+              </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <CampoTexto
+                rotulo="Foto principal"
+                value={form.imagemCapaUrl}
+                onChange={(e) => atualizar("imagemCapaUrl", e.target.value)}
+                placeholder="https://..."
+                icone={<ImagePlus className="h-4 w-4" aria-hidden />}
+              />
+              <CampoTexto
+                rotulo="Vídeo de prévia"
+                value={form.videoPreviaUrl}
+                onChange={(e) => atualizar("videoPreviaUrl", e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+            <CampoTexto
+              rotulo="Fotos extras da galeria"
+              as="textarea"
+              value={form.fotosGaleria}
+              onChange={(e) => atualizar("fotosGaleria", e.target.value)}
+              placeholder={"Uma URL por linha\nhttps://.../foto-1.jpg\nhttps://.../foto-2.jpg"}
+            />
+
+            <div className="grid gap-4 sm:grid-cols-[1fr_5rem_8rem]">
+              <CampoTexto
+                rotulo="Cidade"
+                value={form.cidade}
+                onChange={(e) => atualizar("cidade", e.target.value)}
+                placeholder="São Paulo"
+                icone={<MapPin className="h-4 w-4" aria-hidden />}
+              />
+              <CampoTexto
+                rotulo="UF"
+                value={form.estado}
+                onChange={(e) => atualizar("estado", e.target.value.toUpperCase().slice(0, 2))}
+                placeholder="SP"
+              />
+              <CampoTexto
+                rotulo="Distância"
+                value={form.distanciaKm}
+                onChange={(e) => atualizar("distanciaKm", e.target.value.replace(/\D/g, "").slice(0, 3))}
+                placeholder="8"
+                sufixo="km"
+              />
+            </div>
+
+            <CampoTexto
+              rotulo="Aulas / conteúdo liberado"
+              as="textarea"
+              value={form.modulosTexto}
+              onChange={(e) => atualizar("modulosTexto", e.target.value)}
+              placeholder={"Uma aula por linha: Título | minutos | gratis/pago | URL opcional\nPreparação da pele | 12 | gratis | https://..."}
+            />
+
+            <div className="flex flex-col-reverse gap-2 border-t border-[var(--color-linha)] pt-4 sm:flex-row sm:justify-between">
+              <div>
+                {modo === "editar" && (
+                  <Botao variante="perigo" onClick={desativarTutorial} carregando={salvando}>
+                    <Trash2 className="h-4 w-4" aria-hidden />
+                    Desativar
+                  </Botao>
+                )}
+              </div>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <Botao variante="contorno" onClick={() => setModalAberto(false)}>
+                  Cancelar
+                </Botao>
+                <Botao onClick={salvarTutorial} carregando={salvando}>
+                  <Save className="h-4 w-4" aria-hidden />
+                  {modo === "editar" ? "Salvar alterações" : "Publicar anúncio"}
+                </Botao>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </Modal>
     </div>
   );

@@ -69,11 +69,23 @@ export const esquemaTutorial = z.object({
   videoPreviaUrl: z.string().optional().nullable(),
   cupomDesconto: z.string().max(40, "Cupom muito longo").optional().nullable(),
   destaquePromocional: z.boolean().optional(),
+  bombando: z.boolean().optional(),
+  fotosGaleria: z.array(z.string().min(1)).optional(),
   cidade: z.string().max(80, "Cidade muito longa").optional().nullable(),
   estado: z.string().max(2, "Use a sigla do estado").optional().nullable(),
   distanciaKm: z.number().int().min(0).max(999).optional().nullable(),
   categoriaId: z.string().uuid("Categoria inválida"),
   nivel: z.enum(["INICIANTE", "INTERMEDIARIO", "AVANCADO"]),
+  modulos: z
+    .array(
+      z.object({
+        titulo: z.string().min(2, "Informe o titulo do modulo"),
+        videoUrl: z.string().optional().nullable(),
+        duracaoMinutos: z.number().int().min(1).max(600),
+        gratuito: z.boolean().optional(),
+      })
+    )
+    .optional(),
 });
 
 export type DadosCadastro = z.infer<typeof esquemaCadastro>;

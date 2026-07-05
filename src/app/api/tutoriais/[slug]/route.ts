@@ -51,6 +51,8 @@ export async function GET(
           : null,
         cupomDesconto: tutorial.cupomDesconto,
         destaquePromocional: tutorial.destaquePromocional,
+        bombando: tutorial.bombando,
+        fotosGaleria: tutorial.fotosGaleria || [],
         cidade: tutorial.cidade,
         estado: tutorial.estado,
         distanciaKm: tutorial.distanciaKm,

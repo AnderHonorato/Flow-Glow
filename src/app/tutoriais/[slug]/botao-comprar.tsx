@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingBag } from "lucide-react";
+import { CheckCircle2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Botao } from "@/components/ui";
@@ -20,9 +20,9 @@ export default function BotaoComprar({
 }: BotaoComprarProps) {
   const router = useRouter();
   const { usuario } = useAutenticacao();
-  const { adicionarAoCarrinho, itens } = useCarrinho();
+  const { adicionarAoCarrinho, estaNoCarrinho } = useCarrinho();
   const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-  const jaNoCarrinho = itens.some((item) => item.tutorialId === tutorialId);
+  const jaNoCarrinho = estaNoCarrinho(tutorialId);
 
   function comprarAgora() {
     if (!usuario) { router.push("/login?redir=" + encodeURIComponent(window.location.pathname)); return; }
@@ -38,6 +38,18 @@ export default function BotaoComprar({
       adicionarAoCarrinho({ tutorialId, titulo, imagemCapaUrl, preco, precoPromocional });
     }
     setMostrarOpcoes(false);
+  }
+
+  function acaoPrincipal() {
+    if (!usuario) {
+      router.push("/login?redir=" + encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : ""));
+      return;
+    }
+    if (jaNoCarrinho) {
+      router.push("/carrinho");
+      return;
+    }
+    setMostrarOpcoes(true);
   }
 
   if (mostrarOpcoes) {
@@ -65,9 +77,9 @@ export default function BotaoComprar({
       variante={jaNoCarrinho ? "secundario" : "primario"}
       tamanho="grande"
       className="w-full"
-      onClick={() => usuario ? setMostrarOpcoes(true) : router.push("/login?redir=" + encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : ""))}
+      onClick={acaoPrincipal}
     >
-      <ShoppingBag className="h-5 w-5" />
+      {jaNoCarrinho ? <CheckCircle2 className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}
       {jaNoCarrinho ? "Ir para o carrinho" : "Comprar"}
     </Botao>
   );

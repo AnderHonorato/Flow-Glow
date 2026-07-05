@@ -24,7 +24,14 @@ const rotasPublicas = [
   "/api/webhooks/pagamento",
 ];
 
-const prefixosEstaticos = ["/_next", "/favicon.ico", "/api/upload"];
+const prefixosEstaticos = [
+  "/_next",
+  "/favicon.ico",
+  "/icon",
+  "/apple-icon",
+  "/marca",
+  "/api/upload",
+];
 
 function ehRotaPublica(caminho: string, metodo: string): boolean {
   if (prefixosEstaticos.some((p) => caminho.startsWith(p))) {
@@ -121,5 +128,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|marca).*)"],
 };

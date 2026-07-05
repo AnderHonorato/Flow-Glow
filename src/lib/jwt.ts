@@ -36,14 +36,17 @@ export function verificarRefreshToken(token: string): PayloadToken {
 
 // Define o refresh token como cookie httpOnly, secure, sameSite strict.
 // Isso impede acesso via JavaScript no navegador (proteção contra XSS).
-export async function definirCookieRefreshToken(token: string): Promise<void> {
+export async function definirCookieRefreshToken(
+  token: string,
+  persistente = true
+): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set("refreshToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
+    ...(persistente ? { maxAge: 7 * 24 * 60 * 60 } : {}),
   });
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Marca } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Conta | Flow & Glow",
@@ -31,12 +32,9 @@ export default function LayoutAutenticacao({ children }: { children: ReactNode }
         <div className="mx-auto w-full max-w-md">
           <Link
             href="/"
-            className="mb-6 inline-flex items-center gap-2 font-serif text-2xl font-bold text-[var(--color-texto)] transition-colors hover:text-[var(--color-berry)]"
+            className="mb-6 inline-flex items-center transition-colors hover:text-[var(--color-berry)]"
           >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-berry)] text-xs text-white">
-              SG
-            </span>
-            Flow & Glow
+            <Marca />
           </Link>
           {children}
         </div>

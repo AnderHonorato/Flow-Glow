@@ -1,12 +1,59 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
-import { useAutenticacao } from "@/contexto/autenticacao";
-import { Botao, CampoTexto, Cartao } from "@/components/ui";
+import { Camera, LogOut, MapPin, Save, Trash2, UserRound } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Cabecalho, Rodape } from "@/components/layout";
+import { AvatarUsuario, Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
+import { useAutenticacao } from "@/contexto/autenticacao";
+import { usePreferencias } from "@/contexto/preferencias";
+
+async function recortarImagemPerfil(arquivo: File): Promise<string> {
+  if (!arquivo.type.startsWith("image/")) {
+    throw new Error("Escolha uma imagem válida.");
+  }
+  if (arquivo.size > 4 * 1024 * 1024) {
+    throw new Error("Use uma imagem de até 4 MB.");
+  }
+
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const leitor = new FileReader();
+    leitor.onload = () => resolve(String(leitor.result));
+    leitor.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+    leitor.readAsDataURL(arquivo);
+  });
+
+  const imagem = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Não foi possível abrir a imagem."));
+    img.src = dataUrl;
+  });
+
+  const ladoOrigem = Math.min(imagem.naturalWidth, imagem.naturalHeight);
+  const sx = Math.round((imagem.naturalWidth - ladoOrigem) / 2);
+  const sy = Math.round((imagem.naturalHeight - ladoOrigem) / 2);
+  const canvas = document.createElement("canvas");
+  canvas.width = 384;
+  canvas.height = 384;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Seu navegador não preparou a imagem.");
+  ctx.drawImage(imagem, sx, sy, ladoOrigem, ladoOrigem, 0, 0, 384, 384);
+
+  return canvas.toDataURL("image/jpeg", 0.84);
+}
 
 export default function PaginaPerfil() {
-  const { usuario, accessToken } = useAutenticacao();
+  const router = useRouter();
+  const { usuario, accessToken, atualizarUsuario, logout } = useAutenticacao();
+  const {
+    localizacao,
+    carregandoLocalizacao,
+    erroLocalizacao,
+    solicitarLocalizacao,
+    limparLocalizacao,
+  } = usePreferencias();
 
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -21,6 +68,9 @@ export default function PaginaPerfil() {
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [processandoFoto, setProcessandoFoto] = useState(false);
+  const [excluindoConta, setExcluindoConta] = useState(false);
+  const [confirmarExclusao, setConfirmarExclusao] = useState(false);
 
   useEffect(() => {
     if (usuario) {
@@ -30,7 +80,6 @@ export default function PaginaPerfil() {
     }
   }, [usuario]);
 
-  // Busca o endereço salvo ao carregar a página.
   useEffect(() => {
     async function buscarEndereco() {
       if (!accessToken) return;
@@ -53,7 +102,6 @@ export default function PaginaPerfil() {
     buscarEndereco();
   }, [accessToken]);
 
-  // Consulta o CEP na ViaCEP assim que o campo perde o foco.
   async function handleCepBlur() {
     const cepLimpo = cep.replace(/\D/g, "");
     if (cepLimpo.length !== 8) return;
@@ -68,7 +116,7 @@ export default function PaginaPerfil() {
         setCidade(dados.dados.cidade);
         setEstado(dados.dados.estado);
         setComplemento(dados.dados.complemento || "");
-        setMensagem("CEP encontrado! Confira os dados.");
+        setMensagem("CEP encontrado. Confira os dados.");
       } else {
         setErro(dados.erro || "CEP não encontrado.");
       }
@@ -77,12 +125,29 @@ export default function PaginaPerfil() {
     }
   }
 
-  // Formata o WhatsApp com máscara (XX) XXXXX-XXXX enquanto digita.
   function formatarWhatsApp(valor: string): string {
     const numeros = valor.replace(/\D/g, "").slice(0, 11);
     if (numeros.length <= 2) return numeros;
     if (numeros.length <= 7) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
     return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+  }
+
+  async function escolherFoto(evento: ChangeEvent<HTMLInputElement>) {
+    const arquivo = evento.target.files?.[0];
+    if (!arquivo) return;
+
+    setErro("");
+    setMensagem("");
+    setProcessandoFoto(true);
+    try {
+      const recortada = await recortarImagemPerfil(arquivo);
+      setFotoPerfilUrl(recortada);
+      setMensagem("Foto recortada. Salve o perfil para aplicar.");
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Não foi possível preparar a foto.");
+    }
+    setProcessandoFoto(false);
+    evento.target.value = "";
   }
 
   async function handleSalvarPerfil(e: FormEvent) {
@@ -101,8 +166,12 @@ export default function PaginaPerfil() {
         body: JSON.stringify({ nomeCompleto, whatsapp, fotoPerfilUrl }),
       });
       const dados = await resposta.json();
-      if (dados.sucesso) setMensagem("Perfil atualizado!");
-      else setErro(dados.erro);
+      if (dados.sucesso) {
+        atualizarUsuario(dados.dados);
+        setMensagem("Perfil atualizado.");
+      } else {
+        setErro(dados.erro);
+      }
     } catch {
       setErro("Erro de conexão.");
     }
@@ -134,7 +203,7 @@ export default function PaginaPerfil() {
         }),
       });
       const dados = await resposta.json();
-      if (dados.sucesso) setMensagem("Endereço atualizado!");
+      if (dados.sucesso) setMensagem("Endereço atualizado.");
       else setErro(dados.erro);
     } catch {
       setErro("Erro de conexão.");
@@ -143,69 +212,202 @@ export default function PaginaPerfil() {
     setSalvando(false);
   }
 
+  async function trocarConta() {
+    await logout();
+    router.push("/login");
+  }
+
+  async function deletarConta() {
+    if (!accessToken) return;
+
+    setErro("");
+    setMensagem("");
+    setExcluindoConta(true);
+    try {
+      const resposta = await fetch("/api/usuarios/perfil", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const dados = await resposta.json();
+      if (dados.sucesso) {
+        setConfirmarExclusao(false);
+        await logout();
+        router.push("/");
+      } else {
+        setErro(dados.erro || "Não foi possível excluir a conta.");
+      }
+    } catch {
+      setErro("Erro de conexão ao excluir a conta.");
+    }
+    setExcluindoConta(false);
+  }
+
   return (
     <>
       <Cabecalho />
-      <main className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Meu Perfil</h1>
+      <main className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-5">
+          <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
+            <UserRound className="h-4 w-4" aria-hidden />
+            Minha conta
+          </span>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Perfil e preferências</h1>
+        </div>
 
         {mensagem && (
-          <p className="text-sm text-green-700 bg-green-50 px-4 py-2 rounded-lg mb-4">{mensagem}</p>
+          <p className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">
+            {mensagem}
+          </p>
         )}
         {erro && (
-          <p className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg mb-4">{erro}</p>
+          <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600">
+            {erro}
+          </p>
         )}
 
-        {/* Dados pessoais */}
-        <Cartao className="mb-6">
-          <h2 className="font-serif text-xl font-bold mb-4">Dados Pessoais</h2>
-          <form onSubmit={handleSalvarPerfil} className="flex flex-col gap-4">
-            <CampoTexto
-              rotulo="Nome completo"
-              value={nomeCompleto}
-              onChange={(e) => setNomeCompleto(e.target.value)}
-            />
-            <CampoTexto
-              rotulo="WhatsApp"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(formatarWhatsApp(e.target.value))}
-              placeholder="(XX) XXXXX-XXXX"
-            />
-            <Botao type="submit" carregando={salvando}>
-              Salvar Perfil
-            </Botao>
-          </form>
-        </Cartao>
-
-        {/* Endereço com autopreenchimento por CEP */}
-        <Cartao>
-          <h2 className="font-serif text-xl font-bold mb-4">Endereço</h2>
-          <form onSubmit={handleSalvarEndereco} className="flex flex-col gap-4">
-            <CampoTexto
-              rotulo="CEP"
-              value={cep}
-              onChange={(e) => setCep(e.target.value.replace(/\D/g, "").slice(0, 8))}
-              onBlur={handleCepBlur}
-              placeholder="00000000"
-            />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="sm:col-span-2">
-                <CampoTexto rotulo="Logradouro" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} />
+        <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
+          <div className="space-y-5">
+            <Cartao>
+              <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <AvatarUsuario nome={nomeCompleto} fotoUrl={fotoPerfilUrl} tamanho="grande" />
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-xl font-bold">Dados pessoais</h2>
+                  <p className="mt-1 text-sm text-[var(--color-texto-suave)]">
+                    Sua foto aparece no cabeçalho, chat e avaliações.
+                  </p>
+                </div>
+                <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 py-2 text-sm font-semibold text-[var(--color-texto)] hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]">
+                  <Camera className="h-4 w-4" aria-hidden />
+                  {processandoFoto ? "Preparando..." : "Trocar foto"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={escolherFoto}
+                    disabled={processandoFoto}
+                  />
+                </label>
               </div>
-              <CampoTexto rotulo="Número" value={numero} onChange={(e) => setNumero(e.target.value)} />
-            </div>
-            <CampoTexto rotulo="Complemento" value={complemento} onChange={(e) => setComplemento(e.target.value)} />
-            <CampoTexto rotulo="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <CampoTexto rotulo="Cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
-              <CampoTexto rotulo="Estado" value={estado} onChange={(e) => setEstado(e.target.value.toUpperCase().slice(0, 2))} />
-            </div>
-            <Botao type="submit" carregando={salvando}>
-              Salvar Endereço
-            </Botao>
-          </form>
-        </Cartao>
+
+              <form onSubmit={handleSalvarPerfil} className="grid gap-4">
+                <CampoTexto
+                  rotulo="Nome completo"
+                  value={nomeCompleto}
+                  onChange={(e) => setNomeCompleto(e.target.value)}
+                />
+                <CampoTexto
+                  rotulo="WhatsApp"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(formatarWhatsApp(e.target.value))}
+                  placeholder="(XX) XXXXX-XXXX"
+                />
+                <Botao type="submit" carregando={salvando} className="sm:w-fit">
+                  <Save className="h-4 w-4" aria-hidden />
+                  Salvar perfil
+                </Botao>
+              </form>
+            </Cartao>
+
+            <Cartao>
+              <h2 className="text-xl font-bold">Endereço</h2>
+              <form onSubmit={handleSalvarEndereco} className="mt-4 grid gap-4">
+                <CampoTexto
+                  rotulo="CEP"
+                  value={cep}
+                  onChange={(e) => setCep(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                  onBlur={handleCepBlur}
+                  placeholder="00000000"
+                />
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="sm:col-span-2">
+                    <CampoTexto rotulo="Logradouro" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} />
+                  </div>
+                  <CampoTexto rotulo="Número" value={numero} onChange={(e) => setNumero(e.target.value)} />
+                </div>
+                <CampoTexto rotulo="Complemento" value={complemento} onChange={(e) => setComplemento(e.target.value)} />
+                <CampoTexto rotulo="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <CampoTexto rotulo="Cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
+                  <CampoTexto rotulo="Estado" value={estado} onChange={(e) => setEstado(e.target.value.toUpperCase().slice(0, 2))} />
+                </div>
+                <Botao type="submit" carregando={salvando} className="sm:w-fit">
+                  <Save className="h-4 w-4" aria-hidden />
+                  Salvar endereço
+                </Botao>
+              </form>
+            </Cartao>
+          </div>
+
+          <aside className="space-y-5">
+            <Cartao destaque>
+              <MapPin className="mb-3 h-5 w-5 text-[var(--color-sage)]" aria-hidden />
+              <h2 className="text-lg font-bold">Localização</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--color-texto-suave)]">
+                Use sua posição para organizar filtros por distância. Só pedimos acesso quando você clicar.
+              </p>
+              {localizacao ? (
+                <div className="mt-4 rounded-lg bg-[color-mix(in_srgb,var(--color-sage)_10%,transparent)] p-3 text-sm font-semibold text-[var(--color-sage)]">
+                  Localização ativa
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-[var(--color-texto-suave)]">
+                  Nenhuma localização salva.
+                </p>
+              )}
+              {erroLocalizacao && <p className="mt-2 text-xs text-red-600">{erroLocalizacao}</p>}
+              <div className="mt-4 grid gap-2">
+                <Botao type="button" onClick={solicitarLocalizacao} carregando={carregandoLocalizacao}>
+                  <MapPin className="h-4 w-4" aria-hidden />
+                  Usar minha localização
+                </Botao>
+                {localizacao && (
+                  <Botao type="button" variante="fantasma" onClick={limparLocalizacao}>
+                    Remover localização
+                  </Botao>
+                )}
+              </div>
+            </Cartao>
+
+            <Cartao>
+              <h2 className="text-lg font-bold">Acesso</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--color-texto-suave)]">
+                Troque de conta ou remova seu cadastro deste ambiente de testes.
+              </p>
+              <div className="mt-4 grid gap-2">
+                <Botao type="button" variante="contorno" onClick={trocarConta}>
+                  <LogOut className="h-4 w-4" aria-hidden />
+                  Trocar de conta
+                </Botao>
+                <Botao type="button" variante="perigo" onClick={() => setConfirmarExclusao(true)}>
+                  <Trash2 className="h-4 w-4" aria-hidden />
+                  Deletar conta
+                </Botao>
+              </div>
+            </Cartao>
+          </aside>
+        </div>
       </main>
+      <Modal
+        aberto={confirmarExclusao}
+        titulo="Deletar conta"
+        descricao="Esta ação remove perfil, pedidos, comentários e conversas deste ambiente."
+        onFechar={() => setConfirmarExclusao(false)}
+      >
+        <div className="grid gap-4">
+          <p className="text-sm leading-relaxed text-[var(--color-texto-suave)]">
+            Confirme apenas se deseja apagar a conta atual e sair do sistema.
+          </p>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Botao variante="contorno" onClick={() => setConfirmarExclusao(false)}>
+              Cancelar
+            </Botao>
+            <Botao variante="perigo" onClick={deletarConta} carregando={excluindoConta}>
+              <Trash2 className="h-4 w-4" aria-hidden />
+              Deletar conta
+            </Botao>
+          </div>
+        </div>
+      </Modal>
       <Rodape />
     </>
   );

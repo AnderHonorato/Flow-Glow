@@ -56,7 +56,7 @@ export default function PaginaPainelAdmin() {
           const Icone = atalho.icone;
           return (
             <Link key={atalho.href} href={atalho.href} className="group">
-              <Cartao className="h-full hover:-translate-y-0.5 hover:border-[var(--color-berry)]">
+              <Cartao className="h-full hover:border-[var(--color-berry)]">
                 <Icone className="mb-4 h-5 w-5 text-[var(--color-sage)]" aria-hidden />
                 <h3 className="text-lg font-bold group-hover:text-[var(--color-berry)]">
                   {atalho.titulo}

@@ -16,6 +16,8 @@ export interface TutorialCard {
   precoPromocional: number | null;
   cupomDesconto: string | null;
   destaquePromocional: boolean;
+  bombando: boolean;
+  fotosGaleria: string[];
   cidade: string | null;
   estado: string | null;
   distanciaKm: number | null;
