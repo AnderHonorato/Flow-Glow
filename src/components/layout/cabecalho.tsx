@@ -86,7 +86,7 @@ export function Cabecalho() {
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--color-linha)] bg-[var(--color-papel)]/94 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[#eadfd5] bg-[#fffaf5]/95 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold text-[var(--color-texto)] transition-colors hover:text-[var(--color-berry)] shrink-0">
@@ -100,7 +100,9 @@ export function Cabecalho() {
               const Icone = link.icone;
               return (
                 <Link key={link.href} href={link.href}
-                  className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-semibold text-[var(--color-texto)]/70 transition-colors hover:bg-white hover:text-[var(--color-berry)]">
+            className="inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm
+              font-semibold text-[#2a211d]/70 transition-colors
+              hover:bg-white hover:text-[#9a3655]">
                   <Icone className="h-4 w-4" /> {link.texto}
                 </Link>
               );
@@ -143,7 +145,9 @@ export function Cabecalho() {
 
           {/* Hamburguer mobile — botão grande para dedos */}
           <button type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--color-linha)] bg-white text-[var(--color-texto)] md:hidden active:bg-[var(--color-bege)] touch-manipulation"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border
+                border-[#eadfd5] bg-white text-[#2a211d] md:hidden
+                active:bg-[#eadfd5] touch-manipulation"
             onClick={() => setMenuAberto(true)} aria-label="Abrir menu">
             <Menu className="h-5 w-5" />
           </button>
@@ -159,7 +163,8 @@ export function Cabecalho() {
             <div className="flex h-14 items-center justify-between border-b border-[var(--color-linha)] px-4">
               <span className="font-serif text-lg font-bold">Studio Glow</span>
               <button type="button" onClick={fecharMenu}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--color-texto)]/70 hover:bg-white active:bg-[var(--color-bege)] touch-manipulation"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md
+                text-[#2a211d]/70 hover:bg-white active:bg-[#eadfd5] touch-manipulation"
                 aria-label="Fechar menu">
                 <X className="h-5 w-5" />
               </button>
@@ -171,7 +176,9 @@ export function Cabecalho() {
                 const Icone = link.icone;
                 return (
                   <Link key={link.href} href={link.href} onClick={fecharMenu}
-                    className="inline-flex items-center gap-3 rounded-md px-3 py-3.5 text-base font-semibold text-[var(--color-texto)] hover:bg-white active:bg-[var(--color-bege)] touch-manipulation">
+                    className="inline-flex items-center gap-3 rounded-md px-3 py-3.5 text-base
+                      font-semibold text-[#2a211d] hover:bg-white
+                      active:bg-[#eadfd5] touch-manipulation">
                     <Icone className="h-5 w-5 text-[var(--color-berry)]" /> {link.texto}
                   </Link>
                 );

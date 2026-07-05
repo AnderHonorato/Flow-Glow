@@ -146,8 +146,8 @@ export default function PaginaPerfil() {
   return (
     <>
       <Cabecalho />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-serif text-3xl font-bold mb-8">Meu Perfil</h1>
+      <main className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Meu Perfil</h1>
 
         {mensagem && (
           <p className="text-sm text-green-700 bg-green-50 px-4 py-2 rounded-lg mb-4">{mensagem}</p>

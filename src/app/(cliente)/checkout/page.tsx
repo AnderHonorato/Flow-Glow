@@ -89,7 +89,7 @@ export default function PaginaCheckout() {
           <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
             <Banknote className="h-4 w-4" /> Checkout
           </span>
-          <h1 className="mt-1 text-3xl font-bold">Pagamento</h1>
+          <h1 className="mt-1 text-2xl sm:text-3xl font-bold">Pagamento</h1>
         </div>
 
         {pagamentoCriado ? (
@@ -124,7 +124,7 @@ export default function PaginaCheckout() {
 
               <Cartao>
                 <h2 className="text-lg font-bold">Forma de pagamento</h2>
-                <div className="mt-4 grid gap-3 grid-cols-3">
+                <div className="mt-4 grid gap-3 grid-cols-1 min-[400px]:grid-cols-3">
                   {metodos.map(opcao => {
                     const Icone = opcao.icone;
                     return (

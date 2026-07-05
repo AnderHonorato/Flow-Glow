@@ -41,18 +41,18 @@ export default function PaginaMeusTutoriais() {
   return (
     <>
       <Cabecalho />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="font-serif text-3xl font-bold mb-2">Meus Tutoriais</h1>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-2">Meus Tutoriais</h1>
         <p className="text-[var(--color-texto)]/60 mb-8">
           Continue de onde parou, {usuario?.nomeCompleto?.split(" ")[0]}.
         </p>
 
         {carregando ? (
-          <div className="flex justify-center py-16">
+          <div className="flex justify-center py-10 sm:py-16">
             <div className="animate-spin h-8 w-8 border-4 border-[var(--color-bege)] border-t-[var(--color-berry)] rounded-full" />
           </div>
         ) : tutoriais.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-10 sm:py-16">
             <h2 className="font-serif text-xl font-bold mb-3">
               Você ainda não tem nenhum tutorial
             </h2>

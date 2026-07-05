@@ -214,7 +214,7 @@ function ConteudoTutoriais() {
             {Array.from({ length: 6 }).map((_, indice) => (
               <div
                 key={indice}
-                className="h-80 animate-pulse rounded-lg border border-[var(--color-linha)] bg-white"
+                className="h-52 sm:h-72 lg:h-80 animate-pulse rounded-lg border border-[var(--color-linha)] bg-white"
               />
             ))}
           </div>

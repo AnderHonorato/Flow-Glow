@@ -60,7 +60,7 @@ export default function PaginaChat() {
 
         <div className="flex-1 overflow-y-auto rounded-2xl border border-[var(--color-linha)] bg-white p-4 space-y-3">
           {!conversa || conversa.mensagens.length === 0 ? (
-            <p className="text-center text-[var(--color-texto)]/40 py-16 text-sm">
+              <p className="text-center text-[var(--color-texto)]/40 py-10 sm:py-16 text-sm">
               Envie uma mensagem abaixo. Nosso time responde em até 24h.
             </p>
           ) : (

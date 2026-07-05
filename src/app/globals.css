@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* ============================================
+   Studio Glow — Identidade Visual
+   Todas as cores declaradas diretamente (sem alias var())
+   para garantir resolução no navegador.
+   ============================================ */
+
 @theme inline {
   --color-fundo: #f6f2ec;
   --color-papel: #fffaf5;
@@ -14,14 +20,19 @@
   --color-ouro-claro: #d9b45d;
   --color-linha: #eadfd5;
   --color-linha-forte: #d8c8bb;
-  --color-dourado: var(--color-ouro);
-  --color-dourado-claro: var(--color-ouro-claro);
-  --color-bege: var(--color-linha);
-  --color-bege-escuro: var(--color-linha-forte);
   --color-background: var(--color-fundo);
   --color-foreground: var(--color-texto);
   --font-sans: var(--fonte-inter);
   --font-serif: var(--fonte-fraunces);
+}
+
+/* Garante que todos os apelidos usados no código também existam como
+   variáveis CSS no :root — evita fundo transparente em bg-[var(...)]. */
+:root {
+  --color-bege: #eadfd5;
+  --color-bege-escuro: #d8c8bb;
+  --color-dourado: #b98a2d;
+  --color-dourado-claro: #d9b45d;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -49,27 +60,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--fonte-fraunces), ui-serif, Georgia, serif;
 }
 
-button,
-input,
-textarea {
-  font: inherit;
-}
-
-select {
+button, input, textarea, select {
   font: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-berry);
+  outline: 2px solid #9a3655;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -78,34 +78,13 @@ select {
   background: rgba(154, 54, 85, 0.18);
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-fundo);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-linha-forte);
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-berry-claro);
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f6f2ec; }
+::-webkit-scrollbar-thumb { background: #d8c8bb; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #bf647c; }
 
 @keyframes entrada-suave {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-.animar-entrada {
-  animation: entrada-suave 420ms ease both;
-}
+.animar-entrada { animation: entrada-suave 420ms ease both; }

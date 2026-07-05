@@ -62,7 +62,7 @@ export default function PaginaPlayer() {
     return (
       <>
         <Cabecalho />
-        <div className="flex justify-center py-20">
+        <div className="flex justify-center py-10 sm:py-20">
           <div className="animate-spin h-8 w-8 border-4 border-[var(--color-bege)] border-t-[var(--color-berry)] rounded-full" />
         </div>
         <Rodape />
@@ -74,7 +74,7 @@ export default function PaginaPlayer() {
     return (
       <>
         <Cabecalho />
-        <main className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <main className="max-w-3xl mx-auto px-4 py-10 sm:py-16 text-center">
           <h1 className="font-serif text-2xl font-bold mb-4">Tutorial não encontrado</h1>
           <p className="text-[var(--color-texto)]/60 mb-6">
             Você não comprou este tutorial ou ele não existe.
