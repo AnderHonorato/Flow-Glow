@@ -25,7 +25,7 @@ import { usePreferencias } from "@/contexto/preferencias";
 import { useCarrinho } from "@/hooks/use-carrinho";
 
 const linksNavegacao = [
-  { href: "/tutoriais", texto: "Catalogo", icone: Search, tipo: "catalogo" },
+  { href: "/tutoriais", texto: "Catalogo", icone: ShoppingBag, tipo: "catalogo" },
   { href: "/tutoriais?promocao=true", texto: "Ofertas", icone: Sparkles, tipo: "ofertas" },
 ] as const;
 

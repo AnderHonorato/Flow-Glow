@@ -138,7 +138,7 @@ export function ChatFlutuante() {
   return (
     <div className="fixed bottom-4 right-4 z-[75] sm:bottom-5 sm:right-5">
       {aberto && (
-        <section className="liquid-glass mb-3 flex h-[min(34rem,72dvh)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-xl">
+        <section className="mb-3 flex h-[min(34rem,72dvh)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-xl border border-[#eadfd5] bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-[var(--color-linha)] px-4 py-3">
             <div className="flex items-center gap-2">
               <span className="icon-hover inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-berry)] text-white">
@@ -255,7 +255,7 @@ export function ChatFlutuante() {
       <button
         type="button"
         onClick={() => setAberto((valor) => !valor)}
-        className="icon-hover liquid-glass ml-auto flex h-14 w-14 items-center justify-center rounded-full text-[var(--color-berry)] shadow-[0_14px_36px_rgba(23,32,51,0.16)]"
+        className="icon-hover ml-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#eadfd5] bg-white text-[var(--color-berry)] shadow-[0_14px_36px_rgba(23,32,51,0.16)]"
         aria-label={aberto ? "Fechar chat" : "Abrir chat"}
       >
         <MessageCircle className="h-6 w-6" aria-hidden />
