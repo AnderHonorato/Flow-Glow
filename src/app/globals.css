@@ -107,9 +107,9 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid #b98a2d;
+  outline: 2px solid #e5bd5d;
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 ::selection {

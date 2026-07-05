@@ -52,9 +52,11 @@ export function SeloLocalizacao() {
   const [mostrarPedido, setMostrarPedido] = useState(false);
   const [buscando, setBuscando] = useState(false);
 
-  // Após 5s, mostra o banner pedindo GPS se não tiver localização ainda
+  // Só mostra o pedido de GPS uma vez por sessão (salva no sessionStorage)
   useEffect(() => {
     if (dados?.origem === "gps" || !usuario) return;
+    const jaPerguntou = sessionStorage.getItem("gps_perguntado");
+    if (jaPerguntou) return;
     const timer = setTimeout(() => setMostrarPedido(true), 5000);
     return () => clearTimeout(timer);
   }, [dados?.origem, usuario]);
@@ -62,6 +64,7 @@ export function SeloLocalizacao() {
   async function solicitarGps() {
     setBuscando(true);
     setMostrarPedido(false);
+    sessionStorage.setItem("gps_perguntado", "sim");
     try {
       const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -123,12 +126,12 @@ export function SeloLocalizacao() {
                 <button onClick={solicitarGps} className="text-xs font-semibold bg-[#b98a2d] text-white px-3 py-1.5 rounded-lg hover:bg-[#a07822] transition-colors cursor-pointer">
                   {buscando ? "Buscando..." : "Permitir"}
                 </button>
-                <button onClick={() => setMostrarPedido(false)} className="text-xs font-medium text-[#715f55] px-3 py-1.5 rounded-lg hover:bg-[#f6f2ec] transition-colors cursor-pointer">
+                <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="text-xs font-medium text-[#715f55] px-3 py-1.5 rounded-lg hover:bg-[#f6f2ec] transition-colors cursor-pointer">
                   Agora não
                 </button>
               </div>
             </div>
-            <button onClick={() => setMostrarPedido(false)} className="p-1 text-[#715f55]/50 hover:text-[#715f55] cursor-pointer">
+            <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="p-1 text-[#715f55]/50 hover:text-[#715f55] cursor-pointer">
               <X className="h-4 w-4" />
             </button>
           </div>
