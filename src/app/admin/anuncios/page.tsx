@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { Cartao, Botao, CampoTexto } from "@/components/ui";
+import { UploadImagem } from "@/components/ui/upload-imagem";
 import { Image, Link2, Trash2 } from "lucide-react";
 
 interface AnuncioItem { id: string; titulo: string; imagemUrl: string; linkUrl: string; ordem: number; ativo: boolean; }
@@ -12,6 +13,11 @@ export default function PaginaAdminAnuncios() {
   const [anuncios, setAnuncios] = useState<AnuncioItem[]>([]);
   const [titulo, setTitulo] = useState(""); const [imagemUrl, setImagemUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState(""); const [msg, setMsg] = useState(""); const [erro, setErro] = useState("");
+
+  function aoAlterarImagem(url: string) {
+    setImagemUrl(url);
+    setMsg("");
+  }
 
   async function carregar() {
     const r = await fetch("/api/anuncios", { headers: { Authorization: `Bearer ${accessToken}` } });
@@ -69,7 +75,10 @@ export default function PaginaAdminAnuncios() {
           <CampoTexto rotulo="Título" value={titulo} onChange={e => setTitulo(e.target.value)} />
           <CampoTexto rotulo="URL do link" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="/tutoriais?categoria=maquiagem" />
         </div>
-        <CampoTexto rotulo="URL da imagem" value={imagemUrl} onChange={e => setImagemUrl(e.target.value)} placeholder="https://..." className="mb-4" />
+        <div className="mb-4">
+          <label className="text-sm font-medium text-[var(--color-texto)] mb-1 block">Imagem do banner</label>
+          <UploadImagem valor={imagemUrl} aoAlterar={aoAlterarImagem} />
+        </div>
         <Botao onClick={criar}><Image className="h-4 w-4" /> Criar anúncio</Botao>
       </Cartao>
 

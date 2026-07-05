@@ -11,16 +11,19 @@ interface UploadImagemProps {
 
 export function UploadImagem({ valor, aoAlterar }: UploadImagemProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [modo, setModo] = useState<"link" | "upload" | null>(null);
+  const [modo, setModo] = useState<"link" | null>(null);
   const [link, setLink] = useState(valor);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+
+  function abrirExplorador() {
+    fileRef.current?.click();
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Preview local
     const reader = new FileReader();
     reader.onload = (ev) => setPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
@@ -34,7 +37,6 @@ export function UploadImagem({ valor, aoAlterar }: UploadImagemProps) {
       if (d.sucesso) {
         aoAlterar(d.dados.url);
         setLink(d.dados.url);
-        setModo(null);
       }
     } catch {}
     setUploading(false);
@@ -65,7 +67,7 @@ export function UploadImagem({ valor, aoAlterar }: UploadImagemProps) {
           <Botao type="button" variante="contorno" tamanho="pequeno" onClick={() => setModo("link")}>
             <Link2 className="h-4 w-4" /> Link
           </Botao>
-          <Botao type="button" variante="contorno" tamanho="pequeno" onClick={() => { setModo("upload"); fileRef.current?.click(); }}>
+          <Botao type="button" variante="contorno" tamanho="pequeno" onClick={abrirExplorador}>
             <Upload className="h-4 w-4" /> Dispositivo
           </Botao>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />

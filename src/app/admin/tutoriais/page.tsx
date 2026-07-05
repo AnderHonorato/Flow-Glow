@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
+import { UploadImagem } from "@/components/ui/upload-imagem";
 import type { TutorialCard, TutorialDetalhe } from "@/tipos";
 
 interface Categoria {
@@ -533,13 +534,13 @@ export default function PaginaAdminTutoriais() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <CampoTexto
-                rotulo="Foto principal"
-                value={form.imagemCapaUrl}
-                onChange={(e) => atualizar("imagemCapaUrl", e.target.value)}
-                placeholder="https://..."
-                icone={<ImagePlus className="h-4 w-4" aria-hidden />}
-              />
+              <div>
+                <label className="text-sm font-medium text-[var(--color-texto)] mb-1 block">Foto principal</label>
+                <UploadImagem
+                  valor={form.imagemCapaUrl}
+                  aoAlterar={(url) => atualizar("imagemCapaUrl", url)}
+                />
+              </div>
               <CampoTexto
                 rotulo="Vídeo de prévia"
                 value={form.videoPreviaUrl}
