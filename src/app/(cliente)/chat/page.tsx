@@ -53,7 +53,7 @@ export default function PaginaChat() {
   return (
     <>
       <Cabecalho />
-      <div className="mx-auto flex max-w-2xl flex-col px-4 py-6" style={{ height: "calc(100vh - 7rem)" }}>
+      <div className="mx-auto flex max-w-2xl flex-col px-4 py-6" style={{ height: "calc(100dvh - 7rem)" }}>
         <h1 className="font-serif text-xl font-bold mb-4 flex items-center gap-2">
           <Smile className="h-5 w-5 text-[var(--color-berry)]" /> Fale Conosco
         </h1>
