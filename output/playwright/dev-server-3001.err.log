@@ -151,3 +151,591 @@ Persisting failed: Another write batch or compaction is already active (Only a s
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
 Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\static\development\_buildManifest.js.tmp.5kv0vx97zvp'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\static\\development\\_buildManifest.js.tmp.5kv0vx97zvp'
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\api\tutoriais\[__metadata_id__]\route\app-paths-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\api\\tutoriais\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: Cannot find module '../chunks/ssr/[turbopack]_runtime.js'
+Require stack:
+- C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\require.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\load-components.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\build\utils.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\router-server.js
+- C:\Projetos\Andamento\Vendas Online\node_modules\next\dist\server\lib\start-server.js
+    at Object.<anonymous> (C:\Projetos\Andamento\Vendas Online\.next\dev\server\pages\_document.js:1:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\pages\\_document.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Projetos\\Andamento\\Vendas Online\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\routes-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\routes-manifest.json'
+}
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+⨯ Error: ENOENT: no such file or directory, open 'C:\Projetos\Andamento\Vendas Online\.next\dev\server\app\page\build-manifest.json'
+    at ignore-listed frames {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Projetos\\Andamento\\Vendas Online\\.next\\dev\\server\\app\\page\\build-manifest.json'
+}
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)

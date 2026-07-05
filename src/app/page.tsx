@@ -11,6 +11,8 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Cabecalho, Rodape } from "@/components/layout";
+import { BarraLocalizacao } from "@/components/layout/barra-localizacao";
+import { CarrosselBanners } from "@/components/layout/carrossel-banners";
 import { Botao, Cartao } from "@/components/ui";
 import type { TutorialCard } from "@/tipos";
 
@@ -57,6 +59,8 @@ export default function PaginaInicial() {
   return (
     <>
       <Cabecalho />
+      <BarraLocalizacao />
+      <CarrosselBanners />
 
       <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <section className="divisoria-curva liquid-glass mb-5 p-4 sm:p-5">

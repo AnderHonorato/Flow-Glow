@@ -163,6 +163,9 @@ export function Cabecalho() {
             <Marca compacta={encolhido} />
           </Link>
 
+          {/* Espaçador flexível que empurra ações para a direita */}
+          <div className="flex-1" />
+
           <nav className="hidden items-center gap-1 lg:flex">
             {linksNavegacao.map((link) => {
               const Icone = link.icone;
@@ -259,6 +262,29 @@ export function Cabecalho() {
                   <Botao variante="primario" tamanho="pequeno">Criar conta</Botao>
                 </Link>
               </>
+            )}
+          </div>
+
+          {/* Ações visíveis no mobile */}
+          <div className="flex items-center gap-1 md:hidden">
+            {usuario ? (
+              <>
+                <Link href="/carrinho" className="icon-hover relative inline-flex h-9 w-9 items-center justify-center rounded-full">
+                  <ShoppingBag className="h-5 w-5 text-[var(--color-texto)]" />
+                  {quantidadeItens > 0 && (
+                    <span className="absolute -right-1 -top-0.5 min-w-[18px] rounded-full bg-[var(--color-berry)] text-center text-[10px] font-bold text-white leading-[18px]">
+                      {quantidadeItens}
+                    </span>
+                  )}
+                </Link>
+                <Link href="/perfil" className="icon-hover inline-flex h-9 w-9 items-center justify-center rounded-full">
+                  <AvatarUsuario nome={usuario.nomeCompleto} fotoUrl={usuario.fotoPerfilUrl} tamanho="pequeno" />
+                </Link>
+              </>
+            ) : (
+              <Link href="/login" className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-berry)] px-4 text-sm font-semibold text-white">
+                <LogIn className="h-4 w-4" /> Entrar
+              </Link>
             )}
           </div>
 

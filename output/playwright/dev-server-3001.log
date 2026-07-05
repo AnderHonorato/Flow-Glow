@@ -268,3 +268,20 @@
  GET /api/tutoriais?busca=pele&promocao=true 200 in 153ms (next.js: 3ms, proxy.ts: 8ms, application-code: 141ms)
  GET /api/tutoriais?ordenar=recentes 200 in 171ms (next.js: 9ms, proxy.ts: 12ms, application-code: 151ms)
  GET /api/tutoriais?ordenar=recentes 200 in 458ms (next.js: 9ms, proxy.ts: 8ms, application-code: 441ms)
+○ Compiling /_error ...
+ GET /api/tutoriais?ordenar=recentes 500 in 21.1s (next.js: 21.0s, proxy.ts: 43ms, application-code: 59ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 21.1s (next.js: 21.0s, proxy.ts: 43ms, application-code: 62ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 9.4s (next.js: 9.4s, proxy.ts: 11ms, application-code: 38ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 9.4s (next.js: 9.4s, proxy.ts: 11ms, application-code: 39ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 4.5s (next.js: 4.4s, proxy.ts: 16ms, application-code: 50ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 4.5s (next.js: 4.4s, proxy.ts: 16ms, application-code: 52ms)
+ GET / 500 in 20.7s (next.js: 20.6s, proxy.ts: 9ms, application-code: 35ms)
+ GET / 500 in 20.7s (next.js: 20.6s, proxy.ts: 9ms, application-code: 36ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 14.6s (next.js: 14.5s, proxy.ts: 20ms, application-code: 78ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 14.6s (next.js: 14.5s, proxy.ts: 20ms, application-code: 82ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 19.7s (next.js: 19.6s, proxy.ts: 13ms, application-code: 46ms)
+ GET /api/tutoriais?ordenar=recentes 500 in 19.7s (next.js: 19.6s, proxy.ts: 13ms, application-code: 52ms)
+ GET / 500 in 582ms (next.js: 510ms, proxy.ts: 7ms, application-code: 66ms)
+ GET / 500 in 584ms (next.js: 510ms, proxy.ts: 7ms, application-code: 67ms)
+✓ Compiled in 282ms
+✓ Compiled in 1075ms

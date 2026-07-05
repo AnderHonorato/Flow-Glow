@@ -16,6 +16,8 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { Cabecalho, Rodape } from "@/components/layout";
+import { BarraLocalizacao } from "@/components/layout/barra-localizacao";
+import { CarrosselBanners } from "@/components/layout/carrossel-banners";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
 import { usePreferencias } from "@/contexto/preferencias";
 import type { TutorialCard } from "@/tipos";
@@ -316,6 +318,8 @@ function ConteudoTutoriais() {
   return (
     <>
       <Cabecalho />
+      <BarraLocalizacao />
+      <CarrosselBanners />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <section className="divisoria-curva mb-5 border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_82%,transparent)] p-4 backdrop-blur-md sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:items-end">
