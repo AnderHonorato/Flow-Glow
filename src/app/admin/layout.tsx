@@ -6,6 +6,7 @@ import {
   MessageCircle,
   MessageSquareText,
   PackageCheck,
+  Settings,
   ShieldCheck,
   ShoppingBag,
   Tag,
@@ -18,15 +19,16 @@ import type { ReactNode } from "react";
 import { Marca } from "@/components/ui";
 
 const linksAdmin = [
-  { href: "/admin/painel", texto: "Visão geral", icone: BarChart3 },
+  { href: "/admin/painel", texto: "Visao geral", icone: BarChart3 },
   { href: "/admin/tutoriais", texto: "Tutoriais", icone: ShoppingBag },
   { href: "/admin/categorias", texto: "Categorias", icone: Tag },
   { href: "/admin/anuncios", texto: "Banners", icone: Megaphone },
   { href: "/admin/cupons", texto: "Cupons", icone: Ticket },
-  { href: "/admin/usuarios", texto: "Usuários", icone: UsersRound },
+  { href: "/admin/usuarios", texto: "Usuarios", icone: UsersRound },
   { href: "/admin/pedidos", texto: "Pedidos", icone: PackageCheck },
-  { href: "/admin/comentarios", texto: "Avaliações", icone: MessageSquareText },
+  { href: "/admin/comentarios", texto: "Avaliacoes", icone: MessageSquareText },
   { href: "/admin/chat", texto: "Chat", icone: MessageCircle },
+  { href: "/admin/configuracoes", texto: "Configuracoes", icone: Settings },
 ];
 
 export default function LayoutAdmin({ children }: { children: ReactNode }) {

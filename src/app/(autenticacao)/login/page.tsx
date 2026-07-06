@@ -35,7 +35,7 @@ export default function PaginaLogin() {
     setEnviando(false);
 
     if (resultado.sucesso) {
-      router.push("/meus-tutoriais");
+      router.back();
     } else {
       setErro(resultado.erro || "Erro ao fazer login.");
     }

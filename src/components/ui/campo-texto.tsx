@@ -13,6 +13,7 @@ interface CampoTextoProps
   as?: "input" | "textarea";
   icone?: ReactNode;
   sufixo?: ReactNode;
+  variante?: "padrao" | "busca";
 }
 
 export function CampoTexto({
@@ -23,23 +24,44 @@ export function CampoTexto({
   as = "input",
   icone,
   sufixo,
+  value,
+  maxLength,
+  variante = "padrao",
   ...props
 }: CampoTextoProps) {
   const campoId = id || rotulo.toLowerCase().replace(/\s+/g, "-");
-  const classeBase = `w-full rounded-lg border bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] placeholder:text-[var(--color-texto)]/35 shadow-sm backdrop-blur-md transition-all duration-200 ${
-    erro
-      ? "border-red-500 focus:border-red-500"
-      : "border-[var(--color-linha-forte)] focus:border-[var(--color-berry)]"
-  } focus:outline-none focus:ring-3 focus:ring-[var(--color-berry)]/12 disabled:bg-[var(--color-papel)] disabled:cursor-not-allowed ${className}`;
+  const ehBusca = variante === "busca";
+
+  const classeBase = ehBusca
+    ? `w-full rounded-full border bg-[color-mix(in_srgb,var(--color-papel)_86%,transparent)] text-[var(--color-texto)] placeholder:text-[var(--color-texto)]/35 shadow-sm backdrop-blur-md transition-all duration-200 ${
+        erro
+          ? "border-red-500 focus:border-red-500"
+          : "border-[var(--color-linha)] focus:border-[var(--color-berry)]"
+      } focus:outline-none focus:ring-2 focus:ring-[var(--color-berry)]/12 disabled:bg-[var(--color-papel)] disabled:cursor-not-allowed ${className}`
+    : `w-full rounded-lg border bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] placeholder:text-[var(--color-texto)]/35 shadow-sm backdrop-blur-md transition-all duration-200 ${
+        erro
+          ? "border-red-500 focus:border-red-500"
+          : "border-[var(--color-linha-forte)] focus:border-[var(--color-berry)]"
+      } focus:outline-none focus:ring-3 focus:ring-[var(--color-berry)]/12 disabled:bg-[var(--color-papel)] disabled:cursor-not-allowed ${className}`;
+
+  const comprimento = typeof value === "string" ? value.length : String(value ?? "").length;
+  const mostrarContador = maxLength !== undefined;
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={campoId} className="text-sm font-semibold text-[var(--color-texto)]">
-        {rotulo}
-      </label>
+      <div className="flex items-center justify-between">
+        <label htmlFor={campoId} className="text-sm font-semibold text-[var(--color-texto)]">
+          {rotulo}
+        </label>
+        {mostrarContador && (
+          <span className={`text-xs font-medium ${comprimento > maxLength ? "text-red-500" : "text-[var(--color-texto-suave)]"}`}>
+            {comprimento}/{maxLength}
+          </span>
+        )}
+      </div>
       <div className="relative">
-        {icone && as !== "textarea" && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-texto)]/42">
+        {icone && (
+          <span className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-[var(--color-texto)]/42 ${ehBusca ? "left-3.5" : "left-3"}`}>
             {icone}
           </span>
         )}
@@ -48,19 +70,23 @@ export function CampoTexto({
             id={campoId}
             className={`${classeBase} min-h-28 px-3.5 py-3`}
             rows={4}
+            value={value}
+            maxLength={maxLength}
             {...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
           />
         ) : (
           <input
             id={campoId}
-            className={`${classeBase} h-10 sm:h-11 ${icone ? "pl-10" : "px-3.5"} ${
+            className={`${classeBase} h-10 sm:h-11 ${icone ? (ehBusca ? "pl-10" : "pl-10") : "px-3.5"} ${
               sufixo ? "pr-12" : ""
             }`}
+            value={value}
+            maxLength={maxLength}
             {...(props as InputHTMLAttributes<HTMLInputElement>)}
           />
         )}
-        {sufixo && as !== "textarea" && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-texto)]/42">
+        {sufixo && (
+          <span className={`absolute top-1/2 -translate-y-1/2 text-[var(--color-texto)]/42 ${ehBusca ? "right-3.5" : "right-3"}`}>
             {sufixo}
           </span>
         )}

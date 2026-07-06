@@ -20,10 +20,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     if (papel !== "ADMINISTRADOR") {
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
-    const { titulo, imagemUrl, linkUrl } = await request.json();
+    const { titulo, imagemUrl, linkUrl, corFundo } = await request.json();
     const maxOrdem = await prisma.anuncio.findFirst({ orderBy: { ordem: "desc" }, select: { ordem: true } });
     const anuncio = await prisma.anuncio.create({
-      data: { titulo, imagemUrl, linkUrl, ordem: (maxOrdem?.ordem ?? 0) + 1 },
+      data: { titulo, imagemUrl, linkUrl, corFundo: corFundo || null, ordem: (maxOrdem?.ordem ?? 0) + 1 },
     });
     return NextResponse.json({ sucesso: true, dados: anuncio }, { status: 201 });
   } catch {

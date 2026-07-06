@@ -31,7 +31,7 @@ export function Marca({
       </span>
       {mostrarTexto && (
           <span className="min-w-0 leading-tight">
-          <span className={`block truncate font-serif text-base font-bold ${inversa ? "text-white" : "text-[var(--color-texto)]"}`}>
+          <span className={`block truncate font-serif text-lg font-black tracking-[0.04em] ${inversa ? "text-[var(--color-ouro-claro)]" : "text-[var(--color-ouro)]"} drop-shadow-sm`}>
             MCA
           </span>
           <span className={`block truncate text-[11px] font-bold uppercase tracking-wide ${inversa ? "text-white/62" : "text-[var(--color-texto-suave)]"}`}>

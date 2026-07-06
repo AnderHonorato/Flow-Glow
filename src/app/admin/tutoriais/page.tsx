@@ -11,11 +11,13 @@ import {
   Search,
   TicketPercent,
   Trash2,
+  Download,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
 import { UploadImagem } from "@/components/ui/upload-imagem";
+import { exportarCSV, exportarTXT } from "@/lib/exportar";
 import type { TutorialCard, TutorialDetalhe } from "@/tipos";
 
 interface Categoria {
@@ -142,8 +144,6 @@ export default function PaginaAdminTutoriais() {
 
   useEffect(() => {
     carregar();
-    const intervalo = window.setInterval(carregar, 5000);
-    return () => window.clearInterval(intervalo);
   }, []);
 
   const tutoriaisFiltrados = useMemo(() => {
@@ -324,8 +324,26 @@ export default function PaginaAdminTutoriais() {
             onChange={(e) => setBusca(e.target.value)}
             placeholder="Título, cupom, categoria ou cidade"
             icone={<Search className="h-4 w-4" aria-hidden />}
+            variante="busca"
           />
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
+            <Botao tamanho="pequeno" variante="contorno" onClick={() => {
+              exportarCSV(
+                ["Título", "Slug", "Categoria", "Preço", "Promocional", "Bombando", "Cidade"],
+                tutoriaisFiltrados.map(t => [t.titulo, t.slug, t.categoria.nome, String(t.preco), t.precoPromocional ? String(t.precoPromocional) : "", t.bombando ? "Sim" : "Nao", t.cidade || ""]),
+                "tutoriais"
+              );
+            }}>
+              <Download className="h-4 w-4" /> CSV
+            </Botao>
+            <Botao tamanho="pequeno" variante="contorno" onClick={() => {
+              const txt = tutoriaisFiltrados.map(t =>
+                `Título: ${t.titulo}\nSlug: ${t.slug}\nCategoria: ${t.categoria.nome}\nPreço: R$ ${t.preco}\nPromocional: ${t.precoPromocional ? `R$ ${t.precoPromocional}` : "N/A"}\nBombando: ${t.bombando ? "Sim" : "Nao"}\nCidade: ${t.cidade || "N/A"}\n---`
+              ).join("\n");
+              exportarTXT(txt, "tutoriais");
+            }}>
+              <Download className="h-4 w-4" /> TXT
+            </Botao>
             <Botao onClick={abrirCriacao} className="w-full sm:w-auto">
               <Plus className="h-4 w-4" aria-hidden />
               Novo anúncio
@@ -337,11 +355,6 @@ export default function PaginaAdminTutoriais() {
       {mensagem && (
         <p className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
           {mensagem}
-        </p>
-      )}
-      {erro && (
-        <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
-          {erro}
         </p>
       )}
 
@@ -410,6 +423,11 @@ export default function PaginaAdminTutoriais() {
         descricao="Tudo que aparece no catálogo público fica controlável aqui."
         onFechar={() => setModalAberto(false)}
       >
+        {erro && (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+            {erro}
+          </p>
+        )}
         {carregandoEdicao ? (
           <div className="py-12 text-center text-sm text-[var(--color-texto-suave)]">
             Carregando dados do anúncio...

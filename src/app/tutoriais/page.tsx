@@ -7,6 +7,7 @@ import {
   Flame,
   MapPin,
   Search,
+  ShoppingCart,
   SlidersHorizontal,
   Sparkles,
   Star,
@@ -16,8 +17,8 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { Cabecalho, Rodape } from "@/components/layout";
-import { CarrosselBanners } from "@/components/layout/carrossel-banners";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
+import { useCarrinho } from "@/hooks/use-carrinho";
 import { usePreferencias } from "@/contexto/preferencias";
 import type { TutorialCard } from "@/tipos";
 
@@ -66,6 +67,7 @@ function GrupoFiltro({ titulo, children }: { titulo: string; children: ReactNode
 
 function ConteudoTutoriais() {
   const searchParams = useSearchParams();
+  const { adicionarAoCarrinho, estaNoCarrinho } = useCarrinho();
   const { localizacao, carregandoLocalizacao, solicitarLocalizacao, erroLocalizacao } =
     usePreferencias();
 
@@ -137,10 +139,8 @@ function ConteudoTutoriais() {
     }
 
     const atraso = window.setTimeout(() => carregar(), 180);
-    const intervalo = window.setInterval(() => carregar(true), 5000);
     return () => {
       window.clearTimeout(atraso);
-      window.clearInterval(intervalo);
     };
   }, [
     busca,
@@ -329,7 +329,6 @@ function ConteudoTutoriais() {
   return (
     <>
       <Cabecalho />
-      <CarrosselBanners />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <section className="divisoria-curva mb-5 border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_82%,transparent)] p-4 backdrop-blur-md sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:items-end">
@@ -349,6 +348,7 @@ function ConteudoTutoriais() {
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Ex.: pele, noivas, São Paulo, GLOW20"
               icone={<Search className="h-4 w-4" aria-hidden />}
+              variante="busca"
             />
           </div>
         </section>
@@ -503,9 +503,29 @@ function ConteudoTutoriais() {
                             </span>
                           </div>
 
-                          <div className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[var(--color-berry)]">
-                            Abrir anúncio
-                            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                          <div className="mt-4 flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 text-sm font-bold text-[var(--color-berry)]">
+                              Abrir anúncio
+                              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                adicionarAoCarrinho({
+                                  tutorialId: tutorial.id,
+                                  titulo: tutorial.titulo,
+                                  imagemCapaUrl: tutorial.imagemCapaUrl,
+                                  preco: tutorial.preco,
+                                  precoPromocional: tutorial.precoPromocional,
+                                });
+                              }}
+                              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-berry)] px-3 py-1.5 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[var(--color-berry-escuro)]"
+                            >
+                              <ShoppingCart className="h-3.5 w-3.5" />
+                              {estaNoCarrinho(tutorial.id) ? "✓" : "Comprar"}
+                            </button>
                           </div>
                         </div>
                       </Cartao>

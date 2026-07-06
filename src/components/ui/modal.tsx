@@ -40,7 +40,7 @@ export function Modal({ aberto, titulo, descricao, children, onFechar }: ModalPr
         if (evento.target === evento.currentTarget) onFechar();
       }}
     >
-      <div className="w-full max-w-2xl overflow-hidden rounded-lg border border-[var(--color-linha)] bg-white shadow-[0_24px_70px_rgba(42,31,28,0.22)]">
+      <div className="w-full max-w-2xl overflow-hidden rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] shadow-[0_24px_70px_rgba(42,31,28,0.22)]">
         <div className="flex items-start justify-between gap-4 border-b border-[var(--color-linha)] px-5 py-4">
           <div>
             <h2 id="modal-titulo" className="text-lg font-bold text-[var(--color-texto)]">

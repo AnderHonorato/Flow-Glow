@@ -9,16 +9,27 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
 
-    const comentarios = await prisma.comentario.findMany({
-      include: {
-        usuario: { select: { nomeCompleto: true } },
-        tutorial: { select: { titulo: true } },
-      },
-      orderBy: { criadoEm: "desc" },
-      take: 200,
-    });
+    const [comentarios, atendimentos] = await Promise.all([
+      prisma.comentario.findMany({
+        include: {
+          usuario: { select: { nomeCompleto: true } },
+          tutorial: { select: { titulo: true } },
+        },
+        orderBy: { criadoEm: "desc" },
+        take: 200,
+      }),
+      prisma.conversa.findMany({
+        where: { avaliacaoNota: { not: null } },
+        include: {
+          usuario: { select: { nomeCompleto: true, email: true } },
+          atendente: { select: { nomeCompleto: true, email: true } },
+        },
+        orderBy: { avaliacaoEnviadaEm: "desc" },
+        take: 200,
+      }),
+    ]);
 
-    return NextResponse.json({ sucesso: true, dados: comentarios });
+    return NextResponse.json({ sucesso: true, dados: { comentarios, atendimentos } });
   } catch (erro) {
     console.error("Erro ao listar comentários:", erro);
     return NextResponse.json({ sucesso: false, erro: "Erro interno." }, { status: 500 });

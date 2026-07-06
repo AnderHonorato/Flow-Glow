@@ -20,8 +20,15 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
     const papel = request.headers.get("x-usuario-papel");
     if (papel !== "ADMINISTRADOR") return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
 
-    const { id, contaPausada } = await request.json();
-    await prisma.usuario.update({ where: { id }, data: { contaPausada } });
+    const body = await request.json();
+    const { id, contaPausada, emailVerificado, papel: novoPapel } = body;
+
+    const dados: Record<string, unknown> = {};
+    if (contaPausada !== undefined) dados.contaPausada = contaPausada;
+    if (emailVerificado !== undefined) dados.emailVerificado = emailVerificado;
+    if (novoPapel) dados.papel = novoPapel;
+
+    await prisma.usuario.update({ where: { id }, data: dados });
     return NextResponse.json({ sucesso: true });
   } catch { return NextResponse.json({ sucesso: false, erro: "Erro interno." }, { status: 500 }); }
 }

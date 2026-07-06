@@ -40,6 +40,20 @@ enum TipoAnexo {
   VIDEO
 }
 
+enum ConversaStatus {
+  TRIAGEM
+  AGUARDANDO_ATENDENTE
+  EM_ATENDIMENTO
+  ENCERRADA
+}
+
+enum TipoMensagem {
+  CLIENTE
+  ATENDENTE
+  BOT
+  SISTEMA
+}
+
 // -------------------- USUÁRIO E PERFIL --------------------
 
 model Usuario {
@@ -51,6 +65,11 @@ model Usuario {
   papel                    PapelUsuario @default(CLIENTE)
   fotoPerfilUrl            String?
   whatsapp                 String?
+  telefone                 String?
+  dataNascimento           DateTime?
+  genero                   String?
+  apelido                  String?
+  profissao                String?
   contaPausada             Boolean      @default(false)
   emailVerificado          Boolean      @default(false)
   tokenVerificacaoEmail    String?
@@ -66,6 +85,7 @@ model Usuario {
   pedidos           Pedido[]
   comentarios       Comentario[]
   conversas         Conversa[]
+  atendimentos      Conversa[]       @relation("AtendenteConversas")
   mensagensEnviadas Mensagem[]
 
   @@map("usuarios")
@@ -217,28 +237,47 @@ model AnexoComentario {
 // -------------------- CHAT --------------------
 
 model Conversa {
-  id           String     @id @default(uuid())
-  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
-  usuarioId    String
-  mensagens    Mensagem[]
-  criadoEm     DateTime   @default(now())
-  atualizadoEm DateTime   @updatedAt
+  id                       String         @id @default(uuid())
+  protocolo                String         @unique @default(uuid())
+  status                   ConversaStatus @default(TRIAGEM)
+  assunto                  String?
+  usuario                  Usuario        @relation(fields: [usuarioId], references: [id])
+  usuarioId                String
+  atendente                Usuario?       @relation("AtendenteConversas", fields: [atendenteId], references: [id])
+  atendenteId              String?
+  clienteAguardandoDesde   DateTime?
+  atendimentoIniciadoEm    DateTime?
+  ultimaInteracaoClienteEm DateTime?
+  avisoInatividadeEm       DateTime?
+  encerradoEm              DateTime?
+  encerradoPor             String?
+  avaliacaoNota            Int?
+  avaliacaoTexto           String?
+  avaliacaoEnviadaEm       DateTime?
+  mensagens                Mensagem[]
+  criadoEm                 DateTime       @default(now())
+  atualizadoEm             DateTime       @updatedAt
 
+  @@index([usuarioId])
+  @@index([atendenteId])
+  @@index([status])
   @@map("conversas")
 }
 
 model Mensagem {
   id          String          @id @default(uuid())
   texto       String?
+  tipo        TipoMensagem    @default(CLIENTE)
   conversa    Conversa        @relation(fields: [conversaId], references: [id], onDelete: Cascade)
   conversaId  String
-  remetente   Usuario         @relation(fields: [remetenteId], references: [id])
-  remetenteId String
+  remetente   Usuario?        @relation(fields: [remetenteId], references: [id])
+  remetenteId String?
   lida        Boolean         @default(false)
   anexos      AnexoMensagem[]
   criadoEm    DateTime        @default(now())
 
   @@index([conversaId])
+  @@index([remetenteId])
   @@map("mensagens")
 }
 
@@ -272,9 +311,32 @@ model Anuncio {
   titulo    String
   imagemUrl String
   linkUrl   String
+  corFundo  String?
   ordem     Int      @default(0)
   ativo     Boolean  @default(true)
   criadoEm  DateTime @default(now())
 
   @@map("anuncios")
+}
+
+// -------------------- CONFIGURACOES --------------------
+
+model ConfiguracaoAvisoTopo {
+  id               String    @id @default(uuid())
+  titulo           String
+  mensagem         String
+  linkTexto        String?
+  linkUrl          String?
+  corFundo         String    @default("#b9923d")
+  corTexto         String    @default("#ffffff")
+  ativo            Boolean   @default(false)
+  inicioEm         DateTime
+  fimEm            DateTime
+  desativadoEm     DateTime?
+  desativadoMotivo String?
+  criadoEm         DateTime  @default(now())
+  atualizadoEm     DateTime  @updatedAt
+
+  @@index([ativo, inicioEm, fimEm])
+  @@map("configuracoes_aviso_topo")
 }

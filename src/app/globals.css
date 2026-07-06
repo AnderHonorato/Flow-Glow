@@ -48,21 +48,21 @@
 :root[data-theme="escuro"] {
   --color-fundo: #0f1625;
   --color-papel: #172033;
-  --color-texto: #f4f7fb;
-  --color-texto-suave: #aab8ca;
-  --color-berry: #f06a98;
-  --color-berry-claro: #ff91b4;
-  --color-berry-escuro: #c94373;
-  --color-sage: #56c4bd;
-  --color-sage-escuro: #319b96;
-  --color-ouro: #e5bd5d;
-  --color-ouro-claro: #f5d98a;
+  --color-texto: #e8edf5;
+  --color-texto-suave: #8c9bb5;
+  --color-berry: #d45480;
+  --color-berry-claro: #e07098;
+  --color-berry-escuro: #b34065;
+  --color-sage: #4db8b2;
+  --color-sage-escuro: #2d8a86;
+  --color-ouro: #c9a345;
+  --color-ouro-claro: #dbb85c;
   --color-linha: #2b3850;
   --color-linha-forte: #42516a;
-  --color-bege: #243149;
-  --color-bege-escuro: #3b4961;
-  --color-dourado: #e5bd5d;
-  --color-dourado-claro: #f5d98a;
+  --color-bege: #1e2a40;
+  --color-bege-escuro: #2d3a54;
+  --color-dourado: #c9a345;
+  --color-dourado-claro: #dbb85c;
   --gradiente-fundo: #0f1625;
   --sombra-glass: 0 18px 52px rgba(0, 0, 0, 0.32);
 }
@@ -212,4 +212,8 @@ select {
 :root[data-theme="escuro"] textarea,
 :root[data-theme="escuro"] select {
   color-scheme: dark;
+}
+
+a, button, [role="button"], label[for] {
+  cursor: pointer;
 }

@@ -112,11 +112,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
         usuario: {
           id: usuarioAtualizado.id,
           nomeCompleto: usuarioAtualizado.nomeCompleto,
+          apelido: usuarioAtualizado.apelido,
+          cpf: usuarioAtualizado.cpf,
           email: usuarioAtualizado.email,
           papel: usuarioAtualizado.papel,
           emailVerificado: usuarioAtualizado.emailVerificado,
           fotoPerfilUrl: usuarioAtualizado.fotoPerfilUrl,
           whatsapp: usuarioAtualizado.whatsapp,
+          telefone: usuarioAtualizado.telefone,
+          dataNascimento: usuarioAtualizado.dataNascimento?.toISOString() || null,
+          genero: usuarioAtualizado.genero,
+          profissao: usuarioAtualizado.profissao,
         },
       },
     });

@@ -2,6 +2,7 @@ import {
   MessageCircle,
   MessageSquareText,
   PackageCheck,
+  Settings,
   ShoppingBag,
   UsersRound,
 } from "lucide-react";
@@ -11,13 +12,13 @@ import { Cartao } from "@/components/ui";
 const atalhos = [
   {
     href: "/admin/tutoriais",
-    titulo: "Anúncios",
-    descricao: "Criar, revisar promoções, cupons e distância.",
+    titulo: "Anuncios",
+    descricao: "Criar, revisar promocoes, cupons e distancia.",
     icone: ShoppingBag,
   },
   {
     href: "/admin/usuarios",
-    titulo: "Usuários",
+    titulo: "Usuarios",
     descricao: "Visualizar clientes e contas administrativas.",
     icone: UsersRound,
   },
@@ -29,15 +30,21 @@ const atalhos = [
   },
   {
     href: "/admin/comentarios",
-    titulo: "Avaliações",
-    descricao: "Moderar comentários e experiências dos clientes.",
+    titulo: "Avaliacoes",
+    descricao: "Moderar comentarios e experiencias dos clientes.",
     icone: MessageSquareText,
   },
   {
     href: "/admin/chat",
     titulo: "Chat",
-    descricao: "Responder clientes dentro da plataforma.",
+    descricao: "Iniciar, transferir e encerrar atendimentos por protocolo.",
     icone: MessageCircle,
+  },
+  {
+    href: "/admin/configuracoes",
+    titulo: "Configuracoes",
+    descricao: "Controlar faixa superior de avisos e periodo ativo.",
+    icone: Settings,
   },
 ];
 
@@ -48,7 +55,7 @@ export default function PaginaPainelAdmin() {
         <span className="text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
           Painel
         </span>
-        <h1 className="mt-1 text-3xl font-bold">Visão geral</h1>
+        <h1 className="mt-1 text-3xl font-bold">Visao geral</h1>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

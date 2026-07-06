@@ -43,6 +43,8 @@ function ehRotaPublica(caminho: string, metodo: string): boolean {
     metodoLeitura &&
     (caminho === "/api/tutoriais" ||
       caminho.startsWith("/api/tutoriais/") ||
+      caminho === "/api/anuncios" ||
+      caminho === "/api/aviso-topo" ||
       caminho === "/api/categorias" ||
       caminho.startsWith("/api/categorias/") ||
       caminho.startsWith("/api/cep/"))

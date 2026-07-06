@@ -19,53 +19,87 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json(
         {
           sucesso: false,
-          erro: validacao.error.issues[0]?.message || "Dados inválidos",
+          erro: validacao.error.issues[0]?.message || "Dados invalidos",
         },
         { status: 400 }
       );
     }
 
-    const { nomeCompleto, cpf, email, senha, cep, logradouro, numero, complemento, bairro, cidade, estado } = validacao.data;
+    const {
+      nomeCompleto,
+      apelido,
+      cpf,
+      email,
+      whatsapp,
+      telefone,
+      dataNascimento,
+      genero,
+      profissao,
+      senha,
+      cep,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+    } = validacao.data;
 
-    // Verifica se o e-mail já está cadastrado.
-    const usuarioExistente = await prisma.usuario.findUnique({
-      where: { email },
+    const usuarioExistente = await prisma.usuario.findFirst({
+      where: { OR: [{ email }, { cpf }] },
+      select: { email: true, cpf: true },
     });
 
-    if (usuarioExistente) {
+    if (usuarioExistente?.email === email) {
       return NextResponse.json(
-        { sucesso: false, erro: "Este e-mail já está cadastrado." },
+        { sucesso: false, erro: "Este e-mail ja esta cadastrado." },
         { status: 409 }
       );
     }
 
-    // Hash da senha com bcrypt (fator de custo 12).
-    const senhaHash = await bcrypt.hash(senha, 12);
+    if (usuarioExistente?.cpf === cpf) {
+      return NextResponse.json(
+        { sucesso: false, erro: "Este CPF ja esta cadastrado." },
+        { status: 409 }
+      );
+    }
 
-    // Token de verificação de e-mail — gerado com crypto aleatório seguro.
+    const senhaHash = await bcrypt.hash(senha, 12);
     const tokenVerificacao = crypto.randomBytes(32).toString("hex");
 
     const usuario = await prisma.usuario.create({
       data: {
         nomeCompleto,
+        apelido: apelido || null,
         cpf,
         email,
         senhaHash,
+        whatsapp,
+        telefone: telefone || null,
+        dataNascimento: new Date(`${dataNascimento}T00:00:00.000Z`),
+        genero: genero || null,
+        profissao: profissao || null,
         tokenVerificacaoEmail: tokenVerificacao,
         endereco: {
-          create: { cep, logradouro, numero, complemento: complemento || null, bairro, cidade, estado },
+          create: {
+            cep,
+            logradouro,
+            numero,
+            complemento: complemento || null,
+            bairro,
+            cidade,
+            estado,
+          },
         },
       },
     });
 
-    // Envia e-mail de verificação (placeholder — será substituído pelo provedor real).
     await provedorEmail.enviarVerificacao({
       para: usuario.email,
       nome: usuario.nomeCompleto,
       token: tokenVerificacao,
     });
 
-    // Gera tokens JWT e define o refresh token como cookie httpOnly.
     const payload = {
       usuarioId: usuario.id,
       email: usuario.email,
@@ -84,15 +118,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
           usuario: {
             id: usuario.id,
             nomeCompleto: usuario.nomeCompleto,
+            apelido: usuario.apelido,
+            cpf: usuario.cpf,
             email: usuario.email,
             papel: usuario.papel,
             emailVerificado: usuario.emailVerificado,
             fotoPerfilUrl: usuario.fotoPerfilUrl,
             whatsapp: usuario.whatsapp,
+            telefone: usuario.telefone,
+            dataNascimento: usuario.dataNascimento?.toISOString() || null,
+            genero: usuario.genero,
+            profissao: usuario.profissao,
           },
         },
-        mensagem:
-          "Conta criada com sucesso! Verifique seu e-mail para ativar a conta.",
+        mensagem: "Conta criada com sucesso! Verifique seu e-mail para ativar a conta.",
       },
       { status: 201 }
     );

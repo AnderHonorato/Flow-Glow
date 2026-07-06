@@ -9,6 +9,7 @@ interface Banner {
   titulo: string;
   imagemUrl: string;
   linkUrl: string;
+  corFundo: string | null;
   ordem: number;
 }
 
@@ -35,10 +36,9 @@ export function CarrosselBanners() {
     setIndice((prev) => (prev - 1 + banners.length) % banners.length);
   }, [banners.length]);
 
-  // Rotação automática a cada 5 segundos
   useEffect(() => {
     if (banners.length <= 1 || pausado) return;
-    intervaloRef.current = setInterval(avancar, 5000);
+    intervaloRef.current = setInterval(avancar, 8000);
     return () => {
       if (intervaloRef.current) clearInterval(intervaloRef.current);
     };
@@ -49,54 +49,52 @@ export function CarrosselBanners() {
   const banner = banners[indice];
 
   return (
-    <div className="relative mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-3 pt-2 sm:px-5 sm:pt-3 lg:px-8">
       <div
-        className="group relative overflow-hidden rounded-2xl border border-[#eadfd5] bg-[#eadfd5] shadow-sm"
+        className="group relative overflow-hidden rounded-2xl border border-[var(--color-linha)]"
+        style={{ background: banner.corFundo || "var(--color-bege, #e9efed)" }}
         onMouseEnter={() => setPausado(true)}
         onMouseLeave={() => setPausado(false)}
       >
         <Link
           href={banner.linkUrl || "/tutoriais"}
-          className="block aspect-[3/1] min-h-[140px] max-h-[320px] w-full sm:aspect-[4/1]"
+          className="block aspect-[1.85/1] min-h-[132px] max-h-[320px] w-full sm:aspect-[4/1]"
         >
-          <div
-            className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-            style={{ backgroundImage: `url(${banner.imagemUrl})` }}
-            role="img"
-            aria-label={banner.titulo}
+          <img
+            src={banner.imagemUrl}
+            alt={banner.titulo}
+            className="h-full w-full object-cover"
           />
         </Link>
 
-        {/* Gradiente inferior com título */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 sm:p-6">
-          <p className="text-sm font-bold text-white sm:text-base">{banner.titulo}</p>
-        </div>
+        {banner.titulo && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 sm:p-6">
+            <p className="text-sm font-bold text-white sm:text-base">{banner.titulo}</p>
+          </div>
+        )}
 
-        {/* Botão voltar */}
         {banners.length > 1 && (
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); voltar(); }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[#2a211d] shadow-md opacity-0 transition-opacity hover:bg-white group-hover:opacity-100 sm:left-4 sm:h-10 sm:w-10"
+            className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-[#2a211d] shadow-md transition-opacity hover:bg-white md:opacity-0 md:group-hover:opacity-100 sm:left-4 sm:h-10 sm:w-10"
             aria-label="Banner anterior"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
 
-        {/* Botão avançar */}
         {banners.length > 1 && (
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); avancar(); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[#2a211d] shadow-md opacity-0 transition-opacity hover:bg-white group-hover:opacity-100 sm:right-4 sm:h-10 sm:w-10"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-[#2a211d] shadow-md transition-opacity hover:bg-white md:opacity-0 md:group-hover:opacity-100 sm:right-4 sm:h-10 sm:w-10"
             aria-label="Próximo banner"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
         )}
 
-        {/* Indicadores (bolinhas) */}
         {banners.length > 1 && (
           <div className="absolute bottom-1 right-3 flex gap-1.5 sm:bottom-3 sm:right-4">
             {banners.map((_, i) => (
@@ -113,12 +111,11 @@ export function CarrosselBanners() {
           </div>
         )}
 
-        {/* Botão pausar/play */}
         {banners.length > 1 && (
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); setPausado(!pausado); }}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/30 text-white/70 opacity-0 transition-opacity hover:bg-black/50 hover:text-white group-hover:opacity-100 sm:right-4 sm:top-4"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/55 md:opacity-0 md:group-hover:opacity-100 sm:right-4 sm:top-4"
             aria-label={pausado ? "Retomar rotação" : "Pausar rotação"}
           >
             {pausado ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}

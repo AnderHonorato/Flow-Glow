@@ -34,11 +34,15 @@ export function useCidadeUsuario() {
 
   // Busca endereço do cadastro ao montar (sem GPS automático)
   useEffect(() => {
-    buscarDoCadastro().then(d => d && setDados(d));
+    try {
+      const cache = sessionStorage.getItem("mca_endereco_cache");
+      if (cache) setDados(JSON.parse(cache));
+    } catch {}
+    buscarDoCadastro().then(d => { if (d) { setDados(d); try { sessionStorage.setItem("mca_endereco_cache", JSON.stringify(d)); } catch {} } });
   }, [buscarDoCadastro]);
 
   useEffect(() => {
-    const handler = () => { buscarDoCadastro().then(d => d && setDados(d)); };
+    const handler = () => { buscarDoCadastro().then(d => { if (d) { setDados(d); try { sessionStorage.setItem("mca_endereco_cache", JSON.stringify(d)); } catch {} } }); };
     window.addEventListener("endereco-atualizado", handler);
     return () => window.removeEventListener("endereco-atualizado", handler);
   }, [buscarDoCadastro]);
@@ -47,7 +51,7 @@ export function useCidadeUsuario() {
 }
 
 export function SeloLocalizacao() {
-  const { usuario } = useAutenticacao();
+  const { usuario, accessToken } = useAutenticacao();
   const { dados, setDados } = useCidadeUsuario();
   const [mostrarPedido, setMostrarPedido] = useState(false);
   const [buscando, setBuscando] = useState(false);
@@ -86,12 +90,13 @@ export function SeloLocalizacao() {
         origem: "gps" as const,
       };
       setDados(gps);
+      try { sessionStorage.setItem("mca_endereco_cache", JSON.stringify(gps)); } catch {}
+      window.dispatchEvent(new Event("endereco-atualizado"));
       // Salva no perfil
-      const token = (window as any).__accessToken;
-      if (token && gps.cidade) {
+      if (accessToken && gps.cidade) {
         fetch("/api/usuarios/endereco", {
           method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({
             cep: gps.cep.replace(/\D/g, "").slice(0, 8) || "00000000",
             logradouro: gps.logradouro || "Endereço",
@@ -114,24 +119,24 @@ export function SeloLocalizacao() {
   if (mostrarPedido) {
     return (
       <>
-        <div className="fixed bottom-20 left-4 right-4 z-[80] mx-auto max-w-sm rounded-xl border border-[#eadfd5] bg-white p-4 shadow-xl sm:left-auto sm:right-5 sm:w-80 animate-[entrada-suave_300ms_ease]">
+        <div className="fixed left-4 right-4 top-20 z-[80] mx-auto max-w-sm rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)] p-4 shadow-xl sm:left-auto sm:right-5 sm:w-80 animate-[entrada-suave_300ms_ease]">
           <div className="flex items-start gap-3">
             <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-sage)]" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#2a211d]">Sua localização</p>
-              <p className="text-xs text-[#715f55] mt-1">
+              <p className="text-sm font-bold text-[var(--color-texto)]">Sua localização</p>
+              <p className="text-xs text-[var(--color-texto-suave)] mt-1">
                 Podemos usar seu GPS para mostrar ofertas próximas e preencher o endereço automaticamente?
               </p>
               <div className="flex gap-2 mt-3">
-                <button onClick={solicitarGps} className="text-xs font-semibold bg-[#b98a2d] text-white px-3 py-1.5 rounded-lg hover:bg-[#a07822] transition-colors cursor-pointer">
+                <button onClick={solicitarGps} className="text-xs font-semibold bg-[var(--color-berry)] text-white px-3 py-1.5 rounded-lg hover:bg-[var(--color-berry-escuro)] transition-colors cursor-pointer">
                   {buscando ? "Buscando..." : "Permitir"}
                 </button>
-                <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="text-xs font-medium text-[#715f55] px-3 py-1.5 rounded-lg hover:bg-[#f6f2ec] transition-colors cursor-pointer">
+                <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="text-xs font-medium text-[var(--color-texto-suave)] px-3 py-1.5 rounded-lg hover:bg-[var(--color-linha)] transition-colors cursor-pointer">
                   Agora não
                 </button>
               </div>
             </div>
-            <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="p-1 text-[#715f55]/50 hover:text-[#715f55] cursor-pointer">
+            <button onClick={() => { setMostrarPedido(false); sessionStorage.setItem("gps_perguntado", "sim"); }} className="p-1 text-[var(--color-texto-suave)]/50 hover:text-[var(--color-texto-suave)] cursor-pointer">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -154,11 +159,10 @@ function SeloConteudo({
   cepFormatado: string;
 }) {
   if (!dados?.cidade) {
-    if (!usuario) return null;
     return (
       <Link
         href="/perfil"
-        className="hidden items-center gap-1.5 rounded-full border border-[#eadfd5] bg-white px-3 py-1.5 text-xs font-medium text-[#715f55] hover:text-[#b98a2d] transition-colors sm:flex"
+        className="flex items-center gap-1.5 rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-1.5 text-xs font-medium text-[var(--color-texto-suave)] hover:text-[var(--color-berry)] transition-colors"
       >
         <MapPin className="h-3.5 w-3.5 shrink-0" />
         Adicionar endereço
@@ -169,14 +173,14 @@ function SeloConteudo({
   return (
     <Link
       href="/perfil"
-      className="hidden items-center gap-1.5 rounded-full border border-[#eadfd5] bg-white px-3 py-1.5 text-xs transition-colors hover:border-[#b98a2d] sm:flex"
+      className="flex items-center gap-1.5 rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-1.5 text-xs transition-colors hover:border-[var(--color-berry)]"
     >
       {dados.origem === "gps" ? (
         <Navigation className="h-3.5 w-3.5 shrink-0 text-[var(--color-sage)]" />
       ) : (
-        <MapPin className="h-3.5 w-3.5 shrink-0 text-[#b98a2d]" />
+        <MapPin className="h-3.5 w-3.5 shrink-0 text-[var(--color-ouro)]" />
       )}
-      <span className="truncate font-medium text-[#2a211d]">
+      <span className="truncate font-medium text-[var(--color-texto)]">
         {[dados.cidade, cepFormatado ? `CEP ${cepFormatado}` : null].filter(Boolean).join(" · ")}
       </span>
     </Link>

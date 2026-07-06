@@ -13,11 +13,17 @@ import { usePreferencias } from "@/contexto/preferencias";
 interface UsuarioSessao {
   id: string;
   nomeCompleto: string;
+  apelido: string | null;
+  cpf: string | null;
   email: string;
   papel: string;
   emailVerificado: boolean;
   fotoPerfilUrl: string | null;
   whatsapp: string | null;
+  telefone: string | null;
+  dataNascimento: string | null;
+  genero: string | null;
+  profissao: string | null;
 }
 
 interface ContextoAutenticacao {
@@ -27,8 +33,14 @@ interface ContextoAutenticacao {
   login: (email: string, senha: string) => Promise<{ sucesso: boolean; erro?: string }>;
   cadastro: (dados: {
     nomeCompleto: string;
+    apelido?: string;
     cpf: string;
     email: string;
+    whatsapp: string;
+    telefone?: string;
+    dataNascimento: string;
+    genero?: string;
+    profissao?: string;
     senha: string;
     confirmacaoSenha: string;
     aceitouTermos: boolean;
@@ -209,8 +221,14 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
 
   async function cadastro(dados: {
     nomeCompleto: string;
+    apelido?: string;
     cpf: string;
     email: string;
+    whatsapp: string;
+    telefone?: string;
+    dataNascimento: string;
+    genero?: string;
+    profissao?: string;
     senha: string;
     confirmacaoSenha: string;
     aceitouTermos: boolean;

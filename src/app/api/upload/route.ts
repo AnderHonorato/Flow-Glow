@@ -10,24 +10,37 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Nenhum arquivo enviado." }, { status: 400 });
     }
 
-    // Valida tipo
-    const permitidos = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const permitidos = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+    ];
+
     if (!permitidos.includes(arquivo.type)) {
-      return NextResponse.json({ sucesso: false, erro: "Tipo de imagem não permitido." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Tipo de arquivo nao permitido." }, { status: 400 });
     }
 
-    // Valida tamanho (máx 5MB)
-    if (arquivo.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ sucesso: false, erro: "Imagem muito grande. Máximo 5MB." }, { status: 400 });
+    const limite = arquivo.type.startsWith("video/") ? 24 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (arquivo.size > limite) {
+      return NextResponse.json({ sucesso: false, erro: "Arquivo muito grande para este ambiente." }, { status: 400 });
     }
 
-    // Converte para base64 como storage simples (em produção usar S3/R2)
     const bytes = await arquivo.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString("base64");
     const url = `data:${arquivo.type};base64,${base64}`;
 
-    return NextResponse.json({ sucesso: true, dados: { url } });
+    return NextResponse.json({
+      sucesso: true,
+      dados: {
+        url,
+        tipo: arquivo.type.startsWith("video/") ? "VIDEO" : "IMAGEM",
+      },
+    });
   } catch {
     return NextResponse.json({ sucesso: false, erro: "Erro ao processar upload." }, { status: 500 });
   }

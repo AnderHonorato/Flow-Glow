@@ -1,46 +1,177 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buscarConversaAtivaDoCliente,
+  buscarOuCriarConversaAtiva,
+  carregarConversaPorId,
+  criarConversaAtendimento,
+  criarMensagemChat,
+  opcoesAtendimento,
+  serializarConversa,
+  serializarConversas,
+  sincronizarInatividade,
+  includeConversaChat,
+} from "@/lib/chat";
 import type { RespostaApi } from "@/tipos";
 
-// Envia uma mensagem (cliente para admin).
+type AnexoEntrada = { tipo: "IMAGEM" | "VIDEO"; url: string };
+
+function anexosValidos(anexos: unknown): AnexoEntrada[] {
+  if (!Array.isArray(anexos)) return [];
+  return anexos
+    .filter((anexo): anexo is AnexoEntrada => {
+      if (!anexo || typeof anexo !== "object") return false;
+      const item = anexo as Record<string, unknown>;
+      return (
+        (item.tipo === "IMAGEM" || item.tipo === "VIDEO") &&
+        typeof item.url === "string" &&
+        item.url.length > 0
+      );
+    })
+    .slice(0, 4);
+}
+
+async function carregarListaCliente(usuarioId: string) {
+  await sincronizarInatividade();
+  const conversas = await prisma.conversa.findMany({
+    where: { usuarioId },
+    include: includeConversaChat,
+    orderBy: { atualizadoEm: "desc" },
+    take: 5,
+  });
+  return serializarConversas(conversas);
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
     }
 
-    const { texto } = await request.json();
-    if (!texto || !String(texto).trim()) {
+    await sincronizarInatividade();
+    const corpo = await request.json();
+    const acao = String(corpo.acao || "mensagem");
+
+    if (acao === "novo") {
+      const conversa = await criarConversaAtendimento(usuarioId);
       return NextResponse.json(
-        { sucesso: false, erro: "Mensagem vazia." },
-        { status: 400 }
+        { sucesso: true, dados: await serializarConversa(conversa) },
+        { status: 201 }
       );
     }
 
-    // Busca ou cria uma conversa para este usuário.
-    let conversa = await prisma.conversa.findFirst({
-      where: { usuarioId },
-    });
+    if (acao === "avaliar") {
+      const conversaId = String(corpo.conversaId || "");
+      const nota = Number(corpo.nota);
+      const texto = String(corpo.texto || "").trim();
+      if (!conversaId || !Number.isInteger(nota) || nota < 1 || nota > 5) {
+        return NextResponse.json({ sucesso: false, erro: "Avaliacao invalida." }, { status: 400 });
+      }
 
-    if (!conversa) {
-      conversa = await prisma.conversa.create({
-        data: { usuarioId },
+      const conversa = await prisma.conversa.findFirst({
+        where: { id: conversaId, usuarioId },
+        select: { id: true, status: true, avaliacaoNota: true },
+      });
+
+      if (!conversa || conversa.status !== "ENCERRADA") {
+        return NextResponse.json(
+          { sucesso: false, erro: "A avaliacao fica disponivel apos o encerramento." },
+          { status: 400 }
+        );
+      }
+
+      await prisma.conversa.update({
+        where: { id: conversaId },
+        data: {
+          avaliacaoNota: nota,
+          avaliacaoTexto: texto || null,
+          avaliacaoEnviadaEm: new Date(),
+        },
+      });
+
+      if (!conversa.avaliacaoNota) {
+        await criarMensagemChat({
+          conversaId,
+          tipo: "SISTEMA",
+          texto: `Cliente avaliou o atendimento com ${nota} estrela(s).`,
+        });
+      }
+
+      const atualizada = await carregarConversaPorId(conversaId);
+      return NextResponse.json({
+        sucesso: true,
+        dados: atualizada ? await serializarConversa(atualizada) : null,
       });
     }
 
-    const mensagem = await prisma.mensagem.create({
+    const texto = String(corpo.texto || "").trim();
+    const anexos = anexosValidos(corpo.anexos);
+    if (!texto && anexos.length === 0) {
+      return NextResponse.json({ sucesso: false, erro: "Mensagem vazia." }, { status: 400 });
+    }
+
+    let conversa = await buscarConversaAtivaDoCliente(usuarioId);
+    if (!conversa) {
+      const totalConversas = await prisma.conversa.count({ where: { usuarioId } });
+      if (totalConversas > 0) {
+        return NextResponse.json(
+          { sucesso: false, erro: "Este protocolo foi encerrado. Abra um novo chamado pelo botao +." },
+          { status: 409 }
+        );
+      }
+      conversa = await buscarOuCriarConversaAtiva(usuarioId);
+    }
+
+    if (conversa.status === "ENCERRADA") {
+      return NextResponse.json(
+        { sucesso: false, erro: "Atendimento encerrado. Abra um novo chamado pelo botao +." },
+        { status: 409 }
+      );
+    }
+
+    await criarMensagemChat({
+      conversaId: conversa.id,
+      texto: texto || "Anexo enviado.",
+      tipo: "CLIENTE",
+      remetenteId: usuarioId,
+      anexos,
+    });
+
+    const agora = new Date();
+    await prisma.conversa.update({
+      where: { id: conversa.id },
       data: {
-        texto: String(texto).trim(),
-        conversaId: conversa.id,
-        remetenteId: usuarioId,
-      },
-      include: {
-        remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
+        ultimaInteracaoClienteEm: agora,
+        avisoInatividadeEm: null,
       },
     });
 
-    return NextResponse.json({ sucesso: true, dados: mensagem }, { status: 201 });
+    if (conversa.status === "TRIAGEM") {
+      const opcao = opcoesAtendimento.find((item) => item.id === corpo.opcaoId);
+      await criarMensagemChat({
+        conversaId: conversa.id,
+        tipo: "BOT",
+        texto:
+          opcao?.resposta ||
+          "Recebi sua mensagem. Chamei um atendente e logo alguem continua o atendimento com voce.",
+      });
+
+      await prisma.conversa.update({
+        where: { id: conversa.id },
+        data: {
+          status: "AGUARDANDO_ATENDENTE",
+          assunto: opcao?.rotulo || "Atendimento",
+          clienteAguardandoDesde: agora,
+        },
+      });
+    }
+
+    const atualizada = await carregarConversaPorId(conversa.id);
+    return NextResponse.json(
+      { sucesso: true, dados: atualizada ? await serializarConversa(atualizada) : null },
+      { status: 201 }
+    );
   } catch (erro) {
     console.error("Erro ao enviar mensagem:", erro);
     return NextResponse.json(
@@ -50,41 +181,41 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
   }
 }
 
-// Lista as mensagens de uma conversa.
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     const usuarioPapel = request.headers.get("x-usuario-papel");
 
-    if (!usuarioId && usuarioPapel !== "ADMINISTRADOR") {
-      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
+    if (!usuarioId) {
+      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
     }
 
+    await sincronizarInatividade();
     const { searchParams } = request.nextUrl;
     const conversaId = searchParams.get("conversaId");
 
-    // Admin vê todas as conversas, usuário vê só a sua.
-    let onde: Record<string, unknown> = {};
     if (usuarioPapel === "ADMINISTRADOR") {
-      if (conversaId) onde = { id: conversaId };
-    } else {
-      onde = { usuarioId };
+      const conversas = await prisma.conversa.findMany({
+        where: conversaId ? { id: conversaId } : {},
+        include: includeConversaChat,
+        orderBy: [{ status: "asc" }, { atualizadoEm: "desc" }],
+        take: conversaId ? 1 : 200,
+      });
+      return NextResponse.json({ sucesso: true, dados: await serializarConversas(conversas) });
     }
 
-    const conversas = await prisma.conversa.findMany({
-      where: onde as never,
-      include: {
-        usuario: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true } },
-        mensagens: {
-          include: {
-            remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
-          },
-          orderBy: { criadoEm: "asc" },
-        },
-      },
-    });
+    if (conversaId) {
+      const conversa = await prisma.conversa.findFirst({
+        where: { id: conversaId, usuarioId },
+        include: includeConversaChat,
+      });
+      return NextResponse.json({
+        sucesso: true,
+        dados: conversa ? [await serializarConversa(conversa)] : [],
+      });
+    }
 
-    return NextResponse.json({ sucesso: true, dados: conversas });
+    return NextResponse.json({ sucesso: true, dados: await carregarListaCliente(usuarioId) });
   } catch (erro) {
     console.error("Erro ao buscar conversas:", erro);
     return NextResponse.json(
