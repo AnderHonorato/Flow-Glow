@@ -13,7 +13,7 @@ export function Cartao({ children, className = "", destaque = false }: CartaoPro
         destaque
           ? "border-[var(--color-ouro)] shadow-[0_16px_42px_rgba(23,32,51,0.12)]"
           : "border-[var(--color-linha)] shadow-[0_8px_24px_rgba(23,32,51,0.07)]"
-      } p-4 transition-all duration-200 sm:p-5 ${className}`}
+      } p-3 transition-all duration-200 sm:p-5 ${className}`}
     >
       {children}
     </div>

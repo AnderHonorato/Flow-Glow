@@ -1,133 +1,466 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAutenticacao } from "@/contexto/autenticacao";
-import { Cartao, Botao, CampoTexto } from "@/components/ui";
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  Eye,
+  Image as ImageIcon,
+  Link2,
+  Palette,
+  Pencil,
+  Power,
+  RotateCcw,
+  Save,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Botao, CampoTexto, Cartao } from "@/components/ui";
 import { UploadImagem } from "@/components/ui/upload-imagem";
-import { Image, Link2, Trash2, Palette } from "lucide-react";
+import { useAutenticacao } from "@/contexto/autenticacao";
 
-interface AnuncioItem { id: string; titulo: string; imagemUrl: string; linkUrl: string; corFundo: string | null; ordem: number; ativo: boolean; }
+interface AnuncioItem {
+  id: string;
+  titulo: string;
+  imagemUrl: string;
+  linkUrl: string;
+  corFundo: string | null;
+  ordem: number;
+  ativo: boolean;
+}
+
+interface TutorialDestino {
+  id: string;
+  titulo: string;
+  slug: string;
+  imagemCapaUrl: string;
+  categoria: {
+    nome: string;
+    slug: string;
+  };
+}
+
+const destinosFixos = [
+  { rotulo: "Vitrine completa", url: "/tutoriais" },
+  { rotulo: "Ofertas ativas", url: "/tutoriais?promocao=true" },
+  { rotulo: "Anuncios bombando", url: "/tutoriais?bombando=true" },
+  { rotulo: "Criar conta", url: "/cadastro" },
+];
+
+const estadoInicial = {
+  titulo: "",
+  imagemUrl: "",
+  linkUrl: "/tutoriais",
+  corFundo: "#e9efed",
+  ativo: true,
+};
+
+function normalizarLink(valor: string) {
+  const limpo = valor.trim();
+  if (!limpo) return "/tutoriais";
+  if (limpo.startsWith("/") || limpo.startsWith("https://") || limpo.startsWith("http://")) {
+    return limpo;
+  }
+  return `/${limpo}`;
+}
 
 export default function PaginaAdminAnuncios() {
   const { accessToken } = useAutenticacao();
   const [anuncios, setAnuncios] = useState<AnuncioItem[]>([]);
-  const [titulo, setTitulo] = useState(""); const [imagemUrl, setImagemUrl] = useState("");
-  const [linkUrl, setLinkUrl] = useState(""); const [corFundo, setCorFundo] = useState("#e9efed");
-  const [msg, setMsg] = useState(""); const [erro, setErro] = useState("");
+  const [tutoriais, setTutoriais] = useState<TutorialDestino[]>([]);
+  const [formulario, setFormulario] = useState(estadoInicial);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [msg, setMsg] = useState("");
+  const [erro, setErro] = useState("");
+  const [salvando, setSalvando] = useState(false);
 
-  function aoAlterarImagem(url: string) {
-    setImagemUrl(url);
+  const editando = Boolean(editandoId);
+  const bannersAtivos = useMemo(() => anuncios.filter((a) => a.ativo).length, [anuncios]);
+
+  function atualizarFormulario(campo: keyof typeof estadoInicial, valor: string | boolean) {
+    setFormulario((atual) => ({ ...atual, [campo]: valor }));
     setMsg("");
+    setErro("");
+  }
+
+  function resetarFormulario() {
+    setFormulario(estadoInicial);
+    setEditandoId(null);
   }
 
   async function carregar() {
-    const r = await fetch("/api/anuncios", { headers: { Authorization: `Bearer ${accessToken}` } });
-    const d = await r.json(); if (d.sucesso) setAnuncios(d.dados);
+    if (!accessToken) return;
+    try {
+      const resposta = await fetch("/api/anuncios?todos=true", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      });
+      const dados = await resposta.json();
+      if (dados.sucesso) setAnuncios(dados.dados);
+    } catch {
+      setErro("Nao foi possivel carregar os banners.");
+    }
   }
-  useEffect(() => { carregar(); }, [accessToken]);
 
-  async function criar() {
-    setErro(""); setMsg("");
-    const r = await fetch("/api/anuncios", {
-      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ titulo, imagemUrl, linkUrl, corFundo }),
+  async function carregarTutoriais() {
+    try {
+      const resposta = await fetch("/api/tutoriais?limite=50", { cache: "no-store" });
+      const dados = await resposta.json();
+      if (dados.sucesso) setTutoriais(dados.dados);
+    } catch {}
+  }
+
+  useEffect(() => {
+    carregar();
+    carregarTutoriais();
+  }, [accessToken]);
+
+  function editar(anuncio: AnuncioItem) {
+    setEditandoId(anuncio.id);
+    setFormulario({
+      titulo: anuncio.titulo,
+      imagemUrl: anuncio.imagemUrl,
+      linkUrl: anuncio.linkUrl,
+      corFundo: anuncio.corFundo || "#e9efed",
+      ativo: anuncio.ativo,
     });
-    const d = await r.json();
-    if (d.sucesso) { setMsg("Anúncio criado!"); setTitulo(""); setImagemUrl(""); setLinkUrl(""); setCorFundo("#e9efed"); carregar(); }
-    else setErro(d.erro);
+    setMsg("");
+    setErro("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function salvar() {
+    setErro("");
+    setMsg("");
+
+    if (!formulario.titulo.trim()) {
+      setErro("Informe o titulo do banner.");
+      return;
+    }
+    if (!formulario.imagemUrl.trim()) {
+      setErro("Informe ou envie uma imagem para o banner.");
+      return;
+    }
+
+    setSalvando(true);
+    try {
+      const resposta = await fetch("/api/anuncios", {
+        method: editando ? "PATCH" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          id: editandoId,
+          ...formulario,
+          linkUrl: normalizarLink(formulario.linkUrl),
+        }),
+      });
+      const dados = await resposta.json();
+      if (dados.sucesso) {
+        setMsg(editando ? "Banner atualizado." : "Banner criado.");
+        resetarFormulario();
+        await carregar();
+      } else {
+        setErro(dados.erro || "Nao foi possivel salvar o banner.");
+      }
+    } catch {
+      setErro("Erro de conexao ao salvar o banner.");
+    }
+    setSalvando(false);
   }
 
   async function remover(id: string) {
-    await fetch(`/api/anuncios?id=${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${accessToken}` } });
-    carregar();
+    await fetch(`/api/anuncios?id=${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (editandoId === id) resetarFormulario();
+    await carregar();
   }
 
-  async function moverParaCima(index: number) {
-    if (index === 0) return;
-    const nova = [...anuncios];
-    [nova[index - 1], nova[index]] = [nova[index], nova[index - 1]];
-    setAnuncios(nova);
+  async function alternarAtivo(anuncio: AnuncioItem) {
     await fetch("/api/anuncios", {
-      method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ ids: nova.map(a => a.id) }),
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ id: anuncio.id, ativo: !anuncio.ativo }),
+    });
+    await carregar();
+  }
+
+  async function reordenar(proximaLista: AnuncioItem[]) {
+    setAnuncios(proximaLista);
+    await fetch("/api/anuncios", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ ids: proximaLista.map((a) => a.id) }),
     });
   }
 
-  async function moverParaBaixo(index: number) {
-    if (index === anuncios.length - 1) return;
+  function mover(index: number, direcao: -1 | 1) {
+    const destino = index + direcao;
+    if (destino < 0 || destino >= anuncios.length) return;
     const nova = [...anuncios];
-    [nova[index], nova[index + 1]] = [nova[index + 1], nova[index]];
-    setAnuncios(nova);
-    await fetch("/api/anuncios", {
-      method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ ids: nova.map(a => a.id) }),
-    });
+    [nova[index], nova[destino]] = [nova[destino], nova[index]];
+    reordenar(nova);
+  }
+
+  function aplicarDestino(valor: string) {
+    if (!valor) return;
+    atualizarFormulario("linkUrl", valor);
   }
 
   return (
     <div>
-      <h1 className="font-serif text-2xl font-bold mb-6">Anúncios</h1>
-      {msg && <p className="text-sm text-green-700 bg-green-50 px-4 py-2 rounded-lg mb-4">{msg}</p>}
-      {erro && <p className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg mb-4">{erro}</p>}
-
-      <Cartao className="mb-6">
-        <h2 className="font-medium mb-4">Novo anúncio</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <CampoTexto rotulo="Título" value={titulo} onChange={e => setTitulo(e.target.value)} />
-          <CampoTexto rotulo="URL do link" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="/tutoriais?categoria=maquiagem" />
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[var(--color-berry)]">
+            <Palette className="h-4 w-4" aria-hidden />
+            Controle do site
+          </span>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Banners principais</h1>
+          <p className="mt-1 text-sm text-[var(--color-texto-suave)]">
+            Defina imagem, link de destino, cor, ordem e status do carrossel da pagina inicial.
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="text-sm font-medium text-[var(--color-texto)] mb-1 block">Imagem do banner</label>
-            <UploadImagem valor={imagemUrl} aoAlterar={aoAlterarImagem} />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-[var(--color-texto)] mb-1 block">Cor de fundo / degrade</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={corFundo}
-                onChange={e => setCorFundo(e.target.value)}
-                className="h-11 w-16 cursor-pointer rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)]"
-              />
-              <input
-                type="text"
-                value={corFundo}
-                onChange={e => setCorFundo(e.target.value)}
-                placeholder="ex: linear-gradient(135deg, #f06a98, #e5bd5d)"
-                className="h-11 flex-1 rounded-lg border border-[var(--color-linha-forte)] bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] px-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
-              />
-            </div>
-            <p className="mt-1 text-xs text-[var(--color-texto-suave)]">Use cor sólida, degrade CSS ou hex (#FF0000)</p>
-          </div>
+        <div className="rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-2 text-sm font-bold text-[var(--color-texto)]">
+          {bannersAtivos} ativo(s) de {anuncios.length}
         </div>
-        <Botao onClick={criar}><Palette className="h-4 w-4" /> Criar anúncio</Botao>
-      </Cartao>
+      </div>
 
-      <div className="space-y-3">
-        {anuncios.map((a, i) => (
-          <Cartao key={a.id} className="flex items-center gap-4">
-            <div className="flex flex-col items-center gap-1 mr-2">
-              <button onClick={() => moverParaCima(i)} className="text-xs text-[var(--color-texto)]/40 hover:text-[var(--color-berry)] cursor-pointer">▲</button>
-              <span className="text-xs font-mono text-[var(--color-texto)]/30">{i + 1}</span>
-              <button onClick={() => moverParaBaixo(i)} className="text-xs text-[var(--color-texto)]/40 hover:text-[var(--color-berry)] cursor-pointer">▼</button>
+      {msg && <p className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">{msg}</p>}
+      {erro && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600">{erro}</p>}
+
+      <div className="grid gap-5 xl:grid-cols-[1fr_25rem]">
+        <Cartao>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold">{editando ? "Editar banner" : "Novo banner"}</h2>
+            {editando && (
+              <Botao type="button" variante="fantasma" tamanho="pequeno" onClick={resetarFormulario}>
+                <RotateCcw className="h-4 w-4" aria-hidden />
+                Cancelar edicao
+              </Botao>
+            )}
+          </div>
+
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <CampoTexto
+                rotulo="Titulo exibido no banner"
+                value={formulario.titulo}
+                onChange={(e) => atualizarFormulario("titulo", e.target.value)}
+                placeholder="Ex.: Pele real com desconto"
+              />
+              <CampoTexto
+                rotulo="Link de destino"
+                value={formulario.linkUrl}
+                onChange={(e) => atualizarFormulario("linkUrl", e.target.value)}
+                placeholder="/tutoriais/maquiagem-pele-real-eventos"
+                sufixo={<Link2 className="h-4 w-4" aria-hidden />}
+              />
             </div>
-            <div className="w-16 h-10 rounded overflow-hidden flex-shrink-0 flex items-center justify-center" style={{ background: a.corFundo || "var(--color-bege)" }}>
-              {a.imagemUrl ? <img src={a.imagemUrl} alt="" className="w-full h-full object-cover" /> : <Image className="h-4 w-4 text-[var(--color-texto)]/30" />}
+
+            <label className="grid gap-1.5 text-sm font-semibold text-[var(--color-texto)]">
+              Enviar cliente para um anuncio existente
+              <select
+                value=""
+                onChange={(e) => aplicarDestino(e.target.value)}
+                className="h-11 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
+              >
+                <option value="">Escolher destino rapido...</option>
+                {destinosFixos.map((destino) => (
+                  <option key={destino.url} value={destino.url}>
+                    {destino.rotulo}
+                  </option>
+                ))}
+                {tutoriais.map((tutorial) => (
+                  <option key={tutorial.id} value={`/tutoriais/${tutorial.slug}`}>
+                    {tutorial.titulo} - {tutorial.categoria.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="grid gap-4 md:grid-cols-[1fr_16rem]">
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-[var(--color-texto)]">
+                  Imagem do banner
+                </label>
+                <UploadImagem
+                  valor={formulario.imagemUrl}
+                  aoAlterar={(url) => atualizarFormulario("imagemUrl", url)}
+                />
+              </div>
+              <div className="grid content-start gap-3">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--color-texto)]">
+                  Cor de fundo
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={formulario.corFundo.startsWith("#") ? formulario.corFundo : "#e9efed"}
+                      onChange={(e) => atualizarFormulario("corFundo", e.target.value)}
+                      className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)]"
+                    />
+                    <input
+                      type="text"
+                      value={formulario.corFundo}
+                      onChange={(e) => atualizarFormulario("corFundo", e.target.value)}
+                      placeholder="linear-gradient(...)"
+                      className="min-w-0 flex-1 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
+                    />
+                  </div>
+                </label>
+                <label className="flex min-h-11 items-center gap-3 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 text-sm font-semibold text-[var(--color-texto)]">
+                  <input
+                    type="checkbox"
+                    checked={formulario.ativo}
+                    onChange={(e) => atualizarFormulario("ativo", e.target.checked)}
+                    className="h-4 w-4 accent-[var(--color-berry)]"
+                  />
+                  Publicar banner
+                </label>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm truncate">{a.titulo}</h3>
-              <p className="text-xs text-[var(--color-texto)]/50 flex items-center gap-1"><Link2 className="h-3 w-3" />{a.linkUrl}</p>
-              {a.corFundo && (
-                <span className="inline-flex items-center gap-1 mt-1 text-xs text-[var(--color-texto-suave)]">
-                  <span className="inline-block h-3 w-3 rounded-full border border-[var(--color-linha)]" style={{ background: a.corFundo }} />
-                  {a.corFundo}
-                </span>
+
+            <Botao type="button" onClick={salvar} carregando={salvando} className="w-full sm:w-fit">
+              {editando ? <Save className="h-4 w-4" aria-hidden /> : <Palette className="h-4 w-4" aria-hidden />}
+              {editando ? "Salvar alteracoes" : "Criar banner"}
+            </Botao>
+          </div>
+        </Cartao>
+
+        <Cartao destaque>
+          <div className="mb-3 flex items-center gap-2">
+            <Eye className="h-4 w-4 text-[var(--color-sage)]" aria-hidden />
+            <h2 className="text-lg font-bold">Previa</h2>
+          </div>
+          <div
+            className="overflow-hidden rounded-lg border border-[var(--color-linha)]"
+            style={{ background: formulario.corFundo || "var(--color-bege)" }}
+          >
+            <div className="relative aspect-[1.85/1] min-h-32">
+              {formulario.imagemUrl ? (
+                <img src={formulario.imagemUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm font-bold text-[var(--color-texto-suave)]">
+                  Sem imagem
+                </div>
+              )}
+              {formulario.titulo && (
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-3">
+                  <p className="text-sm font-bold text-white">{formulario.titulo}</p>
+                </div>
               )}
             </div>
-            <button onClick={() => remover(a.id)} className="text-red-400 hover:text-red-600 cursor-pointer p-1"><Trash2 className="h-4 w-4" /></button>
-          </Cartao>
-        ))}
+          </div>
+          <p className="mt-3 break-all text-xs font-semibold text-[var(--color-texto-suave)]">
+            Destino: {normalizarLink(formulario.linkUrl)}
+          </p>
+        </Cartao>
+      </div>
+
+      <div className="mt-6 space-y-3">
+        {anuncios.length === 0 ? (
+          <Cartao>Nenhum banner cadastrado.</Cartao>
+        ) : (
+          anuncios.map((anuncio, i) => (
+            <Cartao
+              key={anuncio.id}
+              className={`grid gap-3 sm:grid-cols-[auto_4.5rem_1fr_auto] sm:items-center ${
+                !anuncio.ativo ? "opacity-65" : ""
+              }`}
+            >
+              <div className="flex items-center gap-1 sm:flex-col">
+                <button
+                  type="button"
+                  onClick={() => mover(i, -1)}
+                  disabled={i === 0}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-texto-suave)] hover:bg-[var(--color-linha)]/55 hover:text-[var(--color-berry)] disabled:opacity-30"
+                  aria-label="Mover para cima"
+                >
+                  <ArrowUp className="h-4 w-4" aria-hidden />
+                </button>
+                <span className="w-8 text-center font-mono text-xs text-[var(--color-texto-suave)]">{i + 1}</span>
+                <button
+                  type="button"
+                  onClick={() => mover(i, 1)}
+                  disabled={i === anuncios.length - 1}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-texto-suave)] hover:bg-[var(--color-linha)]/55 hover:text-[var(--color-berry)] disabled:opacity-30"
+                  aria-label="Mover para baixo"
+                >
+                  <ArrowDown className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+
+              <div
+                className="flex h-16 w-full items-center justify-center overflow-hidden rounded-lg border border-[var(--color-linha)] sm:h-12"
+                style={{ background: anuncio.corFundo || "var(--color-bege)" }}
+              >
+                {anuncio.imagemUrl ? (
+                  <img src={anuncio.imagemUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-4 w-4 text-[var(--color-texto-suave)]" aria-hidden />
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="truncate text-sm font-bold">{anuncio.titulo}</h3>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-black ${
+                      anuncio.ativo
+                        ? "bg-green-100 text-green-700"
+                        : "bg-[var(--color-linha)] text-[var(--color-texto-suave)]"
+                    }`}
+                  >
+                    {anuncio.ativo ? <CheckCircle2 className="h-3 w-3" aria-hidden /> : <Power className="h-3 w-3" aria-hidden />}
+                    {anuncio.ativo ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+                <p className="mt-1 flex min-w-0 items-center gap-1 break-all text-xs text-[var(--color-texto-suave)]">
+                  <Link2 className="h-3 w-3 shrink-0" aria-hidden />
+                  {anuncio.linkUrl}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-end gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => alternarAtivo(anuncio)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-texto-suave)] hover:bg-[var(--color-linha)]/55 hover:text-[var(--color-sage)]"
+                  aria-label={anuncio.ativo ? "Desativar banner" : "Ativar banner"}
+                  title={anuncio.ativo ? "Desativar" : "Ativar"}
+                >
+                  <Power className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => editar(anuncio)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-texto-suave)] hover:bg-[var(--color-linha)]/55 hover:text-[var(--color-berry)]"
+                  aria-label="Editar banner"
+                  title="Editar"
+                >
+                  <Pencil className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remover(anuncio.id)}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-red-500 hover:bg-red-500/10"
+                  aria-label="Remover banner"
+                  title="Remover"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+            </Cartao>
+          ))
+        )}
       </div>
     </div>
   );

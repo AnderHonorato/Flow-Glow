@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { Cabecalho, Rodape } from "@/components/layout";
 import { AtualizadorTempoReal } from "@/components/layout/atualizador-tempo-real";
+import { BotaoFavorito } from "@/components/favoritos/botao-favorito";
 import { Botao, Cartao } from "@/components/ui";
 import BotaoComprar from "./botao-comprar";
 import { RaspadinhaCupom } from "./raspadinha-cupom";
@@ -98,7 +99,7 @@ export default async function PaginaTutorial({
                 <span className="rounded-md bg-[var(--color-sage)] px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
                   {tutorial.categoria.nome}
                 </span>
-                <span className="rounded-md bg-white px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-[var(--color-texto)] ring-1 ring-[var(--color-linha)]">
+                <span className="rounded-md bg-[var(--color-papel)] px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-[var(--color-texto)] ring-1 ring-[var(--color-linha)]">
                   {tutorial.nivel.toLowerCase().replace("_", " ")}
                 </span>
                 {temPromocao && (
@@ -124,17 +125,17 @@ export default async function PaginaTutorial({
 
               <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold text-[var(--color-texto)]/64">
                 {tutorial.distanciaKm !== null && (
-                  <span className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 ring-1 ring-[var(--color-linha)]">
+                  <span className="inline-flex items-center gap-2 rounded-md bg-[var(--color-papel)] px-3 py-2 ring-1 ring-[var(--color-linha)]">
                     <MapPin className="h-4 w-4 text-[var(--color-berry)]" aria-hidden />
                     {tutorial.cidade}, {tutorial.estado} · {tutorial.distanciaKm} km
                   </span>
                 )}
-                <span className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 ring-1 ring-[var(--color-linha)]">
+                <span className="inline-flex items-center gap-2 rounded-md bg-[var(--color-papel)] px-3 py-2 ring-1 ring-[var(--color-linha)]">
                   <Clock3 className="h-4 w-4 text-[var(--color-sage)]" aria-hidden />
                   {modulos.length} aulas
                 </span>
                 {tutorial.totalAvaliacoes > 0 && (
-                  <span className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 ring-1 ring-[var(--color-linha)]">
+                  <span className="inline-flex items-center gap-2 rounded-md bg-[var(--color-papel)] px-3 py-2 ring-1 ring-[var(--color-linha)]">
                     <Star className="h-4 w-4 fill-[var(--color-ouro)] text-[var(--color-ouro)]" aria-hidden />
                     {tutorial.notaMedia.toFixed(1)} em {tutorial.totalAvaliacoes} avaliação
                   </span>
@@ -142,7 +143,7 @@ export default async function PaginaTutorial({
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-[var(--color-linha)] bg-white shadow-[0_16px_38px_rgba(42,31,28,0.10)]">
+            <div className="overflow-hidden rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] shadow-[0_16px_38px_rgba(42,31,28,0.10)]">
               {tutorial.videoPreviaUrl ? (
                 <video
                   src={tutorial.videoPreviaUrl}
@@ -242,13 +243,18 @@ export default async function PaginaTutorial({
 
                 <RaspadinhaCupom cupom={tutorial.cupomDesconto} />
 
-                <BotaoComprar
-                  tutorialId={tutorial.id}
-                  titulo={tutorial.titulo}
-                  imagemCapaUrl={tutorial.imagemCapaUrl}
-                  preco={tutorial.preco}
-                  precoPromocional={tutorial.precoPromocional}
-                />
+                <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <BotaoComprar
+                      tutorialId={tutorial.id}
+                      titulo={tutorial.titulo}
+                      imagemCapaUrl={tutorial.imagemCapaUrl}
+                      preco={tutorial.preco}
+                      precoPromocional={tutorial.precoPromocional}
+                    />
+                  </div>
+                  <BotaoFavorito tutorialId={tutorial.id} />
+                </div>
 
                 <div className="space-y-3 border-t border-[var(--color-linha)] pt-4">
                   {[

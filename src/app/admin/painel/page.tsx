@@ -1,10 +1,12 @@
 import {
+  Megaphone,
   MessageCircle,
   MessageSquareText,
   PackageCheck,
   Settings,
   ShoppingBag,
   UsersRound,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { Cartao } from "@/components/ui";
@@ -15,6 +17,18 @@ const atalhos = [
     titulo: "Anuncios",
     descricao: "Criar, revisar promocoes, cupons e distancia.",
     icone: ShoppingBag,
+  },
+  {
+    href: "/admin/anuncios",
+    titulo: "Banners",
+    descricao: "Controlar carrossel principal, links, ordem e status.",
+    icone: Megaphone,
+  },
+  {
+    href: "/admin/favoritos",
+    titulo: "Favoritos",
+    descricao: "Ver anuncios salvos pelos clientes e interesse por item.",
+    icone: Heart,
   },
   {
     href: "/admin/usuarios",

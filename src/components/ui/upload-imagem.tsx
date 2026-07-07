@@ -79,7 +79,7 @@ export function UploadImagem({ valor, aoAlterar }: UploadImagemProps) {
             value={link}
             onChange={(e) => setLink(e.target.value)}
             placeholder="https://..."
-            className="flex-1 rounded-lg border border-[#eadfd5] px-3 py-1.5 text-sm"
+            className="min-w-0 flex-1 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 py-1.5 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
           />
           <Botao type="button" tamanho="pequeno" onClick={() => { aoAlterar(link); setModo(null); }}>OK</Botao>
           <Botao type="button" variante="fantasma" tamanho="pequeno" onClick={() => setModo(null)}>Cancelar</Botao>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   BadgePercent,
@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Cabecalho, Rodape } from "@/components/layout";
 import { CarrosselBanners } from "@/components/layout/carrossel-banners";
+import { BotaoFavorito } from "@/components/favoritos/botao-favorito";
 import { Botao, Cartao } from "@/components/ui";
 import { useCarrinho } from "@/hooks/use-carrinho";
 import type { TutorialCard } from "@/tipos";
@@ -33,9 +34,12 @@ function CartaoTutorial({ item }: { item: TutorialCard }) {
     <Link href={`/tutoriais/${item.slug}`} className="group cursor-pointer">
       <Cartao className={`h-full overflow-hidden p-0 transition hover:border-[var(--color-berry)] ${item.bombando ? "ring-2 ring-[var(--color-ouro)]" : ""}`}>
         <div
-          className="relative h-40 bg-cover bg-center sm:h-44"
+          className="relative h-36 bg-cover bg-center sm:h-44"
           style={{ backgroundImage: `url(${item.imagemCapaUrl})` }}
         >
+          <div className="absolute right-3 top-3 z-10">
+            <BotaoFavorito tutorialId={item.id} compacto />
+          </div>
           {item.bombando && (
             <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-berry)]/30 to-[var(--color-ouro)]/20" />
           )}
@@ -54,20 +58,20 @@ function CartaoTutorial({ item }: { item: TutorialCard }) {
             )}
           </div>
         </div>
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <div className="mb-2 flex justify-between gap-2 text-xs font-bold uppercase tracking-wide text-[var(--color-sage)]">
             <span>{item.categoria.nome}</span>
             {item.distanciaKm !== null && <span>{item.distanciaKm} km</span>}
           </div>
-          <h3 className="text-lg font-bold leading-snug group-hover:text-[var(--color-berry)]">
+          <h3 className="text-base font-bold leading-snug group-hover:text-[var(--color-berry)] sm:text-lg">
             {item.titulo}
           </h3>
           <p className="mt-2 line-clamp-2 text-sm text-[var(--color-texto-suave)]">
             {item.descricaoCurta}
           </p>
-          <div className="mt-4 flex items-end justify-between gap-3">
+          <div className="mt-3 flex items-end justify-between gap-3 sm:mt-4">
             <div>
-              <p className="text-lg font-bold">{formatarReal(precoAtual)}</p>
+              <p className="text-base font-bold sm:text-lg">{formatarReal(precoAtual)}</p>
               {item.precoPromocional && (
                 <p className="text-xs text-[var(--color-texto-suave)] line-through">
                   {formatarReal(item.preco)}
@@ -101,14 +105,81 @@ function CartaoTutorial({ item }: { item: TutorialCard }) {
                 precoPromocional: item.precoPromocional,
               });
             }}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-berry)] py-2 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[var(--color-berry-escuro)]"
+            className="action-reveal mt-3 bg-[var(--color-berry)] text-white hover:bg-[var(--color-berry-escuro)]"
+            aria-label={estaNoCarrinho(item.id) ? "Item no carrinho" : "Adicionar ao carrinho"}
+            title={estaNoCarrinho(item.id) ? "Item no carrinho" : "Adicionar ao carrinho"}
           >
             <ShoppingCart className="h-3.5 w-3.5" />
-            {estaNoCarrinho(item.id) ? "No carrinho ✓" : "Adicionar ao carrinho"}
+            <span className="action-reveal-text">{estaNoCarrinho(item.id) ? "No carrinho" : "Comprar"}</span>
           </button>
         </div>
       </Cartao>
     </Link>
+  );
+}
+
+function SkeletonCartaoTutorial() {
+  return (
+    <Cartao className="h-full overflow-hidden p-0">
+      <div className="skeleton h-36 sm:h-44" />
+      <div className="p-3 sm:p-4">
+        <div className="mb-3 flex justify-between gap-2">
+          <span className="skeleton h-3 w-24 rounded-full" />
+          <span className="skeleton h-3 w-10 rounded-full" />
+        </div>
+        <div className="skeleton h-5 w-4/5 rounded-md" />
+        <div className="mt-2 space-y-1.5">
+          <div className="skeleton h-3 w-full rounded-full" />
+          <div className="skeleton h-3 w-2/3 rounded-full" />
+        </div>
+        <div className="mt-4 flex items-end justify-between">
+          <div className="space-y-1.5">
+            <div className="skeleton h-5 w-20 rounded-md" />
+            <div className="skeleton h-3 w-14 rounded-full" />
+          </div>
+          <div className="skeleton h-7 w-14 rounded-lg" />
+        </div>
+      </div>
+    </Cartao>
+  );
+}
+
+function SkeletonHome() {
+  return (
+    <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
+      <section className="mb-8">
+        <div className="skeleton mb-4 h-6 w-36 rounded-md" />
+        <Cartao className="overflow-hidden p-0">
+          <div className="grid md:grid-cols-[5fr_4fr]">
+            <div className="skeleton h-44 md:h-60" />
+            <div className="p-4 sm:p-6">
+              <div className="skeleton h-3 w-24 rounded-full" />
+              <div className="skeleton mt-3 h-6 w-4/5 rounded-md" />
+              <div className="mt-3 space-y-2">
+                <div className="skeleton h-3 w-full rounded-full" />
+                <div className="skeleton h-3 w-5/6 rounded-full" />
+                <div className="skeleton h-3 w-2/3 rounded-full" />
+              </div>
+              <div className="skeleton mt-5 h-8 w-36 rounded-md" />
+            </div>
+          </div>
+        </Cartao>
+      </section>
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="skeleton h-6 w-44 rounded-md" />
+          <div className="flex gap-1">
+            <div className="skeleton h-9 w-9 rounded-full" />
+            <div className="skeleton h-9 w-9 rounded-full" />
+          </div>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCartaoTutorial key={i} />
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -134,10 +205,34 @@ export default function PaginaInicial() {
   const [categorias, setCategorias] = useState<{ nome: string; slug: string }[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [indiceOfertas, setIndiceOfertas] = useState(0);
+  const [indiceDia, setIndiceDia] = useState(0);
+
+  useEffect(() => {
+    setIndiceDia(Math.floor(Date.now() / 86400000));
+  }, []);
 
   useEffect(() => {
     async function carregar() {
-      setCarregando(true);
+      let cacheRestaurado = false;
+      let itensCache: TutorialCard[] = [];
+      let categoriasCache: { nome: string; slug: string }[] = [];
+      try {
+        const cache = sessionStorage.getItem("mca_home_cache_v1");
+        if (cache) {
+          const dados = JSON.parse(cache) as {
+            itens: TutorialCard[];
+            categorias: { nome: string; slug: string }[];
+          };
+          itensCache = dados.itens || [];
+          categoriasCache = dados.categorias || [];
+          setItens(itensCache);
+          setCategorias(categoriasCache);
+          setCarregando(false);
+          cacheRestaurado = true;
+        }
+      } catch {}
+
+      if (!cacheRestaurado) setCarregando(true);
       try {
         const [resT, resC] = await Promise.all([
           fetch("/api/tutoriais?ordenar=recentes&limite=50", { cache: "no-store" }),
@@ -145,8 +240,18 @@ export default function PaginaInicial() {
         ]);
         const dT = await resT.json();
         const dC = await resC.json();
-        if (dT.sucesso) setItens(dT.dados);
-        if (dC.sucesso) setCategorias(dC.dados);
+        const proximosItens = dT.sucesso ? dT.dados : itensCache;
+        const proximasCategorias = dC.sucesso ? dC.dados : categoriasCache;
+        if (dT.sucesso) setItens(proximosItens);
+        if (dC.sucesso) setCategorias(proximasCategorias);
+        if (dT.sucesso || dC.sucesso) {
+          try {
+            sessionStorage.setItem(
+              "mca_home_cache_v1",
+              JSON.stringify({ itens: proximosItens, categorias: proximasCategorias })
+            );
+          } catch {}
+        }
       } catch {}
       setCarregando(false);
     }
@@ -160,9 +265,9 @@ export default function PaginaInicial() {
 
   const ofertaDoDia = useMemo(() => {
     if (ofertas.length === 0) return itens.length > 0 ? itens[0] : null;
-    const indice = Math.floor(Date.now() / 86400000) % ofertas.length;
+    const indice = indiceDia % ofertas.length;
     return ofertas[indice];
-  }, [ofertas, itens]);
+  }, [indiceDia, ofertas, itens]);
 
   const categoriasComItens = useMemo(() => {
     const mapa = new Map<string, TutorialCard[]>();
@@ -184,22 +289,32 @@ export default function PaginaInicial() {
       });
   }, [itens]);
 
+  const maisVendidos = useMemo(() => {
+    const vistos = new Set<string>();
+    return categoriasComItens
+      .flatMap((cat) => cat.topItems)
+      .filter((item) => {
+        if (vistos.has(item.id)) return false;
+        vistos.add(item.id);
+        return true;
+      })
+      .sort((a, b) => {
+        if (Number(b.bombando) !== Number(a.bombando)) {
+          return Number(b.bombando) - Number(a.bombando);
+        }
+        return b.notaMedia - a.notaMedia;
+      })
+      .slice(0, 8);
+  }, [categoriasComItens]);
+
   const maxPaginasOfertas = useMemo(() => Math.max(0, Math.ceil(ofertas.length / 4) - 1), [ofertas]);
 
   if (carregando) {
     return (
       <>
         <Cabecalho />
-        <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-72 animate-pulse rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)]"
-              />
-            ))}
-          </div>
-        </main>
+        <CarrosselBanners />
+        <SkeletonHome />
         <Rodape />
       </>
     );
@@ -214,7 +329,7 @@ export default function PaginaInicial() {
         {/* 1. Oferta do dia */}
         {ofertaDoDia && (
           <section className="mb-8">
-            <h2 className="mb-4 text-lg font-bold sm:text-xl">Oferta do dia</h2>
+            <h2 className="titulo-desenhado mb-5 text-lg font-bold sm:text-xl">Oferta do dia</h2>
             <Link href={`/tutoriais/${ofertaDoDia.slug}`} className="group block">
               <Cartao className="overflow-hidden p-0 hover:border-[var(--color-berry)]">
                 <div className="grid md:grid-cols-[5fr_4fr]">
@@ -253,7 +368,7 @@ export default function PaginaInicial() {
         {ofertas.length > 0 && (
           <section className="mb-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold sm:text-xl">Ofertas imperdíveis</h2>
+              <h2 className="titulo-desenhado text-lg font-bold sm:text-xl">Ofertas imperdiveis</h2>
               <div className="flex gap-1">
                 <button
                   type="button"
@@ -269,7 +384,7 @@ export default function PaginaInicial() {
                   onClick={() => setIndiceOfertas((p) => Math.min(maxPaginasOfertas, p + 1))}
                   disabled={indiceOfertas >= maxPaginasOfertas}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:opacity-30"
-                  aria-label="Próximas ofertas"
+                  aria-label="PrÃ³ximas ofertas"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -283,35 +398,34 @@ export default function PaginaInicial() {
           </section>
         )}
 
-        {/* 4-7. Mais vendidos por categoria */}
-        {categoriasComItens.map((cat, idx) => (
-          <div key={cat.slug}>
-            <section className="mb-8">
-              <div className="mb-4 flex items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-bold sm:text-xl">Mais vendidos da semana</h2>
-                  <p className="text-sm text-[var(--color-texto-suave)]">{cat.nome}</p>
-                </div>
-                <Link href={`/tutoriais?categoria=${cat.slug}`}>
-                  <Botao variante="fantasma">
-                    Ver mais
-                    <ChevronRight className="h-4 w-4" aria-hidden />
-                  </Botao>
-                </Link>
+        {maisVendidos.length > 0 && (
+          <section className="mb-8">
+            <div className="mb-5 flex items-end justify-between gap-3">
+              <div>
+                <h2 className="titulo-desenhado text-lg font-bold sm:text-xl">Mais vendidos da semana</h2>
+                <p className="mt-3 text-sm text-[var(--color-texto-suave)]">
+                  Uma selecao compacta dos anuncios com melhor destaque.
+                </p>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {cat.topItems.map((item) => (
-                  <CartaoTutorial key={item.id} item={item} />
-                ))}
-              </div>
-            </section>
-          </div>
-        ))}
+              <Link href="/tutoriais?ordenar=avaliacao">
+                <Botao variante="fantasma">
+                  Ver mais
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </Botao>
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {maisVendidos.map((item) => (
+                <CartaoTutorial key={item.id} item={item} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 8. Categorias */}
         {categorias.length > 0 && (
           <section className="mb-8">
-            <h2 className="mb-4 text-lg font-bold sm:text-xl">Categorias</h2>
+            <h2 className="titulo-desenhado mb-5 text-lg font-bold sm:text-xl">Categorias</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {categorias.map((cat) => (
                 <Link
@@ -337,3 +451,5 @@ export default function PaginaInicial() {
     </>
   );
 }
+
+

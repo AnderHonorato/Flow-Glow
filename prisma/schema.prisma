@@ -87,6 +87,7 @@ model Usuario {
   conversas         Conversa[]
   atendimentos      Conversa[]       @relation("AtendenteConversas")
   mensagensEnviadas Mensagem[]
+  favoritos         FavoritoTutorial[]
 
   @@map("usuarios")
 }
@@ -157,6 +158,7 @@ model Tutorial {
   modulos             Modulo[]
   itensPedido         ItemPedido[]
   comentarios         Comentario[]
+  favoritos           FavoritoTutorial[]
   criadoEm            DateTime      @default(now())
   atualizadoEm        DateTime      @updatedAt
 
@@ -175,6 +177,19 @@ model Modulo {
   tutorialId     String
 
   @@map("modulos")
+}
+
+model FavoritoTutorial {
+  id         String   @id @default(uuid())
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String
+  tutorial  Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  tutorialId String
+  criadoEm  DateTime @default(now())
+
+  @@unique([usuarioId, tutorialId])
+  @@index([tutorialId])
+  @@map("favoritos_tutoriais")
 }
 
 // -------------------- PEDIDOS E PAGAMENTO --------------------

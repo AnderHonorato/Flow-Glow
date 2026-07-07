@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRound, LogIn, Mail } from "lucide-react";
+import { KeyRound, LogIn, Mail, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -20,6 +20,7 @@ export default function PaginaLogin() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [status, setStatus] = useState<"idle" | "verificando" | "sucesso">("idle");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -31,12 +32,15 @@ export default function PaginaLogin() {
     }
 
     setEnviando(true);
+    setStatus("verificando");
     const resultado = await login(email, senha);
     setEnviando(false);
 
     if (resultado.sucesso) {
-      router.back();
+      setStatus("sucesso");
+      setTimeout(() => router.back(), 1200);
     } else {
+      setStatus("idle");
       setErro(resultado.erro || "Erro ao fazer login.");
     }
   }
@@ -60,6 +64,20 @@ export default function PaginaLogin() {
           Acesse sua conta para comprar, comentar e testar o painel.
         </p>
       </div>
+
+      {status === "verificando" && (
+        <div className="mb-4 flex items-center justify-center gap-3 rounded-lg bg-[var(--color-papel)] px-4 py-3 text-sm font-semibold text-[var(--color-texto)]">
+          <Loader2 className="h-5 w-5 animate-spin text-[var(--color-berry)]" aria-hidden />
+          Estamos verificando, aguarde...
+        </div>
+      )}
+
+      {status === "sucesso" && (
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-lg bg-green-50 px-4 py-3 text-sm font-bold text-green-700">
+          <CheckCircle2 className="h-5 w-5" aria-hidden />
+          Login efetuado com sucesso!
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <CampoTexto
@@ -107,7 +125,7 @@ export default function PaginaLogin() {
                 setEmail(conta.email);
                 setSenha(conta.senha);
               }}
-              className="rounded-md bg-white px-3 py-2 text-left text-xs font-semibold text-[var(--color-texto)] ring-1 ring-[var(--color-linha)] hover:ring-[var(--color-berry)]"
+              className="rounded-md bg-[var(--color-papel)] px-3 py-2 text-left text-xs font-semibold text-[var(--color-texto)] ring-1 ring-[var(--color-linha)] hover:ring-[var(--color-berry)]"
             >
               {conta.papel}: {conta.email} / {conta.senha}
             </button>

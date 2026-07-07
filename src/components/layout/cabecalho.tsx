@@ -10,20 +10,21 @@ import {
   Monitor,
   Moon,
   PackageCheck,
-  Search,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Sparkles,
   Sun,
+  Heart,
   UserRound,
   X,
   ZoomIn,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type FormEvent, type FocusEvent } from "react";
+import { useEffect, useMemo, useState, type FocusEvent } from "react";
 import { AvatarUsuario, Botao, Marca } from "@/components/ui";
+import { BuscaAutocomplete } from "@/components/layout/busca-autocomplete";
 import { SeloLocalizacao } from "@/components/layout/barra-localizacao";
 import { FaixaAvisos } from "@/components/layout/faixa-avisos";
 import { useAutenticacao } from "@/contexto/autenticacao";
@@ -62,6 +63,7 @@ export function Cabecalho() {
   const [encolhido, setEncolhido] = useState(false);
   const [busca, setBusca] = useState("");
   const [promocaoAtiva, setPromocaoAtiva] = useState(false);
+  const [saindo, setSaindo] = useState(false);
   const ehAdmin = usuario?.papel === "ADMINISTRADOR";
 
   useEffect(() => {
@@ -83,23 +85,18 @@ export function Cabecalho() {
   );
 
   async function sair() {
-    await logout();
+    setSaindo(true);
     setMenuAberto(false);
     setPerfilAberto(false);
-    router.push("/");
+    await logout();
+    setTimeout(() => {
+      setSaindo(false);
+      router.push("/");
+    }, 600);
   }
 
   function fecharMenu() {
     setMenuAberto(false);
-  }
-
-  function pesquisar(evento: FormEvent<HTMLFormElement>) {
-    evento.preventDefault();
-    const params = new URLSearchParams();
-    if (busca.trim()) params.set("busca", busca.trim());
-    setPromocaoAtiva(false);
-    router.push(`/tutoriais${params.toString() ? `?${params.toString()}` : ""}`);
-    fecharMenu();
   }
 
   function linkAtivo(tipo: "catalogo" | "ofertas") {
@@ -184,6 +181,11 @@ export function Cabecalho() {
               <UserRound className="h-4 w-4" aria-hidden /> Perfil
             </Botao>
           </Link>
+          <Link href="/favoritos" onClick={fecharMenu} className="w-full">
+            <Botao variante="fantasma" tamanho="pequeno" className="w-full justify-start">
+              <Heart className="h-4 w-4" aria-hidden /> Favoritos
+            </Botao>
+          </Link>
           <Link href="/carrinho" onClick={fecharMenu} className="w-full">
             <Botao variante="fantasma" tamanho="pequeno" className="w-full justify-start">
               <ShoppingCart className="h-4 w-4" aria-hidden /> Carrinho
@@ -194,14 +196,15 @@ export function Cabecalho() {
               )}
             </Botao>
           </Link>
-          <Botao
-            variante="fantasma"
-            tamanho="pequeno"
+          <button
+            type="button"
             onClick={sair}
-            className="w-full justify-start text-red-600"
+            disabled={saindo}
+            className="inline-flex min-h-11 w-full items-center justify-start gap-2 rounded-lg px-3 text-sm font-bold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+            aria-label="Sair da conta"
           >
             <LogOut className="h-4 w-4" aria-hidden /> Sair
-          </Botao>
+          </button>
         </>
       ) : (
         <>
@@ -253,19 +256,16 @@ export function Cabecalho() {
               })}
             </nav>
 
-            <form onSubmit={pesquisar} className="hidden min-w-0 flex-1 md:block">
-              <label className="relative block">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-texto-suave)]" />
-                <input
-                  value={busca}
-                  onChange={(evento) => setBusca(evento.target.value)}
-                  placeholder="Buscar ofertas, tutoriais, cidade..."
-                  className="h-10 w-full rounded-full border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_86%,transparent)] pl-10 pr-3 text-sm text-[var(--color-texto)] outline-none transition focus:border-[var(--color-berry)] focus:ring-2 focus:ring-[var(--color-berry)]/12"
-                />
-              </label>
-            </form>
+            <BuscaAutocomplete
+              value={busca}
+              onChange={setBusca}
+              onSearch={() => setPromocaoAtiva(false)}
+              className="hidden flex-1 md:block"
+            />
 
-            <SeloLocalizacao />
+            <div className="hidden lg:block">
+              <SeloLocalizacao />
+            </div>
 
             <div className="ml-auto hidden items-center gap-1 md:flex">
               {usuario ? (
@@ -335,17 +335,6 @@ export function Cabecalho() {
             </div>
 
             <div className="flex items-center gap-1 md:hidden">
-              <button
-                type="button"
-                onClick={solicitarLocalizacao}
-                className={`icon-hover inline-flex h-9 w-9 items-center justify-center rounded-full ${
-                  localizacao ? "text-[var(--color-sage)]" : "text-[var(--color-texto)]"
-                }`}
-                aria-label={localizacao ? "Localizacao ativa" : "Usar localizacao"}
-                title={localizacao ? "Localizacao ativa" : "Usar localizacao"}
-              >
-                <MapPin className="h-5 w-5" aria-hidden />
-              </button>
               {usuario ? (
                 <Link href="/carrinho" className="icon-hover relative inline-flex h-9 w-9 items-center justify-center rounded-full">
                   <ShoppingCart className="h-5 w-5 text-[var(--color-texto)]" />
@@ -371,6 +360,31 @@ export function Cabecalho() {
               <Menu className="h-5 w-5" />
             </button>
           </div>
+
+          <div className="mt-1 flex md:hidden">
+            <button
+              type="button"
+              onClick={solicitarLocalizacao}
+              className={`inline-flex max-w-full items-center gap-1.5 truncate px-1 text-left text-[11px] font-bold ${
+                localizacao ? "text-[var(--color-sage)]" : "text-[var(--color-texto-suave)]"
+              }`}
+              aria-label={localizacao ? "Localizacao ativa" : "Usar localizacao"}
+              title={localizacao ? "Localizacao ativa" : "Usar localizacao"}
+            >
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="truncate">
+                {localizacao ? "Localizacao ativa" : "Usar localizacao"}
+              </span>
+            </button>
+          </div>
+          <BuscaAutocomplete
+            value={busca}
+            onChange={setBusca}
+            onSearch={() => setPromocaoAtiva(false)}
+            className="mt-2 md:hidden"
+            placeholder="Buscar anuncios"
+            inputClassName="h-9 bg-[color-mix(in_srgb,var(--color-papel)_92%,transparent)]"
+          />
         </div>
 
         {menuAberto && (
@@ -396,17 +410,14 @@ export function Cabecalho() {
               </div>
 
               <div className="border-b border-[var(--color-linha)] p-4">
-                <form onSubmit={pesquisar}>
-                  <label className="relative block">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-texto-suave)]" />
-                    <input
-                      value={busca}
-                      onChange={(evento) => setBusca(evento.target.value)}
-                      placeholder="Buscar no catalogo"
-                      className="h-11 w-full rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] pl-10 pr-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
-                    />
-                  </label>
-                </form>
+                <BuscaAutocomplete
+                  value={busca}
+                  onChange={setBusca}
+                  onSearch={() => setPromocaoAtiva(false)}
+                  onNavigate={fecharMenu}
+                  placeholder="Buscar no catálogo"
+                  inputClassName="h-11 bg-[var(--color-papel)]"
+                />
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto">
@@ -457,6 +468,15 @@ export function Cabecalho() {
           </div>
         )}
       </header>
+
+      {saindo && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="rounded-2xl border border-[var(--color-linha)] bg-[var(--color-papel)] px-8 py-6 text-center shadow-[0_24px_64px_rgba(0,0,0,0.3)]">
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[var(--color-linha)] border-t-[var(--color-berry)]" />
+            <p className="text-sm font-bold text-[var(--color-texto)]">Saindo da conta com seguranca, aguarde...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }

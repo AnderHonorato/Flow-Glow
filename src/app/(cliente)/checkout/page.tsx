@@ -99,10 +99,10 @@ export default function PaginaCheckout() {
             <p className="mt-3 text-sm text-[var(--color-texto)]/62">Use o código PIX simulado abaixo.</p>
             {qrCode && (
               <div className="mt-5 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] p-4">
-                <div className="mx-auto mb-3 flex h-36 w-36 items-center justify-center rounded-md bg-white text-[var(--color-texto)]/42 ring-1 ring-[var(--color-linha)]">
+                <div className="mx-auto mb-3 flex h-36 w-36 items-center justify-center rounded-md bg-[var(--color-papel)] text-[var(--color-texto)]/42 ring-1 ring-[var(--color-linha)]">
                   <QrCode className="h-16 w-16" />
                 </div>
-                <p className="break-all rounded-md bg-white p-3 font-mono text-xs text-[var(--color-texto)]/56">{qrCode}</p>
+                <p className="break-all rounded-md bg-[var(--color-papel)] p-3 font-mono text-xs text-[var(--color-texto)]/56">{qrCode}</p>
               </div>
             )}
             <Botao className="mt-5" onClick={() => router.push("/meus-tutoriais")}>Ir para meus tutoriais</Botao>
@@ -130,7 +130,7 @@ export default function PaginaCheckout() {
                     return (
                       <button key={opcao.valor} type="button" onClick={() => setMetodo(opcao.valor)}
                         className={`rounded-lg border p-4 text-left transition-colors cursor-pointer ${
-                          metodo === opcao.valor ? "border-[var(--color-berry)] bg-[var(--color-berry)]/8" : "border-[var(--color-linha)] bg-white hover:border-[var(--color-berry)]"
+                          metodo === opcao.valor ? "border-[var(--color-berry)] bg-[var(--color-berry)]/8" : "border-[var(--color-linha)] bg-[var(--color-papel)] hover:border-[var(--color-berry)]"
                         }`}>
                         <Icone className="mb-3 h-5 w-5 text-[var(--color-berry)]" />
                         <span className="block font-bold text-sm">{opcao.rotulo}</span>
@@ -152,7 +152,7 @@ export default function PaginaCheckout() {
                   <div className="mt-3 flex gap-2">
                     <input type="text" value={cupomInput} onChange={e => setCupomInput(e.target.value.toUpperCase())}
                       placeholder="Código do cupom" disabled={!!cupomAplicado}
-                      className="flex-1 rounded-lg border border-[var(--color-linha-forte)] bg-white px-3 py-2 text-sm uppercase placeholder:normal-case focus:outline-none focus:ring-2 focus:ring-[var(--color-berry)]/20 disabled:opacity-50" />
+                      className="flex-1 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 py-2 text-sm uppercase text-[var(--color-texto)] placeholder:normal-case focus:outline-none focus:ring-2 focus:ring-[var(--color-berry)]/20 disabled:opacity-50" />
                     {cupomAplicado ? (
                       <Botao type="button" variante="fantasma" tamanho="pequeno" onClick={() => { setCupomAplicado(null); setCupomInput(""); }}>
                         Remover

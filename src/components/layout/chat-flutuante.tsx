@@ -4,7 +4,10 @@ import {
   Bold,
   ImageIcon,
   Italic,
+  Briefcase,
   List,
+  Link as LinkIcon,
+  Mail,
   MessageCircle,
   Paperclip,
   Plus,
@@ -18,6 +21,7 @@ import { usePathname } from "next/navigation";
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -61,12 +65,34 @@ interface ConversaChat {
   mensagens: MensagemChat[];
 }
 
-const opcoesBot = [
-  { id: "pedido", texto: "Pedido ou compra" },
-  { id: "pagamento", texto: "Pagamento" },
-  { id: "acesso", texto: "Acesso a conta" },
-  { id: "outro", texto: "Outro assunto" },
-];
+const MARCADOR_CONTATOS_DESENVOLVEDOR = "[[CARTOES_DESENVOLVEDOR]]";
+
+const contatosDesenvolvedor = [
+  {
+    titulo: "E-mail",
+    texto: "contato.anderflow@gmail.com",
+    href: "mailto:contato.anderflow@gmail.com",
+    icone: Mail,
+  },
+  {
+    titulo: "WhatsApp",
+    texto: "+55 11 94065-2843",
+    href: "https://wa.me/5511940652843",
+    icone: MessageCircle,
+  },
+  {
+    titulo: "Portfolio",
+    texto: "Projetos e trabalhos",
+    href: "https://anderhonorato.github.io/meu-portfolio/index.html",
+    icone: Briefcase,
+  },
+  {
+    titulo: "Links",
+    texto: "Canais principais",
+    href: "https://anderhonorato.github.io/links/",
+    icone: LinkIcon,
+  },
+] as const;
 
 function renderizarTexto(texto: string) {
   const partes: (string | { tipo: "bold" | "italic"; texto: string })[] = [];
@@ -100,21 +126,143 @@ function renderizarTexto(texto: string) {
   );
 }
 
-function MensagemBot({ texto, ehUltima }: { texto: string; ehUltima: boolean }) {
-  const [visivel, setVisivel] = useState(ehUltima ? 0 : texto.length);
+function CartoesContatoDesenvolvedor() {
+  return (
+    <div className="mt-2 grid gap-2">
+      {contatosDesenvolvedor.map((contato) => {
+        const Icone = contato.icone;
+        return (
+          <a
+            key={contato.href}
+            href={contato.href}
+            target={contato.href.startsWith("http") ? "_blank" : undefined}
+            rel={contato.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            className="flex items-center gap-2 rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-2 text-[var(--color-texto)] transition hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]"
+          >
+            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-berry)_12%,transparent)] text-[var(--color-berry)]">
+              <Icone className="h-4 w-4" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xs font-black">{contato.titulo}</span>
+              <span className="block truncate text-[11px] font-semibold text-[var(--color-texto-suave)]">
+                {contato.texto}
+              </span>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderizarMensagemBot(texto: string) {
+  const mostrarCartoes = texto.includes(MARCADOR_CONTATOS_DESENVOLVEDOR);
+  const textoLimpo = texto.replace(MARCADOR_CONTATOS_DESENVOLVEDOR, "").trim();
+  const linhas = textoLimpo ? textoLimpo.split(/\n+/) : [];
+
+  return (
+    <>
+      {linhas.map((linha, indice) => (
+        <span
+          key={`${linha}-${indice}`}
+          className="ghost-line"
+          style={{ animationDelay: `${indice * 90}ms` }}
+        >
+          {renderizarTexto(linha)}
+        </span>
+      ))}
+      {mostrarCartoes && <CartoesContatoDesenvolvedor />}
+    </>
+  );
+}
+
+function PensamentoBot() {
+  const frases = [
+    "Estou pensando...",
+    "Aguarde mais um pouco enquanto verifico...",
+    "Estou organizando a melhor resposta...",
+  ];
+  const [indice, setIndice] = useState(0);
+
   useEffect(() => {
-    if (!ehUltima || visivel >= texto.length) return;
+    const timers = [
+      window.setTimeout(() => setIndice(1), 1800),
+      window.setTimeout(() => setIndice(2), 4200),
+    ];
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+
+  return (
+    <span className="inline-flex items-center gap-2 text-xs font-semibold italic text-[var(--color-texto-suave)]">
+      <span className="inline-flex gap-0.5">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-berry)]" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-berry)] [animation-delay:160ms]" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-berry)] [animation-delay:320ms]" />
+      </span>
+      {frases[indice]}
+    </span>
+  );
+}
+
+function MensagemBot({ texto, ehUltima, animada, onAnimacaoCompleta }: { texto: string; ehUltima: boolean; animada: boolean; onAnimacaoCompleta?: () => void }) {
+  const [fase, setFase] = useState<"digitando" | "revelando" | "pronto">(
+    !ehUltima || !animada ? "pronto" : "digitando"
+  );
+  const [visivel, setVisivel] = useState(0);
+  const tokens = useMemo(() => texto.split(/(\s+)/), [texto]);
+  const digitandoRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const concluidoRef = useRef(false);
+
+  useEffect(() => {
+    if (!ehUltima || !animada) {
+      setFase("pronto");
+      return;
+    }
+    digitandoRef.current = setTimeout(() => {
+      setFase("revelando");
+    }, 900);
+    return () => {
+      if (digitandoRef.current) clearTimeout(digitandoRef.current);
+    };
+  }, [ehUltima, animada]);
+
+  useEffect(() => {
+    if (fase !== "revelando") return;
     const intervalo = setInterval(() => {
       setVisivel((v) => {
         const proximo = v + 1;
-        if (proximo >= texto.length) clearInterval(intervalo);
+        if (proximo >= tokens.length) {
+          clearInterval(intervalo);
+          setFase("pronto");
+        }
         return proximo;
       });
-    }, 35);
+    }, 46);
     return () => clearInterval(intervalo);
-  }, [ehUltima, texto.length, visivel]);
-  const trecho = texto.slice(0, visivel);
-  return <span>{renderizarTexto(trecho)}{visivel < texto.length && <span className="animate-pulse">|</span>}</span>;
+  }, [fase, tokens.length]);
+
+  useEffect(() => {
+    if (fase === "pronto" && !concluidoRef.current && animada) {
+      concluidoRef.current = true;
+      onAnimacaoCompleta?.();
+    }
+  }, [fase, animada, onAnimacaoCompleta]);
+
+  if (fase === "digitando") {
+    return <PensamentoBot />;
+  }
+
+  if (fase === "pronto" || !ehUltima) {
+    return <span className="animate-[entrada-suave_400ms_ease]">{renderizarMensagemBot(texto)}</span>;
+  }
+
+  const trecho = tokens.slice(0, visivel).join("");
+  return (
+    <span>
+      {renderizarMensagemBot(trecho)}
+      {visivel < tokens.length && <span className="animate-pulse">|</span>}
+    </span>
+  );
 }
 
 export function ChatFlutuante() {
@@ -128,10 +276,14 @@ export function ChatFlutuante() {
   const [enviando, setEnviando] = useState(false);
   const [avaliacaoTexto, setAvaliacaoTexto] = useState("");
   const [avaliando, setAvaliando] = useState(false);
+  const [ultimaMsgBotAnimada, setUltimaMsgBotAnimada] = useState<string | null>(null);
   const fimRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const enviandoRef = useRef(false);
+  const [mensagemInicial, setMensagemInicial] = useState(
+    "Ola! Posso ajudar com anuncios, compras, favoritos, conta ou suporte."
+  );
 
   const ocultar =
     pathname.startsWith("/admin") ||
@@ -140,6 +292,16 @@ export function ChatFlutuante() {
     pathname.startsWith("/recuperar-senha") ||
     pathname.startsWith("/redefinir-senha") ||
     pathname.startsWith("/chat");
+
+  useEffect(() => {
+    const opcoes = [
+      "Oi! Eu sou o AlphaBot. Me diga o que voce procura e eu te ajudo.",
+      "Ola! Posso ajudar com anuncios, compras, favoritos, conta ou suporte.",
+      "Boas-vindas! Envie sua duvida e eu verifico o melhor caminho.",
+      "Tudo certo por aqui. Como posso ajudar voce hoje?",
+    ];
+    setMensagemInicial(opcoes[Math.floor(Math.random() * opcoes.length)]);
+  }, []);
 
   const carregar = useCallback(async () => {
     if (!accessToken || !aberto || enviandoRef.current) return;
@@ -168,6 +330,19 @@ export function ChatFlutuante() {
   useEffect(() => {
     fimRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversa?.mensagens, aberto]);
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("mca_ultima_msg_bot_animada");
+      if (saved) setUltimaMsgBotAnimada(saved);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (ultimaMsgBotAnimada) {
+      try { sessionStorage.setItem("mca_ultima_msg_bot_animada", ultimaMsgBotAnimada); } catch {}
+    }
+  }, [ultimaMsgBotAnimada]);
 
   async function iniciarNovo() {
     if (!accessToken) return;
@@ -272,10 +447,6 @@ export function ChatFlutuante() {
     await enviarPayload({ texto, anexos });
   }
 
-  async function escolherOpcao(opcaoId: string, texto: string) {
-    await enviarPayload({ texto, opcaoId });
-  }
-
   async function avaliar(nota: number) {
     if (!conversa || !accessToken) return;
     setAvaliando(true);
@@ -322,18 +493,80 @@ export function ChatFlutuante() {
           : "Encerrado"
     : "Atendimento por protocolo";
 
+  const idsMsgsBot = conversa?.mensagens.filter((m) => m.tipo === "BOT").map((m) => m.id) ?? [];
+  const ultimaMsgBotId = idsMsgsBot[idsMsgsBot.length - 1];
+  const animadaMsgId = ultimaMsgBotAnimada;
+
+  const mensagensRenderizadas = conversa?.mensagens.map((msg, idx) => {
+    const minha = msg.remetente.id === (usuario?.id ?? "");
+    const sistema = msg.tipo === "SISTEMA";
+    const ehBot = msg.tipo === "BOT";
+    const ehUltima = idx === (conversa?.mensagens.length ?? 0) - 1;
+    if (sistema) {
+      return (
+        <p key={msg.id} className="mx-auto max-w-[88%] rounded-full bg-[var(--color-linha)]/70 px-3 py-1.5 text-center text-[11px] font-semibold text-[var(--color-texto-suave)]">
+          {msg.texto}
+        </p>
+      );
+    }
+    return (
+      <div key={msg.id} className={`flex items-end gap-2 ${minha ? "justify-end" : "justify-start"}`}>
+        {!minha && (ehBot ? (
+          <img src="/alphabot.png" alt="Bot MCA" className="h-8 w-8 shrink-0 rounded-full border border-white/60 object-cover shadow-sm" />
+        ) : (
+          <AvatarUsuario nome={msg.remetente.nomeCompleto} fotoUrl={msg.remetente.fotoPerfilUrl} tamanho="pequeno" />
+        ))}
+        <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${minha ? "rounded-br-md bg-[var(--color-berry)] text-white" : "rounded-bl-md bg-[var(--color-linha)] text-[var(--color-texto)]"}`}>
+          <p className="mb-0.5 text-[10px] font-medium opacity-70">{msg.remetente.nomeCompleto}</p>
+          {msg.texto && (
+            <div className="whitespace-pre-wrap break-words">
+              {ehBot ? (
+                <MensagemBot
+                  texto={msg.texto!}
+                  ehUltima={ehUltima}
+                  animada={ehUltima && msg.id === ultimaMsgBotId && msg.id !== animadaMsgId}
+                  onAnimacaoCompleta={() => { setUltimaMsgBotAnimada(msg.id); }}
+                />
+              ) : (
+                renderizarTexto(msg.texto)
+              )}
+            </div>
+          )}
+          {msg.anexos?.length > 0 && (
+            <div className="mt-2 grid gap-2">
+              {msg.anexos.map((anexo, indice) =>
+                anexo.tipo === "VIDEO" ? (
+                  <video key={`${msg.id}-${indice}`} src={anexo.url} controls className="max-h-40 rounded-lg" />
+                ) : (
+                  <img key={`${msg.id}-${indice}`} src={anexo.url} alt="Anexo enviado" className="max-h-40 rounded-lg object-cover" />
+                )
+              )}
+            </div>
+          )}
+          <span className="mt-1 block text-[10px] opacity-55">
+            {new Date(msg.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </div>
+        {minha && <AvatarUsuario nome={msg.remetente.nomeCompleto} fotoUrl={msg.remetente.fotoPerfilUrl} tamanho="pequeno" />}
+      </div>
+    );
+  });
+  const aguardandoHumano = conversa?.status === "AGUARDANDO_ATENDENTE";
+
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[75] sm:inset-x-auto sm:bottom-5 sm:right-5">
+    <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-3 z-[85] w-[calc(100vw-1.5rem)] max-w-[24rem] sm:bottom-5 sm:right-5 sm:w-[24rem]">
       {aberto && (
-        <section className="mb-3 flex h-[min(30rem,calc(100dvh-8rem))] w-full flex-col overflow-hidden rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)] shadow-[0_18px_60px_rgba(23,32,51,0.22)] sm:w-[24rem]">
+        <section className="mb-3 flex h-[min(32rem,calc(100dvh-7rem))] w-full flex-col overflow-hidden rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)] shadow-[0_18px_60px_rgba(23,32,51,0.22)]">
           <div className="flex items-center justify-between border-b border-[var(--color-linha)] px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-2">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-berry)] text-white">
-                <MessageCircle className="h-5 w-5" aria-hidden />
-              </span>
+              <img
+                src="/alphabot.png"
+                alt="Bot MCA"
+                className="h-9 w-9 shrink-0 rounded-full object-cover"
+              />
               <div className="min-w-0">
                 <h2 className="truncate text-sm font-black">
-                  {conversa?.protocolo || "Atendimento MCA"}
+                  AlphaBot Atendente Virtual
                 </h2>
                 <p className="truncate text-xs text-[var(--color-texto-suave)]">{statusTexto}</p>
               </div>
@@ -380,77 +613,27 @@ export function ChatFlutuante() {
                 )}
 
                 {!conversa ? (
-                  <div className="grid gap-3 py-10 text-center">
-                    <p className="text-sm text-[var(--color-texto-suave)]">
-                      Abra um protocolo para falar com o Bot MCA e entrar na fila.
-                    </p>
-                    <Botao type="button" onClick={iniciarNovo} carregando={enviando}>
-                      <Plus className="h-4 w-4" aria-hidden />
-                      Novo atendimento
-                    </Botao>
+                  <div className="grid grid-cols-[auto_1fr] items-end gap-2 py-4">
+                    <img src="/alphabot.png" alt="Bot MCA" className="h-8 w-8 shrink-0 rounded-full border border-white/60 object-cover shadow-sm" />
+                    <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-[var(--color-linha)] px-3 py-2 text-sm text-[var(--color-texto)]">
+                      <p className="mb-0.5 text-[10px] font-medium opacity-70">AlphaBot</p>
+                      <p className="whitespace-pre-wrap break-words">{mensagemInicial}</p>
+                    </div>
                   </div>
                 ) : (
-                  conversa.mensagens.map((msg, idx) => {
-                    const minha = msg.remetente.id === usuario.id;
-                    const sistema = msg.tipo === "SISTEMA";
-                    const ehBot = msg.tipo === "BOT";
-                    const ehUltima = idx === conversa.mensagens.length - 1;
-                    if (sistema) {
-                      return (
-                        <p key={msg.id} className="mx-auto max-w-[88%] rounded-full bg-[var(--color-linha)]/70 px-3 py-1.5 text-center text-[11px] font-semibold text-[var(--color-texto-suave)]">
-                          {msg.texto}
-                        </p>
-                      );
-                    }
-                    return (
-                      <div key={msg.id} className={`flex items-end gap-2 ${minha ? "justify-end" : "justify-start"}`}>
-                        {!minha && <AvatarUsuario nome={msg.remetente.nomeCompleto} fotoUrl={msg.remetente.fotoPerfilUrl} tamanho="pequeno" />}
-                        <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${minha ? "rounded-br-md bg-[var(--color-berry)] text-white" : "rounded-bl-md bg-[var(--color-linha)] text-[var(--color-texto)]"}`}>
-                          <p className="mb-0.5 text-[10px] font-medium opacity-70">{msg.remetente.nomeCompleto}</p>
-                          {msg.texto && (
-                            <p className="whitespace-pre-wrap break-words">
-                              {ehBot ? <MensagemBot texto={msg.texto} ehUltima={ehUltima} /> : renderizarTexto(msg.texto)}
-                            </p>
-                          )}
-                          {msg.anexos?.length > 0 && (
-                            <div className="mt-2 grid gap-2">
-                              {msg.anexos.map((anexo, indice) =>
-                                anexo.tipo === "VIDEO" ? (
-                                  <video key={`${msg.id}-${indice}`} src={anexo.url} controls className="max-h-40 rounded-lg" />
-                                ) : (
-                                  <img key={`${msg.id}-${indice}`} src={anexo.url} alt="Anexo enviado" className="max-h-40 rounded-lg object-cover" />
-                                )
-                              )}
-                            </div>
-                          )}
-                          <span className="mt-1 block text-[10px] opacity-55">
-                            {new Date(msg.criadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                          </span>
-                        </div>
-                        {minha && <AvatarUsuario nome={msg.remetente.nomeCompleto} fotoUrl={msg.remetente.fotoPerfilUrl} tamanho="pequeno" />}
-                      </div>
-                    );
-                  })
+                  mensagensRenderizadas
+                )}
+                {enviando && usuario && conversa?.status !== "AGUARDANDO_ATENDENTE" && (
+                  <div className="flex items-end gap-2">
+                    <img src="/alphabot.png" alt="AlphaBot" className="h-8 w-8 shrink-0 rounded-full border border-white/60 object-cover shadow-sm" />
+                    <div className="max-w-[78%] rounded-2xl rounded-bl-md bg-[var(--color-linha)] px-3 py-2 text-sm text-[var(--color-texto)]">
+                      <p className="mb-0.5 text-[10px] font-medium opacity-70">AlphaBot</p>
+                      <PensamentoBot />
+                    </div>
+                  </div>
                 )}
                 <div ref={fimRef} />
               </div>
-
-              {conversa?.status === "TRIAGEM" && (
-                <div className="border-t border-[var(--color-linha)] px-3 py-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    {opcoesBot.map((opcao) => (
-                      <button
-                        key={opcao.id}
-                        type="button"
-                        onClick={() => escolherOpcao(opcao.id, opcao.texto)}
-                        className="min-h-10 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-2 text-xs font-bold text-[var(--color-texto)] hover:border-[var(--color-berry)]"
-                      >
-                        {opcao.texto}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {conversa?.status === "ENCERRADA" ? (
                 <div className="border-t border-[var(--color-linha)] p-3">
@@ -484,8 +667,13 @@ export function ChatFlutuante() {
                     </div>
                   )}
                 </div>
-              ) : conversa ? (
+              ) : (
                 <form onSubmit={enviar} className="border-t border-[var(--color-linha)] p-3">
+                  {aguardandoHumano && (
+                    <p className="mb-2 rounded-lg border border-[var(--color-ouro)]/30 bg-[color-mix(in_srgb,var(--color-ouro)_12%,transparent)] px-3 py-2 text-xs font-semibold text-[var(--color-texto-suave)]">
+                      Protocolo aberto. O AlphaBot pausou as respostas e um humano assume a partir daqui.
+                    </p>
+                  )}
                   {anexos.length > 0 && (
                     <div className="mb-2 flex gap-2 overflow-x-auto">
                       {anexos.map((anexo, indice) => (
@@ -520,7 +708,7 @@ export function ChatFlutuante() {
                       value={mensagem}
                       onChange={(evento) => setMensagem(evento.target.value)}
                       onKeyDown={aoPressionarTecla}
-                      placeholder="Digite sua mensagem..."
+                      placeholder={aguardandoHumano ? "Envie detalhes para o atendente humano..." : "Digite sua mensagem..."}
                       rows={1}
                       className="max-h-28 min-h-11 flex-1 resize-none rounded-2xl border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-2.5 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)]"
                     />
@@ -529,7 +717,7 @@ export function ChatFlutuante() {
                     </Botao>
                   </div>
                 </form>
-              ) : null}
+              )}
             </>
           )}
         </section>

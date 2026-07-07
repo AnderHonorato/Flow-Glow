@@ -10,13 +10,13 @@ interface BotaoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const estilosVariante = {
   primario:
-    "pincelada group border border-[#b98a2d]/30 bg-[#b98a2d] text-white shadow-[0_10px_28px_rgba(185,138,45,0.22)] hover:bg-[#a07822]",
+    "pincelada group border border-[var(--color-ouro)]/35 bg-[var(--color-ouro)] text-white shadow-[0_10px_28px_rgba(185,138,45,0.22)] hover:bg-[var(--color-ouro-claro)] hover:text-[var(--color-texto)]",
   secundario:
     "liquid-button border border-white/25 bg-[var(--color-sage)] text-white shadow-[0_10px_24px_rgba(31,122,118,0.16)] hover:bg-[var(--color-sage-escuro)]",
   contorno:
-    "group border border-[#eadfd5] bg-white text-[#2a211d] hover:border-[#b98a2d] hover:text-[#b98a2d]",
+    "group border border-[var(--color-linha-forte)] bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]",
   fantasma:
-    "group text-[#2a211d] hover:bg-[#f6f2ec] hover:text-[#b98a2d]",
+    "group text-[var(--color-texto)] hover:bg-[color-mix(in_srgb,var(--color-papel)_70%,var(--color-linha)_30%)] hover:text-[var(--color-berry)]",
   perigo:
     "liquid-button border border-white/25 bg-red-600 text-white shadow-[0_10px_24px_rgba(185,28,28,0.18)] hover:bg-red-700",
 };
@@ -36,13 +36,18 @@ export function Botao({
   className = "",
   ...props
 }: BotaoProps) {
+  const rotuloTooltip =
+    typeof props["aria-label"] === "string" ? props["aria-label"] : undefined;
+
   return (
     <button
+      data-tooltip={rotuloTooltip}
       className={`pincelada-botao relative inline-flex items-center justify-center gap-2 overflow-hidden font-semibold transition-all duration-300 cursor-pointer
         active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
-        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b98a2d]
+        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ouro)]
         ${estilosVariante[variante]}
         ${estilosTamanho[tamanho]}
+        ${rotuloTooltip ? "tooltip-action" : ""}
         ${className}`}
       disabled={disabled || carregando}
       {...props}

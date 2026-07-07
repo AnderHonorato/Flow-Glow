@@ -17,15 +17,18 @@ export function CarrosselBanners() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [indice, setIndice] = useState(0);
   const [pausado, setPausado] = useState(false);
+  const [carregando, setCarregando] = useState(true);
   const intervaloRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    setCarregando(true);
     fetch("/api/anuncios")
       .then((r) => r.json())
       .then((d) => {
         if (d.sucesso && d.dados.length > 0) setBanners(d.dados);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setCarregando(false));
   }, []);
 
   const avancar = useCallback(() => {
@@ -43,6 +46,14 @@ export function CarrosselBanners() {
       if (intervaloRef.current) clearInterval(intervaloRef.current);
     };
   }, [banners.length, pausado, avancar]);
+
+  if (carregando) {
+    return (
+      <div className="mx-auto max-w-7xl px-3 pt-2 sm:px-5 sm:pt-3 lg:px-8">
+        <div className="skeleton aspect-[1.85/1] min-h-[132px] max-h-[320px] rounded-2xl border border-[var(--color-linha)] sm:aspect-[4/1]" />
+      </div>
+    );
+  }
 
   if (banners.length === 0) return null;
 
@@ -77,7 +88,7 @@ export function CarrosselBanners() {
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); voltar(); }}
-            className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-[#2a211d] shadow-md transition-opacity hover:bg-white md:opacity-0 md:group-hover:opacity-100 sm:left-4 sm:h-10 sm:w-10"
+            className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] shadow-md transition-opacity hover:bg-[var(--color-papel)] md:opacity-0 md:group-hover:opacity-100 sm:left-4 sm:h-10 sm:w-10"
             aria-label="Banner anterior"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -88,7 +99,7 @@ export function CarrosselBanners() {
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); avancar(); }}
-            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-[#2a211d] shadow-md transition-opacity hover:bg-white md:opacity-0 md:group-hover:opacity-100 sm:right-4 sm:h-10 sm:w-10"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-papel)_88%,transparent)] text-[var(--color-texto)] shadow-md transition-opacity hover:bg-[var(--color-papel)] md:opacity-0 md:group-hover:opacity-100 sm:right-4 sm:h-10 sm:w-10"
             aria-label="Próximo banner"
           >
             <ChevronRight className="h-5 w-5" />

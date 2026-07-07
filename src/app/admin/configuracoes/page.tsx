@@ -1,9 +1,11 @@
 "use client";
 
-import { Megaphone, Power, Save } from "lucide-react";
+import { ImageIcon, Megaphone, Power, Save } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Botao, CampoTexto, Cartao } from "@/components/ui";
 import { useAutenticacao } from "@/contexto/autenticacao";
+import logoDog from "../../../../assets/imagens/logo-dog.jpg";
+import iconeLeopardo from "../../../../assets/imagens/icone-leopardo-semfundo.png";
 
 interface AvisoTopo {
   id: string;
@@ -180,6 +182,53 @@ export default function PaginaAdminConfiguracoes() {
           </div>
         </Cartao>
       </div>
+
+      <Cartao className="mt-6">
+        <div className="mb-4 flex items-center gap-2">
+          <ImageIcon className="h-5 w-5 text-[var(--color-sage)]" aria-hidden />
+          <div>
+            <h2 className="text-xl font-bold">Previa de identidade visual</h2>
+            <p className="mt-1 text-sm text-[var(--color-texto-suave)]">
+              Exemplo com as duas imagens anexadas, sem aplicar ainda como marca global do site.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-[18rem_1fr]">
+          <div className="overflow-hidden rounded-xl border border-[var(--color-linha)] bg-[var(--color-grafite)]">
+            <img
+              src={logoDog.src}
+              alt="Previa vertical da marca MCA"
+              className="h-72 w-full object-cover sm:h-80"
+            />
+          </div>
+          <div className="grid content-center gap-4 rounded-xl border border-[var(--color-linha)] bg-[var(--color-grafite)] p-4 text-white">
+            <div className="rounded-xl bg-white/8 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-ouro-claro)]">
+                Cabeçalho / assinatura
+              </p>
+              <img
+                src={iconeLeopardo.src}
+                alt="Previa horizontal da marca MCA com leopardo"
+                className="mt-3 max-h-48 w-full object-contain"
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-white/12 bg-white/7 p-4">
+                <p className="text-sm font-black text-[var(--color-ouro-claro)]">Uso sugerido</p>
+                <p className="mt-1 text-sm text-white/70">
+                  Banner institucional, capa de marca ou tela de boas-vindas.
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/12 bg-white/7 p-4">
+                <p className="text-sm font-black text-[var(--color-ouro-claro)]">Antes de aplicar</p>
+                <p className="mt-1 text-sm text-white/70">
+                  Confirme se prefere trocar logo, fundo do rodape ou criar uma pagina de marca.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Cartao>
 
       <div className="mt-6 space-y-3">
         <h2 className="text-xl font-bold">Historico</h2>

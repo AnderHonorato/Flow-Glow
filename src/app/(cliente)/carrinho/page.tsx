@@ -31,7 +31,7 @@ export default function PaginaCarrinho() {
         </div>
 
         {itens.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[var(--color-linha-forte)] bg-white px-4 py-14 text-center">
+          <div className="rounded-lg border border-dashed border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-4 py-14 text-center">
             <ShoppingBag className="mx-auto mb-3 h-8 w-8 text-[var(--color-berry)]" aria-hidden />
             <h2 className="text-lg font-bold">Seu carrinho está vazio</h2>
             <p className="mt-2 text-sm text-[var(--color-texto)]/60">

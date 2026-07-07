@@ -62,28 +62,24 @@ interface ContextoAutenticacao {
 
 const Contexto = createContext<ContextoAutenticacao | null>(null);
 
-function salvarToken(token: string, persistir: boolean): void {
-  if (typeof window !== "undefined") {
-    if (persistir) {
-      localStorage.setItem("accessToken", token);
-    } else {
-      localStorage.removeItem("accessToken");
-    }
-  }
+function salvarToken(token: string, _persistir: boolean): void {
+  try {
+    localStorage.setItem("accessToken", token);
+    sessionStorage.setItem("accessToken", token);
+  } catch {}
 }
 
 function obterTokenSalvo(): string | null {
-  if (typeof window !== "undefined") {
-    if (localStorage.getItem("mca_cookie_consent") !== "aceito") return null;
-    return localStorage.getItem("accessToken");
-  }
-  return null;
+  try {
+    return localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+  } catch { return null; }
 }
 
 function removerTokenSalvo(): void {
-  if (typeof window !== "undefined") {
+  try {
     localStorage.removeItem("accessToken");
-  }
+    sessionStorage.removeItem("accessToken");
+  } catch {}
 }
 
 export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
@@ -215,7 +211,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
 
       return { sucesso: true };
     } catch {
-      return { sucesso: false, erro: "Erro de conexão. Verifique sua internet." };
+      return { sucesso: false, erro: "Erro de conexao. Verifique sua internet." };
     }
   }
 

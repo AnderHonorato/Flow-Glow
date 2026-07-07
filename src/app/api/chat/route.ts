@@ -6,12 +6,18 @@ import {
   carregarConversaPorId,
   criarConversaAtendimento,
   criarMensagemChat,
-  opcoesAtendimento,
+  includeConversaChat,
   serializarConversa,
   serializarConversas,
   sincronizarInatividade,
-  includeConversaChat,
+  textoProtocoloAberto,
 } from "@/lib/chat";
+import {
+  deveTransferirParaHumano,
+  gerarRespostaAlphaBot,
+  perguntaSobreDesenvolvedor,
+  textoContatosDesenvolvedor,
+} from "@/lib/alphabot";
 import type { RespostaApi } from "@/tipos";
 
 type AnexoEntrada = { tipo: "IMAGEM" | "VIDEO"; url: string };
@@ -40,6 +46,33 @@ async function carregarListaCliente(usuarioId: string) {
     take: 5,
   });
   return serializarConversas(conversas);
+}
+
+async function abrirProtocoloHumano({
+  conversaId,
+  protocolo,
+  assunto,
+  agora,
+}: {
+  conversaId: string;
+  protocolo: string;
+  assunto: string;
+  agora: Date;
+}) {
+  await criarMensagemChat({
+    conversaId,
+    tipo: "BOT",
+    texto: textoProtocoloAberto(protocolo),
+  });
+
+  await prisma.conversa.update({
+    where: { id: conversaId },
+    data: {
+      status: "AGUARDANDO_ATENDENTE",
+      assunto: assunto || "Atendimento solicitado",
+      clienteAguardandoDesde: agora,
+    },
+  });
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
@@ -113,13 +146,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     let conversa = await buscarConversaAtivaDoCliente(usuarioId);
     if (!conversa) {
-      const totalConversas = await prisma.conversa.count({ where: { usuarioId } });
-      if (totalConversas > 0) {
-        return NextResponse.json(
-          { sucesso: false, erro: "Este protocolo foi encerrado. Abra um novo chamado pelo botao +." },
-          { status: 409 }
-        );
-      }
       conversa = await buscarOuCriarConversaAtiva(usuarioId);
     }
 
@@ -148,23 +174,44 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     });
 
     if (conversa.status === "TRIAGEM") {
-      const opcao = opcoesAtendimento.find((item) => item.id === corpo.opcaoId);
-      await criarMensagemChat({
-        conversaId: conversa.id,
-        tipo: "BOT",
-        texto:
-          opcao?.resposta ||
-          "Recebi sua mensagem. Chamei um atendente e logo alguem continua o atendimento com voce.",
-      });
+      if (perguntaSobreDesenvolvedor(texto)) {
+        await criarMensagemChat({
+          conversaId: conversa.id,
+          tipo: "BOT",
+          texto: textoContatosDesenvolvedor(),
+        });
+      } else if (deveTransferirParaHumano(texto)) {
+        await abrirProtocoloHumano({
+          conversaId: conversa.id,
+          protocolo: conversa.protocolo,
+          assunto: "Atendimento solicitado pelo cliente",
+          agora,
+        });
+      } else {
+        const respostaBot = await gerarRespostaAlphaBot({
+          texto,
+          usuarioId,
+          historico: conversa.mensagens.map((mensagem) => ({
+            tipo: mensagem.tipo,
+            texto: mensagem.texto,
+          })),
+        });
 
-      await prisma.conversa.update({
-        where: { id: conversa.id },
-        data: {
-          status: "AGUARDANDO_ATENDENTE",
-          assunto: opcao?.rotulo || "Atendimento",
-          clienteAguardandoDesde: agora,
-        },
-      });
+        if (respostaBot.transferir) {
+          await abrirProtocoloHumano({
+            conversaId: conversa.id,
+            protocolo: conversa.protocolo,
+            assunto: respostaBot.assunto || "Atendimento solicitado",
+            agora,
+          });
+        } else {
+          await criarMensagemChat({
+            conversaId: conversa.id,
+            tipo: "BOT",
+            texto: respostaBot.texto,
+          });
+        }
+      }
     }
 
     const atualizada = await carregarConversaPorId(conversa.id);

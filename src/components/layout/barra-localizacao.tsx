@@ -163,6 +163,7 @@ function SeloConteudo({
       <Link
         href="/perfil"
         className="flex items-center gap-1.5 rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-1.5 text-xs font-medium text-[var(--color-texto-suave)] hover:text-[var(--color-berry)] transition-colors"
+        suppressHydrationWarning
       >
         <MapPin className="h-3.5 w-3.5 shrink-0" />
         Adicionar endereço
@@ -174,6 +175,7 @@ function SeloConteudo({
     <Link
       href="/perfil"
       className="flex items-center gap-1.5 rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 py-1.5 text-xs transition-colors hover:border-[var(--color-berry)]"
+      suppressHydrationWarning
     >
       {dados.origem === "gps" ? (
         <Navigation className="h-3.5 w-3.5 shrink-0 text-[var(--color-sage)]" />

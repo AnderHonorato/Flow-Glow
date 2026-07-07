@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   BadgePercent,
@@ -17,6 +17,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { Cabecalho, Rodape } from "@/components/layout";
+import { BotaoFavorito } from "@/components/favoritos/botao-favorito";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
 import { useCarrinho } from "@/hooks/use-carrinho";
 import { usePreferencias } from "@/contexto/preferencias";
@@ -24,25 +25,25 @@ import type { TutorialCard } from "@/tipos";
 
 const opcoesOrdenacao = [
   { valor: "recentes", rotulo: "Mais recentes" },
-  { valor: "preco-asc", rotulo: "Menor preço" },
-  { valor: "preco-desc", rotulo: "Maior preço" },
+  { valor: "preco-asc", rotulo: "Menor preÃ§o" },
+  { valor: "preco-desc", rotulo: "Maior preÃ§o" },
   { valor: "distancia", rotulo: "Mais perto" },
-  { valor: "avaliacao", rotulo: "Melhor avaliação" },
+  { valor: "avaliacao", rotulo: "Melhor avaliaÃ§Ã£o" },
 ];
 
 const distancias = [
   { valor: "", rotulo: "Todas" },
-  { valor: "10", rotulo: "Até 10 km" },
-  { valor: "25", rotulo: "Até 25 km" },
-  { valor: "50", rotulo: "Até 50 km" },
-  { valor: "100", rotulo: "Até 100 km" },
+  { valor: "10", rotulo: "AtÃ© 10 km" },
+  { valor: "25", rotulo: "AtÃ© 25 km" },
+  { valor: "50", rotulo: "AtÃ© 50 km" },
+  { valor: "100", rotulo: "AtÃ© 100 km" },
 ];
 
 const niveis = [
   { valor: "", rotulo: "Todos" },
   { valor: "INICIANTE", rotulo: "Iniciante" },
-  { valor: "INTERMEDIARIO", rotulo: "Intermediário" },
-  { valor: "AVANCADO", rotulo: "Avançado" },
+  { valor: "INTERMEDIARIO", rotulo: "IntermediÃ¡rio" },
+  { valor: "AVANCADO", rotulo: "AvanÃ§ado" },
 ];
 
 function formatarReal(valor: number): string {
@@ -62,6 +63,80 @@ function GrupoFiltro({ titulo, children }: { titulo: string; children: ReactNode
       <h3 className="mb-3 text-sm font-bold text-[var(--color-texto)]">{titulo}</h3>
       {children}
     </section>
+  );
+}
+
+function SkeletonCardCatalogo() {
+  return (
+    <Cartao className="h-full overflow-hidden p-0">
+      <div className="skeleton h-36 sm:h-44" />
+      <div className="p-3 sm:p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="skeleton h-3 w-24 rounded-full" />
+          <div className="skeleton h-3 w-12 rounded-full" />
+        </div>
+        <div className="skeleton h-5 w-4/5 rounded-md" />
+        <div className="mt-2 space-y-1.5">
+          <div className="skeleton h-3 w-full rounded-full" />
+          <div className="skeleton h-3 w-2/3 rounded-full" />
+        </div>
+        <div className="mt-4 flex items-end justify-between">
+          <div>
+            <div className="skeleton h-5 w-24 rounded-md" />
+            <div className="skeleton mt-1.5 h-3 w-16 rounded-full" />
+          </div>
+          <div className="skeleton h-7 w-16 rounded-lg" />
+        </div>
+        <div className="skeleton mt-4 h-8 w-full rounded-lg" />
+      </div>
+    </Cartao>
+  );
+}
+
+function SkeletonVitrine() {
+  return (
+    <>
+      <Cabecalho />
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
+        <section className="divisoria-curva mb-5 border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_82%,transparent)] p-4 backdrop-blur-md sm:p-5">
+          <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:items-end">
+            <div>
+              <div className="skeleton h-4 w-24 rounded-full" />
+              <div className="skeleton mt-3 h-8 w-56 rounded-md sm:h-10" />
+              <div className="skeleton mt-3 h-3 w-full max-w-xl rounded-full" />
+            </div>
+            <div className="skeleton h-11 rounded-full" />
+          </div>
+        </section>
+
+        <div className="grid gap-5 md:grid-cols-[16rem_1fr] lg:grid-cols-[18rem_1fr]">
+          <aside className="divisoria-curva hidden border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_84%,transparent)] p-4 md:block">
+            <div className="skeleton h-5 w-24 rounded-md" />
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="mt-5 border-t border-[var(--color-linha)] pt-4">
+                <div className="skeleton h-4 w-20 rounded-full" />
+                <div className="mt-3 space-y-2">
+                  <div className="skeleton h-9 rounded-lg" />
+                  <div className="skeleton h-9 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </aside>
+          <section>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="skeleton h-10 w-28 rounded-lg md:hidden" />
+              <div className="skeleton ml-auto h-10 w-40 rounded-lg" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, indice) => (
+                <SkeletonCardCatalogo key={indice} />
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
+      <Rodape />
+    </>
   );
 }
 
@@ -102,7 +177,6 @@ function ConteudoTutoriais() {
 
   useEffect(() => {
     async function carregar(silencioso = false) {
-      if (!silencioso) setCarregando(true);
       setErro("");
       try {
         const params = new URLSearchParams();
@@ -117,6 +191,24 @@ function ConteudoTutoriais() {
         if (precoMax) params.set("precoMax", precoMax);
         params.set("pagina", String(pagina));
         params.set("limite", "12");
+        const cacheKey = `mca_catalogo_cache_${params.toString()}`;
+        let cacheRestaurado = false;
+
+        try {
+          const cache = sessionStorage.getItem(cacheKey);
+          if (cache) {
+            const dadosCache = JSON.parse(cache) as {
+              tutoriais: TutorialCard[];
+              totalPaginas: number;
+            };
+            setTutoriais(dadosCache.tutoriais || []);
+            setTotalPaginas(dadosCache.totalPaginas || 1);
+            setCarregando(false);
+            cacheRestaurado = true;
+          }
+        } catch {}
+
+        if (!silencioso && !cacheRestaurado) setCarregando(true);
 
         const [resTutoriais, resCategorias] = await Promise.all([
           fetch(`/api/tutoriais?${params.toString()}`),
@@ -129,11 +221,20 @@ function ConteudoTutoriais() {
         if (dadosT.sucesso) {
           setTutoriais(dadosT.dados);
           setTotalPaginas(dadosT.totalPaginas || 1);
-        } else setErro(dadosT.erro || "Erro ao carregar anúncios.");
+          try {
+            sessionStorage.setItem(
+              cacheKey,
+              JSON.stringify({
+                tutoriais: dadosT.dados,
+                totalPaginas: dadosT.totalPaginas || 1,
+              })
+            );
+          } catch {}
+        } else setErro(dadosT.erro || "Erro ao carregar anÃºncios.");
 
         if (dadosC.sucesso) setCategorias(dadosC.dados);
       } catch {
-        setErro("Não foi possível carregar os anúncios agora.");
+        setErro("NÃ£o foi possÃ­vel carregar os anÃºncios agora.");
       }
       if (!silencioso) setCarregando(false);
     }
@@ -155,24 +256,24 @@ function ConteudoTutoriais() {
     somentePromocao,
   ]);
 
-  // Reseta para página 1 quando os filtros mudam
+  // Reseta para pÃ¡gina 1 quando os filtros mudam
   useEffect(() => { setPagina(1); }, [
     busca, distanciaMax, filtroCategoria, nivel, ordenar, precoMax, precoMin, somenteBombando, somentePromocao,
   ]);
 
   const nomeCategoriaAtual = useMemo(() => {
-    if (!filtroCategoria) return "Todos os anúncios";
+    if (!filtroCategoria) return "Todos os anÃºncios";
     return categorias.find((c) => c.slug === filtroCategoria)?.nome || "Categoria";
   }, [categorias, filtroCategoria]);
 
   const filtrosAtivos = [
     filtroCategoria && `Categoria: ${nomeCategoriaAtual}`,
-    somentePromocao && "Promoções",
+    somentePromocao && "PromoÃ§Ãµes",
     somenteBombando && "Bombando",
-    distanciaMax && `Até ${distanciaMax} km`,
+    distanciaMax && `AtÃ© ${distanciaMax} km`,
     nivel && niveis.find((n) => n.valor === nivel)?.rotulo,
     precoMin && `A partir de R$ ${precoMin}`,
-    precoMax && `Até R$ ${precoMax}`,
+    precoMax && `AtÃ© R$ ${precoMax}`,
   ].filter(Boolean) as string[];
 
   function limparFiltros() {
@@ -232,18 +333,18 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="Preço">
+      <GrupoFiltro titulo="PreÃ§o">
         <div className="grid grid-cols-2 gap-2">
           <input
             value={precoMin}
             onChange={(e) => setPrecoMin(normalizarPreco(e.target.value))}
-            placeholder="Mín."
+            placeholder="MÃ­n."
             className="h-10 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 text-sm outline-none focus:border-[var(--color-berry)]"
           />
           <input
             value={precoMax}
             onChange={(e) => setPrecoMax(normalizarPreco(e.target.value))}
-            placeholder="Máx."
+            placeholder="MÃ¡x."
             className="h-10 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 text-sm outline-none focus:border-[var(--color-berry)]"
           />
         </div>
@@ -258,7 +359,7 @@ function ConteudoTutoriais() {
               onChange={(e) => setSomentePromocao(e.target.checked)}
               className="h-4 w-4 accent-[var(--color-berry)]"
             />
-            Promoções e descontos
+            PromoÃ§Ãµes e descontos
           </label>
           <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--color-texto)]">
             <input
@@ -272,7 +373,7 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="Distância">
+      <GrupoFiltro titulo="DistÃ¢ncia">
         <div className="mb-3">
           <Botao
             type="button"
@@ -283,7 +384,7 @@ function ConteudoTutoriais() {
             className="w-full justify-center"
           >
             <MapPin className="h-4 w-4" aria-hidden />
-            {localizacao ? "Localização ativa" : "Usar localização"}
+            {localizacao ? "LocalizaÃ§Ã£o ativa" : "Usar localizaÃ§Ã£o"}
           </Botao>
           {erroLocalizacao && <p className="mt-2 text-xs text-red-600">{erroLocalizacao}</p>}
         </div>
@@ -305,7 +406,7 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="Nível">
+      <GrupoFiltro titulo="NÃ­vel">
         <div className="grid gap-1">
           {niveis.map((opcao) => (
             <button
@@ -329,7 +430,7 @@ function ConteudoTutoriais() {
   return (
     <>
       <Cabecalho />
-      <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
         <section className="divisoria-curva mb-5 border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_82%,transparent)] p-4 backdrop-blur-md sm:p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:items-end">
             <div>
@@ -337,16 +438,16 @@ function ConteudoTutoriais() {
                 <SlidersHorizontal className="h-4 w-4" aria-hidden />
                 Vitrine
               </span>
-              <h1 className="mt-1 text-2xl font-bold sm:text-4xl">{nomeCategoriaAtual}</h1>
+              <h1 className="mt-1 text-xl font-bold sm:text-4xl">{nomeCategoriaAtual}</h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--color-texto-suave)]">
-                Busque por serviço, cidade, cupom ou conteúdo e refine pelos filtros.
+                Busque por serviÃ§o, cidade, cupom ou conteÃºdo e refine pelos filtros.
               </p>
             </div>
             <CampoTexto
               rotulo="Buscar"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Ex.: pele, noivas, São Paulo, GLOW20"
+              placeholder="Ex.: pele, noivas, SÃ£o Paulo, GLOW20"
               icone={<Search className="h-4 w-4" aria-hidden />}
               variante="busca"
             />
@@ -412,24 +513,21 @@ function ConteudoTutoriais() {
             )}
 
             {carregando ? (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, indice) => (
-                  <div
-                    key={indice}
-                    className="h-64 animate-pulse rounded-xl border border-[var(--color-linha)] bg-[var(--color-papel)]"
-                  />
+                  <SkeletonCardCatalogo key={indice} />
                 ))}
               </div>
             ) : tutoriais.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-4 py-12 text-center">
                 <Sparkles className="mx-auto mb-3 h-6 w-6 text-[var(--color-berry)]" aria-hidden />
-                <h2 className="text-lg font-bold">Nenhum anúncio encontrado</h2>
+                <h2 className="text-lg font-bold">Nenhum anÃºncio encontrado</h2>
                 <p className="mt-2 text-sm text-[var(--color-texto-suave)]">
                   Tente remover um filtro ou buscar por outro termo.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {tutoriais.map((tutorial) => {
                   const precoAtual = tutorial.precoPromocional || tutorial.preco;
                   const temPromocao =
@@ -439,9 +537,12 @@ function ConteudoTutoriais() {
                     <Link key={tutorial.id} href={`/tutoriais/${tutorial.slug}`} className="group">
                       <Cartao className="h-full overflow-hidden p-0 hover:border-[var(--color-berry)]">
                         <div
-                          className="relative h-40 bg-cover bg-center sm:h-44"
+                              className="relative h-36 bg-cover bg-center sm:h-44"
                           style={{ backgroundImage: `url(${tutorial.imagemCapaUrl})` }}
                         >
+                          <div className="absolute right-3 top-3 z-10">
+                            <BotaoFavorito tutorialId={tutorial.id} compacto />
+                          </div>
                           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
                             {tutorial.bombando && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-berry)] px-2.5 py-1 text-xs font-bold text-white shadow-sm">
@@ -458,7 +559,7 @@ function ConteudoTutoriais() {
                           </div>
                         </div>
 
-                        <div className="p-4">
+                        <div className="p-3 sm:p-4">
                           <div className="mb-2 flex items-center justify-between gap-3">
                             <span className="text-xs font-bold uppercase tracking-wide text-[var(--color-sage)]">
                               {tutorial.categoria.nome}
@@ -470,16 +571,16 @@ function ConteudoTutoriais() {
                               </span>
                             )}
                           </div>
-                          <h3 className="text-lg font-bold leading-snug group-hover:text-[var(--color-berry)]">
+                          <h3 className="text-base font-bold leading-snug group-hover:text-[var(--color-berry)] sm:text-lg">
                             {tutorial.titulo}
                           </h3>
-                          <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-relaxed text-[var(--color-texto-suave)]">
+                          <p className="mt-2 line-clamp-2 min-h-9 text-xs leading-relaxed text-[var(--color-texto-suave)] sm:min-h-10 sm:text-sm">
                             {tutorial.descricaoCurta}
                           </p>
 
-                          <div className="mt-4 flex items-end justify-between gap-3">
+                          <div className="mt-3 flex items-end justify-between gap-3 sm:mt-4">
                             <div>
-                              <p className="text-lg font-bold text-[var(--color-texto)]">
+                              <p className="text-base font-bold text-[var(--color-texto)] sm:text-lg">
                                 {formatarReal(precoAtual)}
                               </p>
                               {tutorial.precoPromocional && (
@@ -505,7 +606,7 @@ function ConteudoTutoriais() {
 
                           <div className="mt-4 flex items-center gap-2">
                             <span className="inline-flex items-center gap-1 text-sm font-bold text-[var(--color-berry)]">
-                              Abrir anúncio
+                              Abrir anÃºncio
                               <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                             </span>
                             <button
@@ -521,10 +622,12 @@ function ConteudoTutoriais() {
                                   precoPromocional: tutorial.precoPromocional,
                                 });
                               }}
-                              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-berry)] px-3 py-1.5 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[var(--color-berry-escuro)]"
+                              className="action-reveal ml-auto bg-[var(--color-berry)] text-white hover:bg-[var(--color-berry-escuro)]"
+                              aria-label={estaNoCarrinho(tutorial.id) ? "Item no carrinho" : "Adicionar ao carrinho"}
+                              title={estaNoCarrinho(tutorial.id) ? "Item no carrinho" : "Adicionar ao carrinho"}
                             >
                               <ShoppingCart className="h-3.5 w-3.5" />
-                              {estaNoCarrinho(tutorial.id) ? "✓" : "Comprar"}
+                              <span className="action-reveal-text">{estaNoCarrinho(tutorial.id) ? "No carrinho" : "Comprar"}</span>
                             </button>
                           </div>
                         </div>
@@ -535,17 +638,17 @@ function ConteudoTutoriais() {
               </div>
             )}
 
-            {/* Paginação */}
+            {/* PaginaÃ§Ã£o */}
             {totalPaginas > 1 && (
-              <nav className="mt-8 flex items-center justify-center gap-1" aria-label="Paginação">
+              <nav className="mt-8 flex items-center justify-center gap-1" aria-label="PaginaÃ§Ã£o">
                 <button
                   type="button"
                   onClick={() => setPagina((p) => Math.max(1, p - 1))}
                   disabled={pagina === 1}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#eadfd5] bg-white text-sm font-medium text-[#2a211d] hover:border-[var(--color-berry)] disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Página anterior"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] text-sm font-medium text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="PÃ¡gina anterior"
                 >
-                  ‹
+                  â€¹
                 </button>
                 {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
                   <button
@@ -555,7 +658,7 @@ function ConteudoTutoriais() {
                     className={`inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg border text-sm font-medium ${
                       num === pagina
                         ? "border-[var(--color-berry)] bg-[var(--color-berry)] text-white"
-                        : "border-[#eadfd5] bg-white text-[#2a211d] hover:border-[var(--color-berry)]"
+                        : "border-[var(--color-linha)] bg-[var(--color-papel)] text-[var(--color-texto)] hover:border-[var(--color-berry)]"
                     }`}
                   >
                     {num}
@@ -565,10 +668,10 @@ function ConteudoTutoriais() {
                   type="button"
                   onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                   disabled={pagina === totalPaginas}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#eadfd5] bg-white text-sm font-medium text-[#2a211d] hover:border-[var(--color-berry)] disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Próxima página"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] text-sm font-medium text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="PrÃ³xima pÃ¡gina"
                 >
-                  ›
+                  â€º
                 </button>
               </nav>
             )}
@@ -594,14 +697,9 @@ function ConteudoTutoriais() {
 
 export default function PaginaTutoriais() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-linha)] border-t-[var(--color-berry)]" />
-        </div>
-      }
-    >
+    <Suspense fallback={<SkeletonVitrine />}>
       <ConteudoTutoriais />
     </Suspense>
   );
 }
+

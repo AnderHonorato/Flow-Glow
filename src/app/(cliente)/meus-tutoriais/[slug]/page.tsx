@@ -119,7 +119,7 @@ export default function PaginaPlayer() {
         </main>
 
         {/* Sidebar de aulas */}
-        <aside className="w-full lg:w-96 bg-white border-l border-[var(--color-bege)] overflow-y-auto">
+        <aside className="w-full border-l border-[var(--color-linha)] bg-[var(--color-papel)] lg:w-96 overflow-y-auto">
           <div className="p-4 border-b border-[var(--color-bege)]">
             <h2 className="font-medium">Conteúdo do Tutorial</h2>
             <p className="text-sm text-[var(--color-texto)]/50">
