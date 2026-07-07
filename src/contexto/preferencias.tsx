@@ -183,7 +183,6 @@ export function ProvedorPreferencias({ children }: { children: ReactNode }) {
     window.localStorage.removeItem(CHAVE_TEMA);
     window.localStorage.removeItem(CHAVE_ZOOM);
     window.localStorage.removeItem(CHAVE_LOCALIZACAO);
-    window.localStorage.removeItem("accessToken");
     window.localStorage.removeItem("studioglow_carrinho");
     window.sessionStorage.setItem(SESSAO_RECUSADA, "sim");
     setConsentimento("recusado");
@@ -192,7 +191,7 @@ export function ProvedorPreferencias({ children }: { children: ReactNode }) {
   const solicitarLocalizacao = useCallback(async () => {
     setErroLocalizacao("");
     if (!navigator.geolocation) {
-      setErroLocalizacao("Seu navegador nao oferece localizacao.");
+      setErroLocalizacao("Seu navegador não oferece localização.");
       return;
     }
 
@@ -216,7 +215,7 @@ export function ProvedorPreferencias({ children }: { children: ReactNode }) {
           resolve();
         },
         () => {
-          setErroLocalizacao("Localizacao nao autorizada.");
+          setErroLocalizacao("Localização não autorizada.");
           resolve();
         },
         { enableHighAccuracy: false, maximumAge: 1000 * 60 * 10, timeout: 8000 }

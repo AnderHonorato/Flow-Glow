@@ -3,16 +3,28 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { esquemaRecuperarSenha } from "@/lib/validacao";
+import { verificarRateLimit, cabecalhoRetryAfter } from "@/lib/rate-limit";
 import { ProvedorDeEmailPlaceholder } from "@/lib/email";
 import type { RespostaApi } from "@/tipos";
 
 const provedorEmail = new ProvedorDeEmailPlaceholder();
+
+const RATE_LIMIT_RECUPERACAO = 5;
+const RATE_LIMIT_JANELA_MS = 60_000;
 
 // Gera o token, salva apenas o hash no banco com expiração de 1 hora
 // — nunca guardamos o token em texto puro.
 
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
+    const rate = verificarRateLimit(request, RATE_LIMIT_RECUPERACAO, RATE_LIMIT_JANELA_MS, "recuperar-senha");
+    if (rate.bloqueado) {
+      return NextResponse.json(
+        { sucesso: false, erro: "Muitas solicitações. Aguarde um minuto e tente novamente." },
+        { status: 429, headers: { "Retry-After": cabecalhoRetryAfter(rate.resetEmMs) } }
+      );
+    }
+
     const corpo = await request.json();
     const validacao = esquemaRecuperarSenha.safeParse(corpo);
 

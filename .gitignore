@@ -36,6 +36,8 @@ yarn-error.log*
 
 # test output
 /output
+/test-results
+/playwright-report
 
 # env files (can opt-in for committing if needed)
 .env*

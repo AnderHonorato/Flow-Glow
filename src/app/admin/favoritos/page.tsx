@@ -35,8 +35,8 @@ export default function PaginaAdminFavoritos() {
       setErro("");
       try {
         const resposta = await fetch("/api/favoritos?analise=true", {
-          headers: { Authorization: `Bearer ${accessToken}` },
           cache: "no-store",
+          credentials: "include",
         });
         const dados = await resposta.json();
         if (dados.sucesso) setItens(dados.dados || []);

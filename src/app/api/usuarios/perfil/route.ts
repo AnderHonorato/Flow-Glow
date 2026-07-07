@@ -52,7 +52,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
     const usuario = await prisma.usuario.findUnique({
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
 
     if (!usuario) {
       return NextResponse.json(
-        { sucesso: false, erro: "Usuario nao encontrado." },
+        { sucesso: false, erro: "Usuário não encontrado." },
         { status: 404 }
       );
     }
@@ -81,14 +81,14 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
     const corpo = await request.json();
     const validacao = esquemaPerfil.safeParse(corpo);
     if (!validacao.success) {
       return NextResponse.json(
-        { sucesso: false, erro: validacao.error.issues[0]?.message || "Dados invalidos" },
+        { sucesso: false, erro: validacao.error.issues[0]?.message || "Dados inválidos" },
         { status: 400 }
       );
     }
@@ -99,7 +99,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
     });
 
     if (!usuarioAtual) {
-      return NextResponse.json({ sucesso: false, erro: "Usuario nao encontrado." }, { status: 404 });
+      return NextResponse.json({ sucesso: false, erro: "Usuário não encontrado." }, { status: 404 });
     }
 
     const dados = validacao.data;
@@ -111,7 +111,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
       return NextResponse.json(
         {
           sucesso: false,
-          erro: "Para trocar o e-mail, informe o codigo ficticio 123456.",
+          erro: "Para trocar o e-mail, confirme a verificação do novo endereço.",
         },
         { status: 400 }
       );
@@ -124,7 +124,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
       });
       if (existeEmail && existeEmail.id !== usuarioId) {
         return NextResponse.json(
-          { sucesso: false, erro: "Este e-mail ja esta em uso." },
+          { sucesso: false, erro: "Este e-mail já está em uso." },
           { status: 409 }
         );
       }
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
       });
       if (existeCpf && existeCpf.id !== usuarioId) {
         return NextResponse.json(
-          { sucesso: false, erro: "Este CPF ja esta em uso." },
+          { sucesso: false, erro: "Este CPF já está em uso." },
           { status: 409 }
         );
       }
@@ -198,7 +198,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse<Respost
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
     await prisma.$transaction(async (tx) => {
@@ -252,7 +252,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse<Respost
 
     return NextResponse.json({
       sucesso: true,
-      mensagem: "Conta excluida com sucesso.",
+      mensagem: "Conta excluída com sucesso.",
     });
   } catch (erro) {
     console.error("Erro ao excluir conta:", erro);

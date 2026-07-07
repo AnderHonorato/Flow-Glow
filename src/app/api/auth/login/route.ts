@@ -2,14 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { esquemaLogin } from "@/lib/validacao";
-import { gerarAccessToken, gerarRefreshToken, definirCookieRefreshToken } from "@/lib/jwt";
+import { gerarAccessToken, gerarRefreshToken, definirCookieRefreshToken, definirCookieAccessToken } from "@/lib/jwt";
+import { verificarRateLimit, cabecalhoRetryAfter } from "@/lib/rate-limit";
 import type { RespostaApi } from "@/tipos";
 
 const MAXIMO_TENTATIVAS = 5;
 const JANELA_TENTATIVAS_MINUTOS = 15;
+const RATE_LIMIT_LOGIN = 5;
+const RATE_LIMIT_JANELA_MS = 60_000;
 
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
+    const rate = verificarRateLimit(request, RATE_LIMIT_LOGIN, RATE_LIMIT_JANELA_MS, "login");
+    if (rate.bloqueado) {
+      return NextResponse.json(
+        { sucesso: false, erro: "Muitas tentativas. Aguarde um minuto e tente novamente." },
+        { status: 429, headers: { "Retry-After": cabecalhoRetryAfter(rate.resetEmMs) } }
+      );
+    }
+
     const persistirSessao = request.headers.get("x-preferencias-permitidas") === "sim";
     const corpo = await request.json();
     const validacao = esquemaLogin.safeParse(corpo);
@@ -18,7 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json(
         {
           sucesso: false,
-          erro: validacao.error.issues[0]?.message || "Dados invalidos",
+          erro: validacao.error.issues[0]?.message || "Dados inválidos",
         },
         { status: 400 }
       );
@@ -103,6 +114,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     const accessToken = gerarAccessToken(payload);
     const refreshToken = gerarRefreshToken(payload);
+    await definirCookieAccessToken(accessToken);
     await definirCookieRefreshToken(refreshToken, persistirSessao);
 
     return NextResponse.json({

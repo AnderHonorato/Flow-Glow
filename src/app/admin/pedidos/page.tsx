@@ -32,19 +32,19 @@ export default function PaginaAdminPedidos() {
   const [processando, setProcessando] = useState(false);
   const [erro, setErro] = useState("");
 
-  useEffect(() => {
-    carregar();
-  }, [accessToken]);
-
   function carregar() {
     fetch("/api/admin/pedidos", {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: "include",
     })
       .then((r) => r.json())
       .then((d) => {
         if (d.sucesso) setPedidos(d.dados);
       });
   }
+
+  useEffect(() => {
+    carregar();
+  }, [accessToken]);
 
   async function atualizarStatus(pedidoId: string, status: string, motivo?: string) {
     setProcessando(true);
@@ -54,9 +54,9 @@ export default function PaginaAdminPedidos() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ pedidoId, status, motivo }),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) {

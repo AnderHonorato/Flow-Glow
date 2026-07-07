@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       );
     }
 
-    const { nota, texto, tutorialId } = corpo;
+    const { nota, texto, tutorialId } = validacao.data;
 
     // Verifica se o tutorial existe e está ativo.
     const tutorial = await prisma.tutorial.findUnique({

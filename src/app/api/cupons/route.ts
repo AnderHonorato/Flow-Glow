@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { esquemaCupom } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 export async function GET(): Promise<NextResponse<RespostaApi>> {
@@ -21,14 +22,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
     const { codigo, descontoPercentual, validoAte } = await request.json();
-    if (!codigo || !descontoPercentual || !validoAte) {
-      return NextResponse.json({ sucesso: false, erro: "Dados incompletos." }, { status: 400 });
+    const validacao = esquemaCupom.safeParse({ codigo, descontoPercentual, validoAte });
+    if (!validacao.success) {
+      return NextResponse.json(
+        { sucesso: false, erro: validacao.error.issues[0]?.message || "Dados incompletos." },
+        { status: 400 }
+      );
     }
     const cupom = await prisma.cupom.create({
       data: {
-        codigo: codigo.toUpperCase().trim(),
-        descontoPercentual: Math.min(100, Math.max(1, Number(descontoPercentual))),
-        validoAte: new Date(validoAte),
+        codigo: validacao.data.codigo.toUpperCase().trim(),
+        descontoPercentual: Math.min(100, Math.max(1, validacao.data.descontoPercentual)),
+        validoAte: new Date(validacao.data.validoAte),
       },
     });
     return NextResponse.json({ sucesso: true, dados: cupom }, { status: 201 });

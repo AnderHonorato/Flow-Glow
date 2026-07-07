@@ -17,7 +17,9 @@ export async function GET(
       );
     }
 
-    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`, {
+      signal: AbortSignal.timeout(8000),
+    });
 
     if (!resposta.ok) {
       return NextResponse.json(

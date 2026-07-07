@@ -1,3 +1,4 @@
+import "server-only";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
@@ -34,8 +35,9 @@ export function verificarRefreshToken(token: string): PayloadToken {
   return jwt.verify(token, CHAVE_REFRESH!) as PayloadToken;
 }
 
-// Define o refresh token como cookie httpOnly, secure, sameSite strict.
-// Isso impede acesso via JavaScript no navegador (proteção contra XSS).
+// Define o refresh token como cookie httpOnly, secure, sameSite lax.
+// sameSite=lax permite o envio do cookie em navegações top-level (GET)
+// vindas de sites externos, mantendo proteção contra CSRF em POST.
 export async function definirCookieRefreshToken(
   token: string,
   persistente = true
@@ -44,7 +46,7 @@ export async function definirCookieRefreshToken(
   cookieStore.set("refreshToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
     ...(persistente ? { maxAge: 7 * 24 * 60 * 60 } : {}),
   });
@@ -55,7 +57,7 @@ export async function removerCookieRefreshToken(): Promise<void> {
   cookieStore.set("refreshToken", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
     maxAge: 0,
   });
@@ -64,4 +66,30 @@ export async function removerCookieRefreshToken(): Promise<void> {
 export async function obterRefreshTokenDoCookie(): Promise<string | undefined> {
   const cookieStore = await cookies();
   return cookieStore.get("refreshToken")?.value;
+}
+
+// Access token em cookie httpOnly de curta duração (15 min).
+// O navegador envia automaticamente em toda requisição, sem expor o
+// valor ao JavaScript (proteção contra roubo via XSS).
+export async function definirCookieAccessToken(token: string): Promise<void> {
+  const cookieStore = await cookies();
+  const expiresInSegundos = 15 * 60;
+  cookieStore.set("accessToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: expiresInSegundos,
+  });
+}
+
+export async function removerCookieAccessToken(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set("accessToken", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }

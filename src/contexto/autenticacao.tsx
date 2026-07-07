@@ -62,25 +62,7 @@ interface ContextoAutenticacao {
 
 const Contexto = createContext<ContextoAutenticacao | null>(null);
 
-function salvarToken(token: string, _persistir: boolean): void {
-  try {
-    localStorage.setItem("accessToken", token);
-    sessionStorage.setItem("accessToken", token);
-  } catch {}
-}
-
-function obterTokenSalvo(): string | null {
-  try {
-    return localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-  } catch { return null; }
-}
-
-function removerTokenSalvo(): void {
-  try {
-    localStorage.removeItem("accessToken");
-    sessionStorage.removeItem("accessToken");
-  } catch {}
-}
+const MARCADOR_COOKIE = "httpOnly-cookie";
 
 export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
   const { preferenciasPermitidas } = usePreferencias();
@@ -92,17 +74,9 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     setUsuario((atual) => (atual ? { ...atual, ...dados } : atual));
   }, []);
 
-  useEffect(() => {
-    if (!accessToken) return;
-    if (preferenciasPermitidas) {
-      salvarToken(accessToken, true);
-    } else {
-      removerTokenSalvo();
-    }
-  }, [accessToken, preferenciasPermitidas]);
-
-  // Ao carregar a página, tenta renovar o token automaticamente
-  // usando o refresh token armazenado no cookie httpOnly.
+  // Renova o access token via refresh token (cookie httpOnly).
+  // O access token também é armazenado em cookie httpOnly — não
+  // precisamos lê-lo no client; usamos um marcador para indicar sessão ativa.
   const renovarToken = useCallback(async (): Promise<boolean> => {
     try {
       const resposta = await fetch("/api/auth/renovar-token", {
@@ -115,8 +89,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
 
       const dados = await resposta.json();
       if (dados.sucesso && dados.dados?.accessToken) {
-        salvarToken(dados.dados.accessToken, preferenciasPermitidas);
-        setAccessToken(dados.dados.accessToken);
+        setAccessToken(MARCADOR_COOKIE);
         return true;
       }
       return false;
@@ -125,11 +98,11 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
     }
   }, [preferenciasPermitidas]);
 
-  // Busca o perfil do usuário logado usando o access token.
-  async function buscarPerfil(token: string): Promise<boolean> {
+  // Busca o perfil do usuário logado usando o cookie httpOnly.
+  async function buscarPerfil(): Promise<boolean> {
     try {
       const resposta = await fetch("/api/usuarios/perfil", {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
 
       if (!resposta.ok) throw new Error("Falha ao buscar perfil");
@@ -141,48 +114,27 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
       }
       return false;
     } catch {
-      removerTokenSalvo();
       setAccessToken(null);
       setUsuario(null);
       return false;
     }
   }
 
-  // Inicialização — tenta renovar o token ou usar o token salvo.
+  // Inicialização — tenta renovar o token via cookie httpOnly.
   useEffect(() => {
     async function inicializar() {
-      const tokenSalvo = obterTokenSalvo();
-
-      if (tokenSalvo) {
-        setAccessToken(tokenSalvo);
-        const perfilCarregado = await buscarPerfil(tokenSalvo);
-        if (!perfilCarregado) {
-          const renovou = await renovarToken();
-          if (!renovou) {
-            setUsuario(null);
-            setAccessToken(null);
-          }
-        }
+      const renovou = await renovarToken();
+      if (renovou) {
+        await buscarPerfil();
       } else {
-        // Tenta renovar via refresh token (cookie httpOnly).
-        const renovou = await renovarToken();
-        if (!renovou) {
-          setUsuario(null);
-          setAccessToken(null);
-        }
+        setUsuario(null);
+        setAccessToken(null);
       }
       setCarregando(false);
     }
 
     inicializar();
   }, [renovarToken]);
-
-  // Busca o perfil sempre que o access token mudar (ex.: após refresh).
-  useEffect(() => {
-    if (accessToken) {
-      buscarPerfil(accessToken);
-    }
-  }, [accessToken]);
 
   async function login(
     email: string,
@@ -205,13 +157,12 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
         return { sucesso: false, erro: dados.erro };
       }
 
-      salvarToken(dados.dados.accessToken, preferenciasPermitidas);
-      setAccessToken(dados.dados.accessToken);
+      setAccessToken(MARCADOR_COOKIE);
       setUsuario(dados.dados.usuario);
 
       return { sucesso: true };
     } catch {
-      return { sucesso: false, erro: "Erro de conexao. Verifique sua internet." };
+      return { sucesso: false, erro: "Erro de conexão. Verifique sua internet." };
     }
   }
 
@@ -253,8 +204,7 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
         return { sucesso: false, erro: resultado.erro };
       }
 
-      salvarToken(resultado.dados.accessToken, preferenciasPermitidas);
-      setAccessToken(resultado.dados.accessToken);
+      setAccessToken(MARCADOR_COOKIE);
       setUsuario(resultado.dados.usuario);
 
       return { sucesso: true };
@@ -264,7 +214,6 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
   }
 
   async function logout(): Promise<void> {
-    // Chama a API de logout para remover o refresh token do cookie.
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
@@ -274,7 +223,6 @@ export function ProvedorAutenticacao({ children }: { children: ReactNode }) {
       // Ignora erro — o logout local acontece de qualquer forma.
     }
 
-    removerTokenSalvo();
     setAccessToken(null);
     setUsuario(null);
   }

@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import {
   criarConversaAtendimento,
   criarMensagemChat,
+  includeConversaChat,
   serializarConversa,
   textoProtocoloAberto,
 } from "@/lib/chat";
+import { esquemaProblemaPedido } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 export async function POST(request: NextRequest): Promise<NextResponse<RespostaApi>> {
@@ -15,13 +17,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Não autorizado." }, { status: 401 });
     }
 
-    const { pedidoId, descricao, fotos, videos } = await request.json();
-    if (!pedidoId || !descricao?.trim()) {
+    const corpo = await request.json();
+    const validacao = esquemaProblemaPedido.safeParse(corpo);
+    if (!validacao.success) {
       return NextResponse.json(
-        { sucesso: false, erro: "Informe o pedido e a descrição do problema." },
+        { sucesso: false, erro: validacao.error.issues[0]?.message || "Informe o pedido e a descrição do problema." },
         { status: 400 }
       );
     }
+
+    const { pedidoId, descricao, fotos, videos } = validacao.data;
 
     const pedido = await prisma.pedido.findFirst({
       where: { id: pedidoId, usuarioId },
@@ -65,8 +70,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       tipo: "CLIENTE",
       remetenteId: usuarioId,
       anexos: [
-        ...(fotos || []).map((url: string) => ({ tipo: "IMAGEM" as const, url })),
-        ...(videos || []).map((url: string) => ({ tipo: "VIDEO" as const, url })),
+        ...(fotos || []).map((url) => ({ tipo: "IMAGEM" as const, url })),
+        ...(videos || []).map((url) => ({ tipo: "VIDEO" as const, url })),
       ],
     });
 
@@ -78,17 +83,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     const atualizada = await prisma.conversa.findUnique({
       where: { id: conversa.id },
-      include: {
-        usuario: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, email: true } },
-        atendente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, email: true } },
-        mensagens: {
-          include: {
-            remetente: { select: { id: true, nomeCompleto: true, fotoPerfilUrl: true, papel: true } },
-            anexos: true,
-          },
-          orderBy: { criadoEm: "asc" },
-        },
-      },
+      include: includeConversaChat,
     });
 
     return NextResponse.json(
@@ -96,7 +91,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
         sucesso: true,
         dados: {
           protocolo: conversa.protocolo,
-          conversa: atualizada ? await serializarConversa(atualizada as any) : null,
+          conversa: atualizada ? await serializarConversa(atualizada) : null,
         },
       },
       { status: 201 }

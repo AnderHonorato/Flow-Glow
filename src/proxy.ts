@@ -62,7 +62,9 @@ function ehRotaPublica(caminho: string, metodo: string): boolean {
 
 function obterPayloadPeloAccessToken(request: NextRequest): PayloadToken | null {
   const authHeader = request.headers.get("authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const tokenHeader = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const tokenCookie = request.cookies.get("accessToken")?.value;
+  const token = tokenHeader || tokenCookie;
 
   if (!token) return null;
 

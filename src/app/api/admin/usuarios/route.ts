@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { esquemaAdminUsuario } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
@@ -21,7 +22,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
     if (papel !== "ADMINISTRADOR") return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
 
     const body = await request.json();
-    const { id, contaPausada, emailVerificado, papel: novoPapel } = body;
+    const validacao = esquemaAdminUsuario.safeParse(body);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "ID obrigatório." }, { status: 400 });
+    }
+    const { id, contaPausada, emailVerificado, papel: novoPapel } = validacao.data;
 
     const dados: Record<string, unknown> = {};
     if (contaPausada !== undefined) dados.contaPausada = contaPausada;

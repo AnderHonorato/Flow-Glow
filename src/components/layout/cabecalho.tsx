@@ -54,8 +54,6 @@ export function Cabecalho() {
     zoom,
     aumentarZoom,
     diminuirZoom,
-    localizacao,
-    solicitarLocalizacao,
   } = usePreferencias();
   const { dados: dadosLocalizacao } = useCidadeUsuario();
 

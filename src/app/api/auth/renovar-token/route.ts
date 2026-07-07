@@ -4,8 +4,10 @@ import {
   gerarAccessToken,
   obterRefreshTokenDoCookie,
   definirCookieRefreshToken,
+  definirCookieAccessToken,
   gerarRefreshToken,
   removerCookieRefreshToken,
+  removerCookieAccessToken,
 } from "@/lib/jwt";
 import type { RespostaApi } from "@/tipos";
 
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       email: payload.email,
       papel: payload.papel,
     });
+    await definirCookieAccessToken(novoAccessToken);
     await definirCookieRefreshToken(novoRefreshToken, persistirSessao);
 
     return NextResponse.json({
@@ -44,8 +47,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       dados: { accessToken: novoAccessToken },
     });
   } catch (erro) {
-    // Se o refresh token for inválido ou expirado, remove o cookie.
+    // Se o refresh token for inválido ou expirado, remove os cookies.
     await removerCookieRefreshToken();
+    await removerCookieAccessToken();
     console.error("Erro ao renovar token:", erro);
     return NextResponse.json(
       { sucesso: false, erro: "Sessão expirada. Faça login novamente." },

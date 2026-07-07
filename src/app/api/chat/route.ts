@@ -18,6 +18,7 @@ import {
   perguntaSobreDesenvolvedor,
   textoContatosDesenvolvedor,
 } from "@/lib/alphabot";
+import { esquemaChatAvaliar, esquemaChatMensagem } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 type AnexoEntrada = { tipo: "IMAGEM" | "VIDEO"; url: string };
@@ -95,12 +96,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     }
 
     if (acao === "avaliar") {
-      const conversaId = String(corpo.conversaId || "");
-      const nota = Number(corpo.nota);
-      const texto = String(corpo.texto || "").trim();
-      if (!conversaId || !Number.isInteger(nota) || nota < 1 || nota > 5) {
-        return NextResponse.json({ sucesso: false, erro: "Avaliação inválida." }, { status: 400 });
+      const validacao = esquemaChatAvaliar.safeParse(corpo);
+      if (!validacao.success) {
+        return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "Avaliação inválida." }, { status: 400 });
       }
+      const { conversaId, nota, texto } = validacao.data;
+      const textoAvaliacao = (texto || "").trim();
 
       const conversa = await prisma.conversa.findFirst({
         where: { id: conversaId, usuarioId },
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
         where: { id: conversaId },
         data: {
           avaliacaoNota: nota,
-          avaliacaoTexto: texto || null,
+          avaliacaoTexto: textoAvaliacao || null,
           avaliacaoEnviadaEm: new Date(),
         },
       });
@@ -138,8 +139,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       });
     }
 
-    const texto = String(corpo.texto || "").trim();
-    const anexos = anexosValidos(corpo.anexos);
+    const validacaoMsg = esquemaChatMensagem.safeParse({ ...corpo, acao: "mensagem" });
+    if (!validacaoMsg.success) {
+      return NextResponse.json({ sucesso: false, erro: "Mensagem inválida." }, { status: 400 });
+    }
+    const texto = (validacaoMsg.data.texto || "").trim();
+    const anexos = anexosValidos(validacaoMsg.data.anexos);
     if (!texto && anexos.length === 0) {
       return NextResponse.json({ sucesso: false, erro: "Mensagem vazia." }, { status: 400 });
     }

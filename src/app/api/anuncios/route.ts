@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verificarAccessToken } from "@/lib/jwt";
+import { esquemaAnuncio, esquemaReordenarAnuncios, esquemaAtualizarAnuncio } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 function limparLink(linkUrl: unknown): string {
@@ -49,23 +50,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     if (papel !== "ADMINISTRADOR") {
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
-    const { titulo, imagemUrl, linkUrl, corFundo, ativo } = await request.json();
-    const tituloLimpo = limparTexto(titulo);
-    const imagemLimpa = limparTexto(imagemUrl);
-    if (!tituloLimpo || !imagemLimpa) {
+    const corpo = await request.json();
+    const validacao = esquemaAnuncio.safeParse(corpo);
+    if (!validacao.success) {
       return NextResponse.json(
-        { sucesso: false, erro: "Informe titulo e imagem do banner." },
+        { sucesso: false, erro: validacao.error.issues[0]?.message || "Informe título e imagem do banner." },
         { status: 400 }
       );
     }
+    const dados = validacao.data;
+    const tituloLimpo = dados.titulo.trim();
+    const imagemLimpa = dados.imagemUrl.trim();
     const maxOrdem = await prisma.anuncio.findFirst({ orderBy: { ordem: "desc" }, select: { ordem: true } });
     const anuncio = await prisma.anuncio.create({
       data: {
         titulo: tituloLimpo,
         imagemUrl: imagemLimpa,
-        linkUrl: limparLink(linkUrl),
-        corFundo: limparTexto(corFundo) || null,
-        ativo: ativo !== false,
+        linkUrl: limparLink(dados.linkUrl),
+        corFundo: limparTexto(dados.corFundo) || null,
+        ativo: dados.ativo !== false,
         ordem: (maxOrdem?.ordem ?? 0) + 1,
       },
     });
@@ -81,12 +84,13 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
     if (papel !== "ADMINISTRADOR") {
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
-    const { ids } = await request.json();
-    if (!Array.isArray(ids)) {
-      return NextResponse.json({ sucesso: false, erro: "Lista de banners invalida." }, { status: 400 });
+    const corpo = await request.json();
+    const validacao = esquemaReordenarAnuncios.safeParse(corpo);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: "Lista de banners inválida." }, { status: 400 });
     }
-    for (let i = 0; i < ids.length; i++) {
-      await prisma.anuncio.update({ where: { id: ids[i] }, data: { ordem: i } });
+    for (let i = 0; i < validacao.data.ids.length; i++) {
+      await prisma.anuncio.update({ where: { id: validacao.data.ids[i] }, data: { ordem: i } });
     }
     return NextResponse.json({ sucesso: true });
   } catch {
@@ -102,8 +106,12 @@ export async function PATCH(request: NextRequest): Promise<NextResponse<Resposta
     }
 
     const corpo = await request.json();
-    const id = limparTexto(corpo.id);
-    if (!id) return NextResponse.json({ sucesso: false, erro: "ID nao informado." }, { status: 400 });
+    const validacao = esquemaAtualizarAnuncio.safeParse(corpo);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "ID não informado." }, { status: 400 });
+    }
+    const dadosValidos = validacao.data;
+    const id = dadosValidos.id;
 
     const dados: {
       titulo?: string;
@@ -113,24 +121,24 @@ export async function PATCH(request: NextRequest): Promise<NextResponse<Resposta
       ativo?: boolean;
     } = {};
 
-    if ("titulo" in corpo) {
-      const titulo = limparTexto(corpo.titulo);
-      if (!titulo) return NextResponse.json({ sucesso: false, erro: "Informe o titulo." }, { status: 400 });
+    if (dadosValidos.titulo !== undefined) {
+      const titulo = dadosValidos.titulo.trim();
+      if (!titulo) return NextResponse.json({ sucesso: false, erro: "Informe o título." }, { status: 400 });
       dados.titulo = titulo;
     }
-    if ("imagemUrl" in corpo) {
-      const imagemUrl = limparTexto(corpo.imagemUrl);
+    if (dadosValidos.imagemUrl !== undefined) {
+      const imagemUrl = dadosValidos.imagemUrl.trim();
       if (!imagemUrl) return NextResponse.json({ sucesso: false, erro: "Informe a imagem." }, { status: 400 });
       dados.imagemUrl = imagemUrl;
     }
-    if ("linkUrl" in corpo) dados.linkUrl = limparLink(corpo.linkUrl);
-    if ("corFundo" in corpo) dados.corFundo = limparTexto(corpo.corFundo) || null;
-    if ("ativo" in corpo) dados.ativo = Boolean(corpo.ativo);
+    if (dadosValidos.linkUrl !== undefined) dados.linkUrl = limparLink(dadosValidos.linkUrl);
+    if (dadosValidos.corFundo !== undefined) dados.corFundo = limparTexto(dadosValidos.corFundo) || null;
+    if (dadosValidos.ativo !== undefined) dados.ativo = dadosValidos.ativo;
 
     const anuncio = await prisma.anuncio.update({ where: { id }, data: dados });
     return NextResponse.json({ sucesso: true, dados: anuncio });
   } catch {
-    return NextResponse.json({ sucesso: false, erro: "Erro ao atualizar anuncio." }, { status: 500 });
+    return NextResponse.json({ sucesso: false, erro: "Erro ao atualizar anúncio." }, { status: 500 });
   }
 }
 

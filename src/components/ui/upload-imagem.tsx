@@ -1,8 +1,8 @@
 "use client";
 
-import { ImageIcon, Link2, Trash2, Upload, X } from "lucide-react";
+import { Link2, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { Botao, CampoTexto, Cartao } from "@/components/ui";
+import { Botao } from "@/components/ui";
 
 interface UploadImagemProps {
   valor: string;

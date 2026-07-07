@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { esquemaCadastro } from "@/lib/validacao";
-import { gerarAccessToken, gerarRefreshToken, definirCookieRefreshToken } from "@/lib/jwt";
+import { gerarAccessToken, gerarRefreshToken, definirCookieRefreshToken, definirCookieAccessToken } from "@/lib/jwt";
 import { ProvedorDeEmailPlaceholder } from "@/lib/email";
 import type { RespostaApi } from "@/tipos";
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json(
         {
           sucesso: false,
-          erro: validacao.error.issues[0]?.message || "Dados invalidos",
+          erro: validacao.error.issues[0]?.message || "Dados inválidos",
         },
         { status: 400 }
       );
@@ -52,14 +52,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     if (usuarioExistente?.email === email) {
       return NextResponse.json(
-        { sucesso: false, erro: "Este e-mail ja esta cadastrado." },
+        { sucesso: false, erro: "Este e-mail já está cadastrado." },
         { status: 409 }
       );
     }
 
     if (usuarioExistente?.cpf === cpf) {
       return NextResponse.json(
-        { sucesso: false, erro: "Este CPF ja esta cadastrado." },
+        { sucesso: false, erro: "Este CPF já está cadastrado." },
         { status: 409 }
       );
     }
@@ -108,6 +108,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     const accessToken = gerarAccessToken(payload);
     const refreshToken = gerarRefreshToken(payload);
+    await definirCookieAccessToken(accessToken);
     await definirCookieRefreshToken(refreshToken, persistirSessao);
 
     return NextResponse.json(

@@ -3,10 +3,8 @@
 import { FolderPlus, Plus, Tag, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Botao, CampoTexto, Cartao } from "@/components/ui";
-import { useAutenticacao } from "@/contexto/autenticacao";
 
 export default function PaginaAdminCategorias() {
-  const { accessToken } = useAutenticacao();
   const [categorias, setCategorias] = useState<{ id: string; nome: string; slug: string }[]>([]);
   const [nome, setNome] = useState("");
   const [msg, setMsg] = useState("");
@@ -35,7 +33,8 @@ export default function PaginaAdminCategorias() {
 
     const resposta = await fetch("/api/categorias", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ nome: nome.trim(), slug }),
     });
     const dados = await resposta.json();
@@ -53,7 +52,7 @@ export default function PaginaAdminCategorias() {
     setErro("");
     const resposta = await fetch(`/api/categorias?id=${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: "include",
     });
     const dados = await resposta.json();
     if (dados.sucesso) {

@@ -14,7 +14,7 @@ export default function PaginaAdminCupons() {
   const [validade, setValidade] = useState(""); const [msg, setMsg] = useState(""); const [erro, setErro] = useState("");
 
   async function carregar() {
-    const r = await fetch("/api/cupons", { headers: { Authorization: `Bearer ${accessToken}` } });
+    const r = await fetch("/api/cupons", { credentials: "include" });
     const d = await r.json(); if (d.sucesso) setCupons(d.dados);
   }
   useEffect(() => { carregar(); }, [accessToken]);
@@ -23,7 +23,8 @@ export default function PaginaAdminCupons() {
     setErro(""); setMsg("");
     if (!codigo || !desconto || !validade) { setErro("Preencha todos os campos."); return; }
     const r = await fetch("/api/cupons", {
-      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      method: "POST", headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ codigo: codigo.toUpperCase().trim(), descontoPercentual: Number(desconto), validoAte: new Date(validade).toISOString() }),
     });
     const d = await r.json();
@@ -32,7 +33,7 @@ export default function PaginaAdminCupons() {
   }
 
   async function desativar(id: string) {
-    await fetch("/api/cupons", { method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ id }) });
+    await fetch("/api/cupons", { method: "DELETE", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ id }) });
     carregar();
   }
 

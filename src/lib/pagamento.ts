@@ -1,3 +1,5 @@
+import "server-only";
+
 export interface DadosPagamento {
   valor: number;
   descricao: string;

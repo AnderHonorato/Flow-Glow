@@ -1,3 +1,5 @@
+import "server-only";
+
 export interface EmailVerificacao {
   para: string;
   nome: string;

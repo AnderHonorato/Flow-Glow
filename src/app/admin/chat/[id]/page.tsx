@@ -51,8 +51,8 @@ export default function PaginaAdminChatDetalhe() {
   async function carregar() {
     if (!accessToken) return;
     const resposta = await fetch(`/api/chat?conversaId=${conversaId}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      credentials: "include",
     });
     const dados = await resposta.json();
     if (dados.sucesso) setConversa(dados.dados[0] || null);
@@ -81,7 +81,8 @@ export default function PaginaAdminChatDetalhe() {
     try {
       const resposta = await fetch("/api/admin/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ conversaId, acao, texto }),
       });
       const dados = await resposta.json();
@@ -123,7 +124,8 @@ export default function PaginaAdminChatDetalhe() {
     try {
       const resposta = await fetch("/api/admin/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ conversaId, acao: "responder", texto, anexos }),
       });
       const dados = await resposta.json();

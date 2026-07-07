@@ -43,8 +43,8 @@ export default function PaginaChat() {
     if (!accessToken) return;
     try {
       const r = await fetch("/api/chat", {
-        headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
+        credentials: "include",
       });
       const d = await r.json();
       if (d.sucesso) setConversa(d.dados[0] || null);
@@ -71,8 +71,8 @@ export default function PaginaChat() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const dados = await resposta.json();

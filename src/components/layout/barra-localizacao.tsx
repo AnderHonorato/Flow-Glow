@@ -22,7 +22,7 @@ export function useCidadeUsuario() {
     if (!usuario || !accessToken) return null;
     try {
       const r = await fetch("/api/usuarios/endereco", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: "include",
       });
       const d = await r.json();
       if (d.sucesso && d.dados?.cidade) {
@@ -96,7 +96,8 @@ export function SeloLocalizacao() {
       if (accessToken && gps.cidade) {
         fetch("/api/usuarios/endereco", {
           method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({
             cep: gps.cep.replace(/\D/g, "").slice(0, 8) || "00000000",
             logradouro: gps.logradouro || "Endereço",
@@ -143,19 +144,18 @@ export function SeloLocalizacao() {
         </div>
 
         {/* Selo normal com dados do cadastro */}
-        <SeloConteudo dados={dados} usuario={usuario} cepFormatado={cepFormatado} />
+        <SeloConteudo dados={dados} cepFormatado={cepFormatado} />
       </>
     );
   }
 
-  return <SeloConteudo dados={dados} usuario={usuario} cepFormatado={cepFormatado} />;
+  return <SeloConteudo dados={dados} cepFormatado={cepFormatado} />;
 }
 
 function SeloConteudo({
-  dados, usuario, cepFormatado,
+  dados, cepFormatado,
 }: {
   dados: DadosLocalizacao | null;
-  usuario: { nomeCompleto: string } | null;
   cepFormatado: string;
 }) {
   if (!dados?.cidade) {

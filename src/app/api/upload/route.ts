@@ -21,7 +21,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     ];
 
     if (!permitidos.includes(arquivo.type)) {
-      return NextResponse.json({ sucesso: false, erro: "Tipo de arquivo nao permitido." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Tipo de arquivo não permitido." }, { status: 400 });
     }
 
     const limite = arquivo.type.startsWith("video/") ? 24 * 1024 * 1024 : 5 * 1024 * 1024;

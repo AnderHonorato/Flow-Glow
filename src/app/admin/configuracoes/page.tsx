@@ -58,8 +58,8 @@ export default function PaginaAdminConfiguracoes() {
     if (!accessToken) return;
     try {
       const resposta = await fetch("/api/admin/aviso-topo", {
-        headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setAvisos(dados.dados);
@@ -81,8 +81,8 @@ export default function PaginaAdminConfiguracoes() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           titulo,
           mensagem,
@@ -112,13 +112,13 @@ export default function PaginaAdminConfiguracoes() {
     setErro("");
     setMensagemStatus("");
     await fetch("/api/admin/aviso-topo", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ id }),
-    });
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
     setMensagemStatus("Faixa desativada manualmente.");
     await carregar();
   }

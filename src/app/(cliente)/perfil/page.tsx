@@ -127,7 +127,7 @@ export default function PaginaPerfil() {
       if (!accessToken) return;
       try {
         const resposta = await fetch("/api/usuarios/endereco", {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          credentials: "include",
         });
         const dados = await resposta.json();
         if (dados.sucesso && dados.dados) {
@@ -212,8 +212,8 @@ export default function PaginaPerfil() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify(montarPayloadPerfil()),
       });
       const dados = await resposta.json();
@@ -246,8 +246,8 @@ export default function PaginaPerfil() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify(
           montarPayloadPerfil({ senhaAtual, novaSenha, confirmacaoNovaSenha })
         ),
@@ -279,8 +279,8 @@ export default function PaginaPerfil() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           cep: cep.replace(/\D/g, ""),
           logradouro,
@@ -315,7 +315,7 @@ export default function PaginaPerfil() {
     try {
       const resposta = await fetch("/api/usuarios/perfil", {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) {

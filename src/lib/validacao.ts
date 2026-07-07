@@ -116,6 +116,7 @@ export const esquemaEndereco = z.object({
 export const esquemaComentario = z.object({
   nota: z.number().int().min(1, "Nota mínima é 1").max(5, "Nota máxima é 5"),
   texto: z.string().min(3, "O comentário deve ter pelo menos 3 caracteres").max(2000, "Comentário muito longo"),
+  tutorialId: z.string().uuid("Tutorial inválido"),
 });
 
 export const esquemaTutorial = z.object({
@@ -156,3 +157,132 @@ export type DadosNovaSenha = z.infer<typeof esquemaNovaSenha>;
 export type DadosEndereco = z.infer<typeof esquemaEndereco>;
 export type DadosComentario = z.infer<typeof esquemaComentario>;
 export type DadosTutorial = z.infer<typeof esquemaTutorial>;
+
+export const esquemaCupom = z.object({
+  codigo: z.string().min(1, "Código obrigatório").max(40, "Código muito longo"),
+  descontoPercentual: z.number().int().min(1, "Desconto mínimo é 1%").max(100, "Desconto máximo é 100%"),
+  validoAte: z.string().min(1, "Data de validade obrigatória"),
+});
+
+export const esquemaValidarCupom = z.object({
+  codigo: z.string().min(1, "Código obrigatório"),
+});
+
+export const esquemaAnuncio = z.object({
+  titulo: z.string().min(1, "Título obrigatório").max(120, "Título muito longo"),
+  imagemUrl: z.string().min(1, "Imagem obrigatória"),
+  linkUrl: z.string().max(500).optional().nullable(),
+  corFundo: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  ativo: z.boolean().optional(),
+  ordem: z.number().int().optional(),
+});
+
+export const esquemaReordenarAnuncios = z.object({
+  ids: z.array(z.string().min(1)).min(1, "Lista de banners inválida"),
+});
+
+export const esquemaAtualizarAnuncio = z.object({
+  id: z.string().min(1, "ID obrigatório"),
+  titulo: z.string().min(1).max(120).optional(),
+  imagemUrl: z.string().min(1).optional(),
+  linkUrl: z.string().max(500).optional().nullable(),
+  corFundo: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  ativo: z.boolean().optional(),
+});
+
+export const esquemaCategoria = z.object({
+  nome: z.string().min(1, "Nome obrigatório").max(80, "Nome muito longo"),
+  slug: z.string().min(1, "Slug obrigatório").max(80).regex(/^[a-z0-9-]+$/, "Slug deve conter apenas letras minúsculas, números e hífens"),
+});
+
+export const esquemaCriarPedido = z.object({
+  itens: z.array(z.object({ tutorialId: z.string().uuid("Tutorial inválido") })).min(1, "Nenhum item no pedido."),
+  cupom: z.string().max(40).optional().nullable(),
+});
+
+export const esquemaAtualizarPedido = z.object({
+  pedidoId: z.string().min(1, "Informe pedidoId."),
+  status: z.enum(["PROCESSANDO", "APROVADO", "REEMBOLSADO", "RECUSADO"]),
+  motivo: z.string().optional().nullable(),
+});
+
+export const esquemaProblemaPedido = z.object({
+  pedidoId: z.string().min(1, "Informe o pedido."),
+  descricao: z.string().min(3, "Descreva o problema com mais detalhes.").max(2000, "Descrição muito longa"),
+  fotos: z.array(z.string().url()).optional(),
+  videos: z.array(z.string().url()).optional(),
+});
+
+export const esquemaAvisoTopo = z.object({
+  titulo: z.string().min(1, "Informe título e mensagem.").max(120),
+  mensagem: z.string().min(1, "Informe título e mensagem.").max(500),
+  linkTexto: z.string().max(40).optional().nullable(),
+  linkUrl: z.string().max(500).optional().nullable(),
+  corFundo: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  corTexto: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  inicioEm: z.string().min(1, "Data de início obrigatória"),
+  fimEm: z.string().min(1, "Data de fim obrigatória"),
+  ativo: z.boolean().optional(),
+});
+
+export const esquemaDesativarAviso = z.object({
+  id: z.string().min(1, "ID não informado."),
+});
+
+export const esquemaAdminChat = z.object({
+  conversaId: z.string().min(1, "Conversa não informada."),
+  acao: z.enum(["responder", "iniciar", "transferir", "encerrar", "reabrir"]).optional(),
+  texto: z.string().max(5000).optional().nullable(),
+  anexos: z.array(z.object({
+    tipo: z.enum(["IMAGEM", "VIDEO"]),
+    url: z.string().url(),
+  })).optional(),
+});
+
+export const esquemaAdminUsuario = z.object({
+  id: z.string().min(1, "ID obrigatório."),
+  contaPausada: z.boolean().optional(),
+  emailVerificado: z.boolean().optional(),
+  papel: z.enum(["CLIENTE", "ADMINISTRADOR"]).optional(),
+});
+
+export const esquemaChatAvaliar = z.object({
+  acao: z.literal("avaliar"),
+  conversaId: z.string().min(1, "Conversa inválida."),
+  nota: z.number().int().min(1, "Nota mínima é 1").max(5, "Nota máxima é 5"),
+  texto: z.string().max(2000).optional().nullable(),
+});
+
+export const esquemaChatMensagem = z.object({
+  acao: z.literal("mensagem").optional(),
+  texto: z.string().max(5000).optional().nullable(),
+  anexos: z.array(z.object({
+    tipo: z.enum(["IMAGEM", "VIDEO"]),
+    url: z.string().url(),
+  })).optional(),
+});
+
+export const esquemaWebhookPagamento = z.object({
+  action: z.string().optional(),
+  type: z.string().optional(),
+  data: z.object({
+    id: z.union([z.string(), z.number()]).optional(),
+  }).optional(),
+});
+
+export type DadosCupom = z.infer<typeof esquemaCupom>;
+export type DadosValidarCupom = z.infer<typeof esquemaValidarCupom>;
+export type DadosAnuncio = z.infer<typeof esquemaAnuncio>;
+export type DadosReordenarAnuncios = z.infer<typeof esquemaReordenarAnuncios>;
+export type DadosAtualizarAnuncio = z.infer<typeof esquemaAtualizarAnuncio>;
+export type DadosCategoria = z.infer<typeof esquemaCategoria>;
+export type DadosCriarPedido = z.infer<typeof esquemaCriarPedido>;
+export type DadosAtualizarPedido = z.infer<typeof esquemaAtualizarPedido>;
+export type DadosProblemaPedido = z.infer<typeof esquemaProblemaPedido>;
+export type DadosAvisoTopo = z.infer<typeof esquemaAvisoTopo>;
+export type DadosDesativarAviso = z.infer<typeof esquemaDesativarAviso>;
+export type DadosAdminChat = z.infer<typeof esquemaAdminChat>;
+export type DadosAdminUsuario = z.infer<typeof esquemaAdminUsuario>;
+export type DadosChatAvaliar = z.infer<typeof esquemaChatAvaliar>;
+export type DadosChatMensagem = z.infer<typeof esquemaChatMensagem>;
+export type DadosWebhookPagamento = z.infer<typeof esquemaWebhookPagamento>;

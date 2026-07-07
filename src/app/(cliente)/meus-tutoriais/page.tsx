@@ -28,7 +28,7 @@ export default function PaginaMeusTutoriais() {
     async function carregar() {
       try {
         const resposta = await fetch("/api/usuarios/meus-tutoriais", {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          credentials: "include",
         });
         const dados = await resposta.json();
         if (dados.sucesso) setTutoriais(dados.dados);

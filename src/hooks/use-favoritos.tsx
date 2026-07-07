@@ -35,7 +35,7 @@ export function ProvedorFavoritos({ children }: { children: ReactNode }) {
     setCarregando(true);
     try {
       const resposta = await fetch("/api/favoritos?somenteIds=true", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: "include",
         cache: "no-store",
       });
       const dados = await resposta.json();
@@ -57,7 +57,7 @@ export function ProvedorFavoritos({ children }: { children: ReactNode }) {
   const alternarFavorito = useCallback(
     async (tutorialId: string) => {
       if (!usuario || !accessToken) {
-        return { sucesso: false, erro: "Entre na conta para favoritar anuncios." };
+        return { sucesso: false, erro: "Entre na conta para favoritar anúncios." };
       }
 
       const favorito = ids.has(tutorialId);
@@ -73,12 +73,12 @@ export function ProvedorFavoritos({ children }: { children: ReactNode }) {
           method: favorito ? "DELETE" : "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
           },
+          credentials: "include",
           body: JSON.stringify({ tutorialId }),
         });
         const dados = await resposta.json();
-        if (!dados.sucesso) throw new Error(dados.erro || "Nao foi possivel atualizar.");
+        if (!dados.sucesso) throw new Error(dados.erro || "Não foi possível atualizar.");
         return { sucesso: true };
       } catch (erro) {
         setIds((atuais) => {

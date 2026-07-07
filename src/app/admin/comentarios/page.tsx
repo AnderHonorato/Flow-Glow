@@ -49,8 +49,8 @@ export default function PaginaAdminComentarios() {
 
   async function carregar() {
     const resposta = await fetch("/api/admin/comentarios", {
-      headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      credentials: "include",
     });
     const dados = await resposta.json();
     if (dados.sucesso) {
@@ -66,7 +66,7 @@ export default function PaginaAdminComentarios() {
   async function remover(id: string) {
     await fetch(`/api/admin/comentarios?id=${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: "include",
     });
     setComentarios((atuais) => atuais.filter((comentario) => comentario.id !== id));
   }

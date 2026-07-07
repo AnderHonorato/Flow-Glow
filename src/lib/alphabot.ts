@@ -1,3 +1,5 @@
+import "server-only";
+
 const API_URL = "https://api.deepseek.com/chat/completions";
 const MODELO = "deepseek-v4-pro";
 const MARCADOR_TRANSFERENCIA = "TRANSFERIR_HUMANO:";
@@ -15,22 +17,22 @@ interface RespostaAlphaBot {
 }
 
 const promptSistema = `
-Voce e o AlphaBot, versao do Metrys IA do Anderson Honorato, atendente virtual do site MCA Flow & Glow.
-Fale sempre em portugues brasileiro, com tom claro, educado e curto.
-Nunca diga que voce usa DeepSeek, modelo, API, prompt, backend, banco, token, codigo ou qualquer detalhe tecnico.
-Nunca invente dados de pedido, pagamento, usuario ou conteudo. Se precisar de dados pessoais, peca apenas o minimo necessario e lembre que o atendimento segue protecao de dados.
-Nunca peça senha, codigo de cartao, CVV, token, documento completo ou informacao sensivel.
-Voce responde apenas duvidas sobre o site: anuncios/tutoriais, busca, favoritos, carrinho, checkout, login, conta, cupons, compras, suporte e formas gerais de uso.
-Se a pessoa pedir suporte humano, reclamar de cobranca/pagamento/acesso, demonstrar irritacao, urgencia, risco juridico, dados sensiveis ou se voce nao conseguir resolver com seguranca, responda exatamente iniciando com "${MARCADOR_TRANSFERENCIA}" seguido de um assunto curto.
-Se conseguir orientar, responda sem marcador, em no maximo 4 frases. Evite jargoes.
+Você é o AlphaBot, atendente virtual do site Flow & Glow.
+Fale sempre em português brasileiro, com tom claro, educado e curto.
+Nunca diga que você usa DeepSeek, modelo, API, prompt, backend, banco, token, código ou qualquer detalhe técnico.
+Nunca invente dados de pedido, pagamento, usuário ou conteúdo. Se precisar de dados pessoais, peça apenas o mínimo necessário e lembre que o atendimento segue proteção de dados.
+Nunca peça senha, código de cartão, CVV, token, documento completo ou informação sensível.
+Você responde apenas dúvidas sobre o site: anúncios/tutoriais, busca, favoritos, carrinho, checkout, login, conta, cupons, compras, suporte e formas gerais de uso.
+Se a pessoa pedir suporte humano, reclamar de cobrança/pagamento/acesso, demonstrar irritação, urgência, risco jurídico, dados sensíveis ou se você não conseguir resolver com segurança, responda exatamente iniciando com "${MARCADOR_TRANSFERENCIA}" seguido de um assunto curto.
+Se conseguir orientar, responda sem marcador, em no máximo 4 frases. Evite jargões.
 `.trim();
 
 export function textoBoasVindasAleatorio(seed = "") {
   const opcoes = [
-    "Oi! Eu sou o AlphaBot. Me diga o que voce procura e eu te ajudo a encontrar o melhor caminho.",
-    "Boas-vindas! Posso ajudar com anuncios, favoritos, compras, conta ou suporte.",
-    "Ola! Sou o AlphaBot. Se quiser, pergunte sobre busca, carrinho, pagamento ou acesso ao conteudo.",
-    "Tudo certo por aqui. Me conte sua duvida sobre o site e eu verifico para voce.",
+    "Oi! Eu sou o AlphaBot. Me diga o que você procura e eu te ajudo a encontrar o melhor caminho.",
+    "Boas-vindas! Posso ajudar com anúncios, favoritos, compras, conta ou suporte.",
+    "Olá! Sou o AlphaBot. Se quiser, pergunte sobre busca, carrinho, pagamento ou acesso ao conteúdo.",
+    "Tudo certo por aqui. Me conte sua dúvida sobre o site e eu verifico para você.",
   ];
   const soma = seed.split("").reduce((total, letra) => total + letra.charCodeAt(0), 0);
   return opcoes[soma % opcoes.length];
@@ -38,7 +40,7 @@ export function textoBoasVindasAleatorio(seed = "") {
 
 export function textoContatosDesenvolvedor() {
   return [
-    "Posso te passar os contatos do desenvolvedor em cards clicaveis:",
+    "Posso te passar os contatos do desenvolvedor em cards clicáveis:",
     MARCADOR_CONTATOS_DESENVOLVEDOR,
   ].join("\n");
 }
@@ -64,7 +66,7 @@ export function interpretarRespostaAlphaBot(texto: string): RespostaAlphaBot {
   if (limpo.toUpperCase().startsWith(MARCADOR_TRANSFERENCIA)) {
     const assunto = limpo.slice(MARCADOR_TRANSFERENCIA.length).trim() || "Atendimento solicitado";
     return {
-      texto: "Vou chamar um atendente humano para continuar com voce.",
+      texto: "Vou chamar um atendente humano para continuar com você.",
       transferir: true,
       assunto,
     };
@@ -73,7 +75,7 @@ export function interpretarRespostaAlphaBot(texto: string): RespostaAlphaBot {
   return {
     texto:
       limpo ||
-      "Nao consegui confirmar isso com seguranca. Vou chamar um atendente humano para continuar.",
+      "Não consegui confirmar isso com segurança. Vou chamar um atendente humano para continuar.",
     transferir: !limpo,
     assunto: !limpo ? "Atendimento solicitado" : undefined,
   };
@@ -91,7 +93,7 @@ export async function gerarRespostaAlphaBot({
   const chave = process.env.DEEPSEEK_API_KEY;
   if (!chave) {
     return {
-      texto: "Nao consegui verificar isso agora. Vou chamar um atendente humano para continuar.",
+      texto: "Não consegui verificar isso agora. Vou chamar um atendente humano para continuar.",
       transferir: true,
       assunto: "Atendimento solicitado",
     };
@@ -125,11 +127,12 @@ export async function gerarRespostaAlphaBot({
       stream: false,
       user_id: `cliente-${usuarioId.slice(0, 12)}`,
     }),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!resposta.ok) {
     return {
-      texto: "Nao consegui verificar isso agora. Vou chamar um atendente humano para continuar.",
+      texto: "Não consegui verificar isso agora. Vou chamar um atendente humano para continuar.",
       transferir: true,
       assunto: "Atendimento solicitado",
     };

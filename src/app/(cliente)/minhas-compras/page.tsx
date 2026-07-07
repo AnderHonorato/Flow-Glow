@@ -77,8 +77,8 @@ export default function PaginaMinhasCompras() {
       return;
     }
     fetch("/api/pedidos", {
-      headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      credentials: "include",
     })
       .then((r) => r.json())
       .then((d) => {
@@ -122,8 +122,8 @@ export default function PaginaMinhasCompras() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           pedidoId: pedidoSelecionado.id,
           descricao: descricaoProblema.trim(),

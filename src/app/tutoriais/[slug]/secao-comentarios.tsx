@@ -15,7 +15,7 @@ export default function SecaoComentarios({
   tutorialId,
   comentariosIniciais,
 }: SecaoComentariosProps) {
-  const { usuario, accessToken } = useAutenticacao();
+  const { usuario } = useAutenticacao();
 
   const [comentarios, setComentarios] = useState(comentariosIniciais);
   const [nota, setNota] = useState(5);
@@ -45,9 +45,9 @@ export default function SecaoComentarios({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ tutorialId, nota, texto }),
+        credentials: "include",
       });
 
       const dados = await resposta.json();

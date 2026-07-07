@@ -5,6 +5,7 @@ import {
   criarMensagemChat,
   serializarConversa,
 } from "@/lib/chat";
+import { esquemaAdminChat } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 type AnexoEntrada = { tipo: "IMAGEM" | "VIDEO"; url: string };
@@ -39,11 +40,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     const nomeAdmin = admin?.nomeCompleto || "Atendente";
 
     const corpo = await request.json();
-    const conversaId = String(corpo.conversaId || "");
-    const acao = String(corpo.acao || "responder");
+    const validacao = esquemaAdminChat.safeParse(corpo);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "Conversa não informada." }, { status: 400 });
+    }
+    const dados = validacao.data;
+    const conversaId = dados.conversaId;
+    const acao = dados.acao || "responder";
 
     if (!conversaId) {
-      return NextResponse.json({ sucesso: false, erro: "Conversa nao informada." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Conversa não informada." }, { status: 400 });
     }
 
     const conversa = await prisma.conversa.findUnique({
@@ -52,7 +58,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     });
 
     if (!conversa) {
-      return NextResponse.json({ sucesso: false, erro: "Conversa nao encontrada." }, { status: 404 });
+      return NextResponse.json({ sucesso: false, erro: "Conversa não encontrada." }, { status: 404 });
     }
 
     if (conversa.status === "ENCERRADA" && acao !== "reabrir") {
@@ -62,7 +68,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     if (acao === "iniciar") {
       if (conversa.atendenteId && conversa.atendenteId !== adminId) {
         return NextResponse.json(
-          { sucesso: false, erro: "Outro atendente ja iniciou este protocolo." },
+          { sucesso: false, erro: "Outro atendente já iniciou este protocolo." },
           { status: 409 }
         );
       }
@@ -125,8 +131,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
           "Atendimento encerrado. Um questionario de experiencia com estrelas foi liberado para o cliente.",
       });
     } else {
-      const texto = String(corpo.texto || "").trim();
-      const anexos = anexosValidos(corpo.anexos);
+      const texto = String(dados.texto || "").trim();
+      const anexos = anexosValidos(dados.anexos);
       if (!texto && anexos.length === 0) {
         return NextResponse.json({ sucesso: false, erro: "Mensagem vazia." }, { status: 400 });
       }

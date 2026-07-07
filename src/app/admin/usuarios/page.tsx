@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { Cartao, Botao } from "@/components/ui";
-import { Pause, Play, Trash2, UserCheck, UserX, ShieldCheck, ShieldOff, Download } from "lucide-react";
+import { Pause, Play, Trash2, UserCheck, ShieldCheck, ShieldOff, Download } from "lucide-react";
 import { exportarCSV, exportarTXT } from "@/lib/exportar";
 
 export default function PaginaAdminUsuarios() {
@@ -14,7 +14,7 @@ export default function PaginaAdminUsuarios() {
   }[]>([]);
 
   async function carregar() {
-    const r = await fetch("/api/admin/usuarios", { headers: { Authorization: `Bearer ${accessToken}` } });
+    const r = await fetch("/api/admin/usuarios", { credentials: "include" });
     const d = await r.json();
     if (d.sucesso) setUsuarios(d.dados);
   }
@@ -23,15 +23,16 @@ export default function PaginaAdminUsuarios() {
   async function atualizar(id: string, dados: Record<string, unknown>) {
     await fetch("/api/admin/usuarios", {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, ...dados }),
+      credentials: "include",
     });
     carregar();
   }
 
   async function excluir(id: string) {
     if (!confirm("Excluir permanentemente este usuário?")) return;
-    await fetch(`/api/admin/usuarios?id=${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${accessToken}` } });
+    await fetch(`/api/admin/usuarios?id=${id}`, { method: "DELETE", credentials: "include" });
     carregar();
   }
 

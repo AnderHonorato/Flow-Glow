@@ -307,8 +307,8 @@ export function ChatFlutuante() {
     if (!accessToken || !aberto || enviandoRef.current) return;
     try {
       const resposta = await fetch("/api/chat", {
-        headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setConversa(dados.dados[0] || null);
@@ -354,9 +354,9 @@ export function ChatFlutuante() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ acao: "novo" }),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setConversa(dados.dados);
@@ -421,9 +421,9 @@ export function ChatFlutuante() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) {
@@ -456,7 +456,6 @@ export function ChatFlutuante() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           acao: "avaliar",
@@ -464,6 +463,7 @@ export function ChatFlutuante() {
           nota,
           texto: avaliacaoTexto,
         }),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setConversa(dados.dados);

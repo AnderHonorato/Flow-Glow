@@ -50,8 +50,8 @@ export default function PaginaFavoritos() {
     setErro("");
     try {
       const resposta = await fetch("/api/favoritos", {
-        headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setFavoritos(dados.dados || []);

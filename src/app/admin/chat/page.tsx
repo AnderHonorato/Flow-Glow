@@ -34,8 +34,8 @@ export default function PaginaAdminChat() {
   async function carregar() {
     if (!accessToken) return;
     const resposta = await fetch("/api/chat", {
-      headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      credentials: "include",
     });
     const dados = await resposta.json();
     if (dados.sucesso) setConversas(dados.dados);

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Cabecalho, Rodape } from "@/components/layout";
-import { Cartao } from "@/components/ui";
 import { useAutenticacao } from "@/contexto/autenticacao";
 
 interface ModuloPlayer {
@@ -42,7 +41,7 @@ export default function PaginaPlayer() {
     async function carregar() {
       try {
         const resposta = await fetch("/api/usuarios/meus-tutoriais", {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          credentials: "include",
         });
         const dados = await resposta.json();
         if (dados.sucesso) {

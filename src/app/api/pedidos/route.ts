@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { esquemaCriarPedido, esquemaAtualizarPedido } from "@/lib/validacao";
+import { verificarRateLimit, cabecalhoRetryAfter } from "@/lib/rate-limit";
 import type { RespostaApi } from "@/tipos";
 import type { StatusPedido } from "@/generated/prisma/client";
 
-const statusPermitidosAdmin: StatusPedido[] = [
-  "PROCESSANDO",
-  "APROVADO",
-  "REEMBOLSADO",
-  "RECUSADO",
-];
+const RATE_LIMIT_PEDIDO = 10;
+const RATE_LIMIT_JANELA_MS = 60_000;
 
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
@@ -58,16 +56,26 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
-    const { itens, cupom } = await request.json();
-
-    if (!itens || !Array.isArray(itens) || itens.length === 0) {
+    const rate = verificarRateLimit(request, RATE_LIMIT_PEDIDO, RATE_LIMIT_JANELA_MS, "criar-pedido");
+    if (rate.bloqueado) {
       return NextResponse.json(
-        { sucesso: false, erro: "Nenhum item no pedido." },
+        { sucesso: false, erro: "Muitos pedidos em pouco tempo. Aguarde um minuto." },
+        { status: 429, headers: { "Retry-After": cabecalhoRetryAfter(rate.resetEmMs) } }
+      );
+    }
+
+    const corpo = await request.json();
+    const validacao = esquemaCriarPedido.safeParse(corpo);
+
+    if (!validacao.success) {
+      return NextResponse.json(
+        { sucesso: false, erro: validacao.error.issues[0]?.message || "Nenhum item no pedido." },
         { status: 400 }
       );
     }
 
-    const tutoriaisIds = itens.map((i: { tutorialId: string }) => i.tutorialId);
+    const { itens, cupom } = validacao.data;
+    const tutoriaisIds = itens.map((i) => i.tutorialId);
     const tutoriais = await prisma.tutorial.findMany({
       where: { id: { in: tutoriaisIds }, ativo: true },
     });
@@ -148,17 +156,12 @@ export async function PUT(request: NextRequest): Promise<NextResponse<RespostaAp
       return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
     }
 
-    const { pedidoId, status: novoStatus, motivo } = await request.json();
-    if (!pedidoId || !novoStatus) {
-      return NextResponse.json({ sucesso: false, erro: "Informe pedidoId e status." }, { status: 400 });
+    const corpo = await request.json();
+    const validacao = esquemaAtualizarPedido.safeParse(corpo);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "Informe pedidoId e status." }, { status: 400 });
     }
-
-    if (!statusPermitidosAdmin.includes(novoStatus as StatusPedido)) {
-      return NextResponse.json(
-        { sucesso: false, erro: "Status inválido para atualização." },
-        { status: 400 }
-      );
-    }
+    const { pedidoId, status: novoStatus, motivo } = validacao.data;
 
     const pedido = await prisma.pedido.findUnique({
       where: { id: pedidoId },

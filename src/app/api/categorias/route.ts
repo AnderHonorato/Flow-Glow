@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { esquemaCategoria } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 export async function GET(): Promise<NextResponse<RespostaApi>> {
@@ -11,10 +12,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
   const papel = request.headers.get("x-usuario-papel");
   if (papel !== "ADMINISTRADOR") return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
 
-  const { nome, slug } = await request.json();
-  if (!nome || !slug) return NextResponse.json({ sucesso: false, erro: "Nome e slug obrigatórios." }, { status: 400 });
+  const corpo = await request.json();
+  const validacao = esquemaCategoria.safeParse(corpo);
+  if (!validacao.success) {
+    return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "Nome e slug obrigatórios." }, { status: 400 });
+  }
 
-  const cat = await prisma.categoria.create({ data: { nome, slug } });
+  const cat = await prisma.categoria.create({ data: { nome: validacao.data.nome, slug: validacao.data.slug } });
   return NextResponse.json({ sucesso: true, dados: cat }, { status: 201 });
 }
 

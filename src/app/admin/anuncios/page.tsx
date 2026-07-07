@@ -92,8 +92,8 @@ export default function PaginaAdminAnuncios() {
     if (!accessToken) return;
     try {
       const resposta = await fetch("/api/anuncios?todos=true", {
-        headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) setAnuncios(dados.dados);
@@ -148,8 +148,8 @@ export default function PaginaAdminAnuncios() {
         method: editando ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           id: editandoId,
           ...formulario,
@@ -173,7 +173,7 @@ export default function PaginaAdminAnuncios() {
   async function remover(id: string) {
     await fetch(`/api/anuncios?id=${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${accessToken}` },
+      credentials: "include",
     });
     if (editandoId === id) resetarFormulario();
     await carregar();
@@ -184,8 +184,8 @@ export default function PaginaAdminAnuncios() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
       },
+      credentials: "include",
       body: JSON.stringify({ id: anuncio.id, ativo: !anuncio.ativo }),
     });
     await carregar();
@@ -197,8 +197,8 @@ export default function PaginaAdminAnuncios() {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
       },
+      credentials: "include",
       body: JSON.stringify({ ids: proximaLista.map((a) => a.id) }),
     });
   }

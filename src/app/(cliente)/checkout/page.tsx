@@ -67,7 +67,8 @@ export default function PaginaCheckout() {
     try {
       const resposta = await fetch("/api/pedidos", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           itens: itens.map(i => ({ tutorialId: i.tutorialId })),
           metodoPagamento: metodo,

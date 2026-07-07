@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { esquemaAvisoTopo, esquemaDesativarAviso } from "@/lib/validacao";
 import type { RespostaApi } from "@/tipos";
 
 function ehAdmin(request: NextRequest) {
@@ -49,21 +50,26 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     }
 
     const corpo = await request.json();
-    const titulo = String(corpo.titulo || "").trim();
-    const mensagem = String(corpo.mensagem || "").trim();
-    const linkTexto = String(corpo.linkTexto || "").trim();
-    const linkUrl = String(corpo.linkUrl || "").trim();
-    const inicioEm = new Date(corpo.inicioEm);
-    const fimEm = new Date(corpo.fimEm);
-    const ativo = Boolean(corpo.ativo);
+    const validacao = esquemaAvisoTopo.safeParse(corpo);
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: validacao.error.issues[0]?.message || "Informe título e mensagem." }, { status: 400 });
+    }
+    const dados = validacao.data;
+    const titulo = dados.titulo.trim();
+    const mensagem = dados.mensagem.trim();
+    const linkTexto = (dados.linkTexto || "").trim();
+    const linkUrl = (dados.linkUrl || "").trim();
+    const inicioEm = new Date(dados.inicioEm);
+    const fimEm = new Date(dados.fimEm);
+    const ativo = Boolean(dados.ativo);
 
     if (!titulo || !mensagem) {
-      return NextResponse.json({ sucesso: false, erro: "Informe titulo e mensagem." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Informe título e mensagem." }, { status: 400 });
     }
 
     if (Number.isNaN(inicioEm.getTime()) || Number.isNaN(fimEm.getTime()) || fimEm <= inicioEm) {
       return NextResponse.json(
-        { sucesso: false, erro: "Periodo invalido. O fim precisa ser depois do inicio." },
+        { sucesso: false, erro: "Período inválido. O fim precisa ser depois do início." },
         { status: 400 }
       );
     }
@@ -109,12 +115,13 @@ export async function PATCH(request: NextRequest): Promise<NextResponse<Resposta
     }
 
     const { id } = await request.json();
-    if (!id) {
-      return NextResponse.json({ sucesso: false, erro: "ID nao informado." }, { status: 400 });
+    const validacao = esquemaDesativarAviso.safeParse({ id });
+    if (!validacao.success) {
+      return NextResponse.json({ sucesso: false, erro: "ID não informado." }, { status: 400 });
     }
 
     const aviso = await prisma.configuracaoAvisoTopo.update({
-      where: { id },
+      where: { id: validacao.data.id },
       data: {
         ativo: false,
         desativadoEm: new Date(),

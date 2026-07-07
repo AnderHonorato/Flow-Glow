@@ -4,7 +4,6 @@ import {
   BadgePercent,
   Edit3,
   Flame,
-  ImagePlus,
   MapPin,
   Plus,
   Save,
@@ -14,7 +13,6 @@ import {
   Download,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useAutenticacao } from "@/contexto/autenticacao";
 import { Botao, CampoTexto, Cartao, Modal } from "@/components/ui";
 import { UploadImagem } from "@/components/ui/upload-imagem";
 import { exportarCSV, exportarTXT } from "@/lib/exportar";
@@ -116,7 +114,6 @@ const estadoInicial = {
 };
 
 export default function PaginaAdminTutoriais() {
-  const { accessToken } = useAutenticacao();
   const [tutoriais, setTutoriais] = useState<TutorialCard[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [modalAberto, setModalAberto] = useState(false);
@@ -258,9 +255,9 @@ export default function PaginaAdminTutoriais() {
         method: modo === "editar" ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(corpo),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) {
@@ -286,9 +283,9 @@ export default function PaginaAdminTutoriais() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ id: form.id }),
+        credentials: "include",
       });
       const dados = await resposta.json();
       if (dados.sucesso) {
