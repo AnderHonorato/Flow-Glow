@@ -15,6 +15,7 @@ function serializarTutorialFavorito(favorito: {
     imagemCapaUrl: string;
     destaquePromocional: boolean;
     bombando: boolean;
+    ativo: boolean;
     cidade: string | null;
     estado: string | null;
     distanciaKm: number | null;
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
     const usuarioId = request.headers.get("x-usuario-id");
     const papel = request.headers.get("x-usuario-papel");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado." }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado." }, { status: 401 });
     }
 
     const { searchParams } = request.nextUrl;
@@ -122,7 +123,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
 
     return NextResponse.json({
       sucesso: true,
-      dados: favoritos.map(serializarTutorialFavorito),
+      dados: favoritos
+        .filter((f) => f.tutorial !== null)
+        .map(serializarTutorialFavorito),
     });
   } catch (erro) {
     console.error("Erro ao listar favoritos:", erro);
@@ -134,12 +137,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado." }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado." }, { status: 401 });
     }
 
     const tutorialId = await lerTutorialId(request);
     if (!tutorialId) {
-      return NextResponse.json({ sucesso: false, erro: "Anuncio nao informado." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Anúncio não informado." }, { status: 400 });
     }
 
     await prisma.favoritoTutorial.upsert({
@@ -151,7 +154,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     return NextResponse.json({ sucesso: true }, { status: 201 });
   } catch (erro) {
     console.error("Erro ao favoritar:", erro);
-    return NextResponse.json({ sucesso: false, erro: "Erro ao favoritar anuncio." }, { status: 500 });
+    return NextResponse.json({ sucesso: false, erro: "Erro ao favoritar anúncio." }, { status: 500 });
   }
 }
 
@@ -159,12 +162,12 @@ export async function DELETE(request: NextRequest): Promise<NextResponse<Respost
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado." }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado." }, { status: 401 });
     }
 
     const tutorialId = await lerTutorialId(request);
     if (!tutorialId) {
-      return NextResponse.json({ sucesso: false, erro: "Anuncio nao informado." }, { status: 400 });
+      return NextResponse.json({ sucesso: false, erro: "Anúncio não informado." }, { status: 400 });
     }
 
     await prisma.favoritoTutorial.deleteMany({ where: { usuarioId, tutorialId } });

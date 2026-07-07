@@ -85,22 +85,22 @@ export default function PaginaCadastro() {
     ];
 
     if (obrigatorios.some((campo) => !campo.trim())) {
-      setErro("Preencha todos os campos obrigatorios.");
+      setErro("Preencha todos os campos obrigatórios.");
       return;
     }
 
     if (senha !== confirmacaoSenha) {
-      setErro("As senhas nao conferem.");
+      setErro("As senhas não conferem.");
       return;
     }
 
     if (senha.length < 8 || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
-      setErro("A senha precisa ter 8 caracteres, 1 letra maiuscula e 1 numero.");
+      setErro("A senha precisa ter 8 caracteres, 1 letra maiúscula e 1 número.");
       return;
     }
 
     if (!aceitouTermos) {
-      setErro("Voce precisa aceitar os termos de uso e a politica de privacidade.");
+      setErro("Você precisa aceitar os termos de uso e a política de privacidade.");
       return;
     }
 
@@ -148,7 +148,7 @@ export default function PaginaCadastro() {
         </span>
         <h1 className="text-2xl font-bold">Criar conta</h1>
         <p className="mt-2 text-sm text-[var(--color-texto)]/60">
-          Dados completos ajudam entrega, suporte e seguranca da compra.
+          Dados completos ajudam entrega, suporte e segurança da compra.
         </p>
       </div>
 
@@ -191,21 +191,21 @@ export default function PaginaCadastro() {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-[var(--color-texto)]">Genero</span>
+            <span className="text-sm font-semibold text-[var(--color-texto)]">Gênero</span>
             <select
               value={genero}
               onChange={(e) => setGenero(e.target.value)}
               className="h-10 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)] sm:h-11"
             >
-              <option value="">Prefiro nao informar</option>
+              <option value="">Prefiro não informar</option>
               <option value="feminino">Feminino</option>
               <option value="masculino">Masculino</option>
-              <option value="nao-binario">Nao binario</option>
+              <option value="nao-binario">Não binário</option>
               <option value="outro">Outro</option>
             </select>
           </label>
           <CampoTexto
-            rotulo="Profissao"
+            rotulo="Profissão"
             value={profissao}
             onChange={(e) => setProfissao(e.target.value)}
             placeholder="Opcional"
@@ -233,7 +233,7 @@ export default function PaginaCadastro() {
 
         <div className="rounded-lg border border-[var(--color-linha)] p-3 sm:p-4">
           <p className="mb-3 flex items-center gap-2 text-sm font-bold text-[var(--color-texto)]">
-            <MapPin className="h-4 w-4" aria-hidden /> Endereco principal
+            <MapPin className="h-4 w-4" aria-hidden /> Endereço principal
           </p>
           <div className="grid gap-3">
             <CampoTexto
@@ -247,9 +247,9 @@ export default function PaginaCadastro() {
             />
             <div className="grid grid-cols-[1fr_6.5rem] gap-3">
               <CampoTexto rotulo="Logradouro" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} placeholder="Rua" />
-              <CampoTexto rotulo="Numero" value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="123" />
+              <CampoTexto rotulo="Número" value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="123" />
             </div>
-            <CampoTexto rotulo="Complemento" value={complemento} onChange={(e) => setComplemento(e.target.value)} placeholder="Apto, bloco, referencia" />
+            <CampoTexto rotulo="Complemento" value={complemento} onChange={(e) => setComplemento(e.target.value)} placeholder="Apto, bloco, referência" />
             <div className="grid gap-3 sm:grid-cols-3">
               <CampoTexto rotulo="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} />
               <CampoTexto rotulo="Cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} />
@@ -274,7 +274,7 @@ export default function PaginaCadastro() {
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            placeholder="8 caracteres, 1 maiuscula e 1 numero"
+            placeholder="8 caracteres, 1 maiúscula e 1 número"
             autoComplete="new-password"
             icone={<KeyRound className="h-4 w-4" aria-hidden />}
           />
@@ -303,7 +303,7 @@ export default function PaginaCadastro() {
             </Link>{" "}
             e a{" "}
             <Link href="/politica-de-privacidade" target="_blank" className="font-semibold text-[var(--color-berry)] hover:underline">
-              Politica de Privacidade
+              Política de Privacidade
             </Link>
             .
           </span>
@@ -322,7 +322,7 @@ export default function PaginaCadastro() {
       </form>
 
       <p className="mt-6 text-center text-sm text-[var(--color-texto)]/60">
-        Ja tem conta?{" "}
+        Já tem conta?{" "}
         <Link href="/login" className="font-semibold text-[var(--color-berry)] hover:underline">
           Entrar
         </Link>

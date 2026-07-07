@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { RespostaApi } from "@/tipos";
+import type { StatusPedido } from "@/generated/prisma/client";
+
+const statusPermitidosAdmin: StatusPedido[] = [
+  "PROCESSANDO",
+  "APROVADO",
+  "REEMBOLSADO",
+  "RECUSADO",
+];
 
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
@@ -127,6 +135,99 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
     console.error("Erro ao criar pedido:", erro);
     return NextResponse.json(
       { sucesso: false, erro: "Erro interno ao criar pedido." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest): Promise<NextResponse<RespostaApi>> {
+  try {
+    const usuarioId = request.headers.get("x-usuario-id");
+    const papel = request.headers.get("x-usuario-papel");
+    if (!usuarioId || papel !== "ADMINISTRADOR") {
+      return NextResponse.json({ sucesso: false, erro: "Acesso restrito." }, { status: 403 });
+    }
+
+    const { pedidoId, status: novoStatus, motivo } = await request.json();
+    if (!pedidoId || !novoStatus) {
+      return NextResponse.json({ sucesso: false, erro: "Informe pedidoId e status." }, { status: 400 });
+    }
+
+    if (!statusPermitidosAdmin.includes(novoStatus as StatusPedido)) {
+      return NextResponse.json(
+        { sucesso: false, erro: "Status inválido para atualização." },
+        { status: 400 }
+      );
+    }
+
+    const pedido = await prisma.pedido.findUnique({
+      where: { id: pedidoId },
+      include: { usuario: { select: { id: true, nomeCompleto: true } } },
+    });
+
+    if (!pedido) {
+      return NextResponse.json({ sucesso: false, erro: "Pedido não encontrado." }, { status: 404 });
+    }
+
+    if (pedido.status === "REEMBOLSADO") {
+      return NextResponse.json(
+        { sucesso: false, erro: "Pedido já foi reembolsado." },
+        { status: 400 }
+      );
+    }
+
+    if (novoStatus === "REEMBOLSADO") {
+      if (!motivo || !["estoque", "problema_produto"].includes(motivo)) {
+        return NextResponse.json(
+          { sucesso: false, erro: "Informe o motivo do reembolso: estoque ou problema_produto." },
+          { status: 400 }
+        );
+      }
+    }
+
+    await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { status: novoStatus as StatusPedido },
+    });
+
+    const motivoTexto =
+      motivo === "estoque"
+        ? "Produto sem estoque"
+        : motivo === "problema_produto"
+          ? "Problema com o produto"
+          : "";
+
+    const mensagemAdmin = motivoTexto
+      ? `Pedido atualizado para **${novoStatus}**\n\nMotivo: ${motivoTexto}\n\nCliente: ${pedido.usuario.nomeCompleto}\nValor reembolsado: R$ ${Number(pedido.valorTotal).toFixed(2)}`
+      : `Pedido atualizado para **${novoStatus}** por decisão administrativa.`;
+
+    const conversaExistente = await prisma.conversa.findFirst({
+      where: { usuarioId: pedido.usuarioId, status: { not: "ENCERRADA" } },
+      orderBy: { criadoEm: "desc" },
+    });
+
+    if (conversaExistente) {
+      await prisma.mensagem.create({
+        data: {
+          texto: mensagemAdmin,
+          tipo: "SISTEMA",
+          conversaId: conversaExistente.id,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      sucesso: true,
+      dados: {
+        pedidoId,
+        status: novoStatus,
+        motivo: motivoTexto || undefined,
+      },
+    });
+  } catch (erro) {
+    console.error("Erro ao atualizar pedido:", erro);
+    return NextResponse.json(
+      { sucesso: false, erro: "Erro ao atualizar status do pedido." },
       { status: 500 }
     );
   }

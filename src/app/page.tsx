@@ -368,7 +368,7 @@ export default function PaginaInicial() {
         {ofertas.length > 0 && (
           <section className="mb-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="titulo-desenhado text-lg font-bold sm:text-xl">Ofertas imperdiveis</h2>
+              <h2 className="titulo-desenhado text-lg font-bold sm:text-xl">Ofertas imperdíveis</h2>
               <div className="flex gap-1">
                 <button
                   type="button"
@@ -384,7 +384,7 @@ export default function PaginaInicial() {
                   onClick={() => setIndiceOfertas((p) => Math.min(maxPaginasOfertas, p + 1))}
                   disabled={indiceOfertas >= maxPaginasOfertas}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-linha)] bg-[var(--color-papel)] text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:opacity-30"
-                  aria-label="PrÃ³ximas ofertas"
+                  aria-label="Próximas ofertas"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -404,7 +404,7 @@ export default function PaginaInicial() {
               <div>
                 <h2 className="titulo-desenhado text-lg font-bold sm:text-xl">Mais vendidos da semana</h2>
                 <p className="mt-3 text-sm text-[var(--color-texto-suave)]">
-                  Uma selecao compacta dos anuncios com melhor destaque.
+                  Uma seleção compacta dos anúncios com melhor destaque.
                 </p>
               </div>
               <Link href="/tutoriais?ordenar=avaliacao">

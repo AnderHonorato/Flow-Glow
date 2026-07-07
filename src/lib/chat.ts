@@ -8,25 +8,25 @@ export const opcoesAtendimento = [
     id: "pedido",
     rotulo: "Pedido ou compra",
     resposta:
-      "Entendi. Separe numero do pedido, e-mail da conta e o que aconteceu. Ja chamei um atendente para continuar por aqui.",
+      "Entendi. Separe número do pedido, e-mail da conta e o que aconteceu. Já chamei um atendente para continuar por aqui.",
   },
   {
     id: "pagamento",
     rotulo: "Pagamento",
     resposta:
-      "Vamos olhar pagamento. Envie forma de pagamento, horario aproximado e comprovante se tiver. Ja chamei um atendente.",
+      "Vamos olhar pagamento. Envie forma de pagamento, horário aproximado e comprovante se tiver. Já chamei um atendente.",
   },
   {
     id: "acesso",
     rotulo: "Acesso a conta",
     resposta:
-      "Certo. Conte se o problema e login, senha, e-mail ou acesso ao conteudo. Ja chamei um atendente.",
+      "Certo. Conte se o problema é login, senha, e-mail ou acesso ao conteúdo. Já chamei um atendente.",
   },
   {
     id: "outro",
     rotulo: "Outro assunto",
     resposta:
-      "Sem problema. Ja chamei um atendente para entender melhor e seguir com voce.",
+      "Sem problema. Já chamei um atendente para entender melhor e seguir com você.",
   },
 ] as const;
 
@@ -53,7 +53,7 @@ const TEMPO_AVISO_INATIVIDADE = 3 * MINUTO;
 const TEMPO_ENCERRAMENTO_INATIVIDADE = 5 * MINUTO;
 
 export function textoIntroBot(protocolo: string) {
-  return `Ola! Sou o AlphaBot. Protocolo ${protocolo}. Envie sua mensagem e eu tento resolver por aqui.`;
+  return `Olá! Sou o AlphaBot. Protocolo ${protocolo}. Envie sua mensagem e eu tento resolver por aqui.`;
 }
 
 export function textoBoasVindas(seed = "") {
@@ -61,23 +61,23 @@ export function textoBoasVindas(seed = "") {
 }
 
 export const baseConhecimento = [
-  { padrao: /pedido|compra|rastreio|status do pedido|meu pedido|onde esta|onde ta|entregar|frete|prazo/i, resposta: "Voce pode acompanhar seus pedidos na pagina **Meus Tutoriais** dentro do seu perfil. La voce encontra status, data prevista e link de acesso ao conteudo." },
-  { padrao: /cancelar|cancelamento|reembolso|devolver|devolucao|arrepend/i, resposta: "Cancelamentos podem ser solicitados em ate **7 dias** apos a compra, desde que o conteudo nao tenha sido acessado. Va em **Meus Tutoriais** e clique em 'Cancelar' no pedido desejado." },
-  { padrao: /pagamento|pagar|pix|boleto|cartao|cart.o|credito|debito|valor|preco|pre.o|quanto custa|custa quanto/i, resposta: "Aceitamos **Pix, cartao de credito e debito**. O pagamento via Pix tem confirmacao instantanea. Cartoes podem parcelar em ate **3x**. Se o pagamento nao foi confirmado, verifique no seu banco ou tente novamente." },
-  { padrao: /acesso|nao consigo acessar|login|senha|entrar|esqueci|recuperar|redefinir|conta bloqueada|bloqueio|nao entra|erro ao entrar/i, resposta: "Problemas de acesso? Verifique se o e-mail e senha estao corretos. Se esqueceu a senha, va em **Esqueci minha senha** na pagina de login. Se sua conta esta bloqueada, entre em contato pelo WhatsApp." },
-  { padrao: /whatsapp|telefone|contato|falar com alguem|humano|atendente|pessoa|suporte/i, resposta: "Nosso WhatsApp e **(11) 99999-9999**. Se preferir, posso te transferir para um atendente humano agora mesmo." },
-  { padrao: /tutoriais|anuncio|curso|video|aula|conteudo|aprender|maquiagem|make|cabelo|pele|skincare|unha|beleza|autoestima|glow/i, resposta: "Temos diversos tutoriais de beleza na nossa **Vitrine**. Voce pode filtrar por categoria (maquiagem, cabelo, pele, unhas), buscar por cidade ou por preco. Acesse **Anuncios** no menu superior!" },
-  { padrao: /cupom|desconto|promo.o|promocional|oferta|black friday|liquida|queima|imperdivel/i, resposta: "Fique de olho na secao **Promocoes**! Sempre tem ofertas com precos especiais. Ative a opcao 'Promocoes e descontos' nos filtros da vitrine para ver apenas anuncios com desconto." },
-  { padrao: /cadastro|criar conta|cadastrar|registrar|nova conta|inscrever/i, resposta: "Para criar sua conta, va em **Criar conta** na pagina de login. Voce precisa de e-mail, CPF valido e uma senha segura. O cadastro e gratuito e rapido!" },
-  { padrao: /cidade|localizacao|regiao|bairro|perto|proximo|cep|endere.o|onde fica/i, resposta: "Voce pode buscar tutoriais pela sua cidade! Clique no icone de localizacao no topo do site para definir seu CEP ou usar GPS. Assim voce ve anuncios perto de voce." },
-  { padrao: /avaliar|avaliacao|nota|estrela|feedback|review|comentar|depoimento/i, resposta: "Apos concluir um tutorial, voce pode deixar uma avaliacao com nota e comentario. Isso ajuda outros compradores e os instrutores. Va em **Meus Tutoriais** e clique em 'Avaliar'." },
-  { padrao: /seguro|confiavel|garantia|confiar|confian.a|prote.o|privacidade|dados/i, resposta: "A Flow & Glow protege seus dados com criptografia. Todas as transacoes sao seguras e voce tem garantia de **7 dias** para cancelamento. Veja nossos **Termos de uso** no rodape do site." },
-  { padrao: /carrinho|adicionar|comprar|finalizar|checkout|sacola/i, resposta: "Para comprar, basta clicar no botao **Comprar** nos cards de anuncio. O item vai para o carrinho. Depois e so finalizar em **Carrinho** no menu superior. Simples assim!" },
-  { padrao: /parcelamento|parcela|parcelar|dividir/i, resposta: "Compras no cartao de credito podem ser parceladas em ate **3x sem juros**! O valor minimo da parcela e de R$ 20,00. Pix tem 5% de desconto em algumas promocoes." },
-  { padrao: /perfil|meus dados|alterar|editar|atualizar cadastro|foto/i, resposta: "Voce pode editar seu perfil a qualquer momento em **Perfil** no menu superior. La voce atualiza foto, endereco, telefone e outras informacoes pessoais." },
-  { padrao: /bot|voce . quem|quem e voce|robo|ia|inteligencia/i, resposta: "Sou o **AlphaBot**, assistente virtual da Flow & Glow! Estou aqui para tirar duvidas sobre anuncios, pedidos, pagamentos e muito mais. Se eu nao souber algo, chamo um atendente humano." },
-  { padrao: /oi|ola|hey|eae|bom dia|boa tarde|boa noite|tudo bem|como vai/i, resposta: "Ola! Tudo bem por aqui :) Como posso te ajudar hoje? Pode perguntar sobre pedidos, pagamentos, tutoriais ou qualquer duvida!" },
-  { padrao: /obrigad|valeu|brigad|thanks|agrade.o|gratidao|show|legal|otimo/i, resposta: "Por nada! Fico feliz em ajudar. Se precisar de mais alguma coisa, e so chamar!" },
+  { padrao: /pedido|compra|rastreio|status do pedido|meu pedido|onde esta|onde ta|entregar|frete|prazo/i, resposta: "Você pode acompanhar seus pedidos na página **Meus Tutoriais** dentro do seu perfil. Lá você encontra status, data prevista e link de acesso ao conteúdo." },
+  { padrao: /cancelar|cancelamento|reembolso|devolver|devolucao|arrepend/i, resposta: "Cancelamentos podem ser solicitados em até **7 dias** após a compra, desde que o conteúdo não tenha sido acessado. Vá em **Meus Tutoriais** e clique em 'Cancelar' no pedido desejado." },
+  { padrao: /pagamento|pagar|pix|boleto|cartao|cart.o|credito|debito|valor|preco|pre.o|quanto custa|custa quanto/i, resposta: "Aceitamos **Pix, cartão de crédito e débito**. O pagamento via Pix tem confirmação instantânea. Cartões podem parcelar em até **3x**. Se o pagamento não foi confirmado, verifique no seu banco ou tente novamente." },
+  { padrao: /acesso|nao consigo acessar|login|senha|entrar|esqueci|recuperar|redefinir|conta bloqueada|bloqueio|nao entra|erro ao entrar/i, resposta: "Problemas de acesso? Verifique se o e-mail e senha estão corretos. Se esqueceu a senha, vá em **Esqueci minha senha** na página de login. Se sua conta está bloqueada, entre em contato pelo WhatsApp." },
+  { padrao: /whatsapp|telefone|contato|falar com alguem|humano|atendente|pessoa|suporte/i, resposta: "Nosso WhatsApp é **(11) 99999-9999**. Se preferir, posso te transferir para um atendente humano agora mesmo." },
+  { padrao: /tutoriais|anuncio|curso|video|aula|conteudo|aprender|maquiagem|make|cabelo|pele|skincare|unha|beleza|autoestima|glow/i, resposta: "Temos diversos tutoriais de beleza na nossa **Vitrine**. Você pode filtrar por categoria (maquiagem, cabelo, pele, unhas), buscar por cidade ou por preço. Acesse **Anúncios** no menu superior!" },
+  { padrao: /cupom|desconto|promo.o|promocional|oferta|black friday|liquida|queima|imperdivel/i, resposta: "Fique de olho na seção **Promoções**! Sempre tem ofertas com preços especiais. Ative a opção 'Promoções e descontos' nos filtros da vitrine para ver apenas anúncios com desconto." },
+  { padrao: /cadastro|criar conta|cadastrar|registrar|nova conta|inscrever/i, resposta: "Para criar sua conta, vá em **Criar conta** na página de login. Você precisa de e-mail, CPF válido e uma senha segura. O cadastro é gratuito e rápido!" },
+  { padrao: /cidade|localizacao|regiao|bairro|perto|proximo|cep|endere.o|onde fica/i, resposta: "Você pode buscar tutoriais pela sua cidade! Clique no ícone de localização no topo do site para definir seu CEP ou usar GPS. Assim você vê anúncios perto de você." },
+  { padrao: /avaliar|avaliacao|nota|estrela|feedback|review|comentar|depoimento/i, resposta: "Após concluir um tutorial, você pode deixar uma avaliação com nota e comentário. Isso ajuda outros compradores e os instrutores. Vá em **Meus Tutoriais** e clique em 'Avaliar'." },
+  { padrao: /seguro|confiavel|garantia|confiar|confian.a|prote.o|privacidade|dados/i, resposta: "A Flow & Glow protege seus dados com criptografia. Todas as transações são seguras e você tem garantia de **7 dias** para cancelamento. Veja nossos **Termos de uso** no rodapé do site." },
+  { padrao: /carrinho|adicionar|comprar|finalizar|checkout|sacola/i, resposta: "Para comprar, basta clicar no botão **Comprar** nos cards de anúncio. O item vai para o carrinho. Depois é só finalizar em **Carrinho** no menu superior. Simples assim!" },
+  { padrao: /parcelamento|parcela|parcelar|dividir/i, resposta: "Compras no cartão de crédito podem ser parceladas em até **3x sem juros**! O valor mínimo da parcela é de R$ 20,00. Pix tem 5% de desconto em algumas promoções." },
+  { padrao: /perfil|meus dados|alterar|editar|atualizar cadastro|foto/i, resposta: "Você pode editar seu perfil a qualquer momento em **Perfil** no menu superior. Lá você atualiza foto, endereço, telefone e outras informações pessoais." },
+  { padrao: /bot|voce . quem|quem e voce|robo|ia|inteligencia/i, resposta: "Sou o **AlphaBot**, assistente virtual da Flow & Glow! Estou aqui para tirar dúvidas sobre anúncios, pedidos, pagamentos e muito mais. Se eu não souber algo, chamo um atendente humano." },
+  { padrao: /oi|ola|hey|eae|bom dia|boa tarde|boa noite|tudo bem|como vai/i, resposta: "Olá! Tudo bem por aqui :) Como posso te ajudar hoje? Pode perguntar sobre pedidos, pagamentos, tutoriais ou qualquer dúvida!" },
+  { padrao: /obrigad|valeu|brigad|thanks|agrade.o|gratidao|show|legal|otimo/i, resposta: "Por nada! Fico feliz em ajudar. Se precisar de mais alguma coisa, é só chamar!" },
 ] as const;
 
 export function buscarRespostaConhecimento(texto: string): string | null {
@@ -94,7 +94,7 @@ export function textoPerguntaEspecialista() {
 }
 
 export function textoProtocoloAberto(protocolo: string) {
-  return `Protocolo **${protocolo}** aberto! Aguarde um momento que logo alguem vai te atender.`;
+  return `Protocolo **${protocolo}** aberto! Aguarde um momento que logo alguém vai te atender.`;
 }
 
 export function textoAjudaAposResposta() {
@@ -278,7 +278,7 @@ export async function sincronizarInatividade() {
         conversaId: conversa.id,
         tipo: "SISTEMA",
         texto:
-          "Atendimento encerrado automaticamente por falta de interacao. Voce pode avaliar esta experiencia ou abrir um novo protocolo pelo botao +.",
+          "Atendimento encerrado automaticamente por falta de interação. Você pode avaliar esta experiência ou abrir um novo protocolo pelo botão +.",
       });
       continue;
     }
@@ -292,7 +292,7 @@ export async function sincronizarInatividade() {
         conversaId: conversa.id,
         tipo: "BOT",
         texto:
-          "Ainda esta por ai? Se nao houver resposta em 2 minutos, este atendimento sera encerrado automaticamente.",
+          "Ainda está por aí? Se não houver resposta em 2 minutos, este atendimento será encerrado automaticamente.",
       });
     }
   }

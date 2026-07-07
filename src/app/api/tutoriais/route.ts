@@ -82,6 +82,27 @@ function serializarTutorial(tutorial: {
 export async function GET(request: NextRequest): Promise<NextResponse<RespostaApi>> {
   try {
     const { searchParams } = request.nextUrl;
+    const idsParam = searchParams.get("ids");
+
+    if (idsParam) {
+      const ids = idsParam.split(",").map((id) => id.trim()).filter(Boolean);
+      if (ids.length === 0) {
+        return NextResponse.json({ sucesso: true, dados: [], total: 0 });
+      }
+      const tutoriais = await prisma.tutorial.findMany({
+        where: { id: { in: ids }, ativo: true },
+        select: { id: true, titulo: true, slug: true, preco: true, precoPromocional: true, imagemCapaUrl: true },
+      });
+      return NextResponse.json({
+        sucesso: true,
+        dados: tutoriais.map((t) => ({
+          ...t,
+          preco: Number(t.preco),
+          precoPromocional: t.precoPromocional ? Number(t.precoPromocional) : null,
+        })),
+      });
+    }
+
     const pagina = Math.max(1, parseInt(searchParams.get("pagina") || "1", 10));
     const limite = Math.min(50, Math.max(1, parseInt(searchParams.get("limite") || "12", 10)));
     const pular = (pagina - 1) * limite;

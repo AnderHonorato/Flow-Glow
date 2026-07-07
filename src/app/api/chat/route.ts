@@ -79,7 +79,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
   try {
     const usuarioId = request.headers.get("x-usuario-id");
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
     await sincronizarInatividade();
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
       const nota = Number(corpo.nota);
       const texto = String(corpo.texto || "").trim();
       if (!conversaId || !Number.isInteger(nota) || nota < 1 || nota > 5) {
-        return NextResponse.json({ sucesso: false, erro: "Avaliacao invalida." }, { status: 400 });
+        return NextResponse.json({ sucesso: false, erro: "Avaliação inválida." }, { status: 400 });
       }
 
       const conversa = await prisma.conversa.findFirst({
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
       if (!conversa || conversa.status !== "ENCERRADA") {
         return NextResponse.json(
-          { sucesso: false, erro: "A avaliacao fica disponivel apos o encerramento." },
+          { sucesso: false, erro: "A avaliação fica disponível após o encerramento." },
           { status: 400 }
         );
       }
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RespostaA
 
     if (conversa.status === "ENCERRADA") {
       return NextResponse.json(
-        { sucesso: false, erro: "Atendimento encerrado. Abra um novo chamado pelo botao +." },
+        { sucesso: false, erro: "Atendimento encerrado. Abra um novo chamado pelo botão +." },
         { status: 409 }
       );
     }
@@ -234,7 +234,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<RespostaAp
     const usuarioPapel = request.headers.get("x-usuario-papel");
 
     if (!usuarioId) {
-      return NextResponse.json({ sucesso: false, erro: "Nao autorizado" }, { status: 401 });
+      return NextResponse.json({ sucesso: false, erro: "Não autorizado" }, { status: 401 });
     }
 
     await sincronizarInatividade();

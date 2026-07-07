@@ -10,6 +10,7 @@ import {
   Monitor,
   Moon,
   PackageCheck,
+  ReceiptText,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
@@ -25,14 +26,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FocusEvent } from "react";
 import { AvatarUsuario, Botao, Marca } from "@/components/ui";
 import { BuscaAutocomplete } from "@/components/layout/busca-autocomplete";
-import { SeloLocalizacao } from "@/components/layout/barra-localizacao";
+import { SeloLocalizacao, useCidadeUsuario } from "@/components/layout/barra-localizacao";
 import { FaixaAvisos } from "@/components/layout/faixa-avisos";
 import { useAutenticacao } from "@/contexto/autenticacao";
 import { usePreferencias, type Tema } from "@/contexto/preferencias";
 import { useCarrinho } from "@/hooks/use-carrinho";
 
 const linksNavegacao = [
-  { href: "/tutoriais", texto: "Catalogo", icone: ShoppingBag, tipo: "catalogo" },
+  { href: "/tutoriais", texto: "Catálogo", icone: ShoppingBag, tipo: "catalogo" },
   { href: "/tutoriais?promocao=true", texto: "Ofertas", icone: Sparkles, tipo: "ofertas" },
 ] as const;
 
@@ -56,6 +57,7 @@ export function Cabecalho() {
     localizacao,
     solicitarLocalizacao,
   } = usePreferencias();
+  const { dados: dadosLocalizacao } = useCidadeUsuario();
 
   const [menuAberto, setMenuAberto] = useState(false);
   const [perfilAberto, setPerfilAberto] = useState(false);
@@ -83,6 +85,15 @@ export function Cabecalho() {
     () => usuario?.apelido || usuario?.nomeCompleto.split(" ")[0] || "",
     [usuario?.apelido, usuario?.nomeCompleto]
   );
+
+  const textoLocalizacao = useMemo(() => {
+    if (dadosLocalizacao?.cidade) {
+      const partes = [dadosLocalizacao.cidade];
+      if (dadosLocalizacao.bairro) partes.unshift(dadosLocalizacao.bairro);
+      return partes.join(", ");
+    }
+    return "Adicionar endereço";
+  }, [dadosLocalizacao]);
 
   async function sair() {
     setSaindo(true);
@@ -176,6 +187,11 @@ export function Cabecalho() {
               <PackageCheck className="h-4 w-4" aria-hidden /> Meus tutoriais
             </Botao>
           </Link>
+          <Link href="/minhas-compras" onClick={fecharMenu} className="w-full">
+            <Botao variante="fantasma" tamanho="pequeno" className="w-full justify-start">
+              <ReceiptText className="h-4 w-4" aria-hidden /> Minhas compras
+            </Botao>
+          </Link>
           <Link href="/perfil" onClick={fecharMenu} className="w-full">
             <Botao variante="fantasma" tamanho="pequeno" className="w-full justify-start">
               <UserRound className="h-4 w-4" aria-hidden /> Perfil
@@ -229,7 +245,7 @@ export function Cabecalho() {
       <header className={`sticky top-0 z-50 transition-all duration-300 ${encolhido ? "py-2" : "py-3"}`}>
         <div className="mx-auto max-w-7xl px-3 sm:px-5 lg:px-8">
           <div
-            className={`liquid-glass flex items-center gap-2 rounded-xl px-3 transition-all duration-300 ${
+            className={`header-glass flex items-center gap-2 rounded-xl px-3 transition-all duration-300 ${
               encolhido ? "min-h-12" : "min-h-14"
             }`}
           >
@@ -297,12 +313,12 @@ export function Cabecalho() {
                     <button
                       type="button"
                       onClick={() => setPerfilAberto((valor) => !valor)}
-                      className="inline-flex items-center gap-2 rounded-full px-1.5 py-1 text-sm font-semibold text-[var(--color-texto)] hover:bg-[color-mix(in_srgb,var(--color-papel)_76%,transparent)]"
+                      className="inline-flex items-center gap-2 rounded-full px-1.5 py-1 text-sm font-semibold text-white/90 hover:bg-white/15"
                       aria-expanded={perfilAberto}
                     >
                       <AvatarUsuario nome={usuario.nomeCompleto} fotoUrl={usuario.fotoPerfilUrl} tamanho="pequeno" />
                       <span className="hidden max-w-24 truncate xl:inline">{primeiroNome}</span>
-                      <ChevronDown className="h-4 w-4 text-[var(--color-texto-suave)]" aria-hidden />
+                      <ChevronDown className="h-4 w-4 text-white/60" aria-hidden />
                     </button>
 
                     {perfilAberto && (
@@ -334,10 +350,22 @@ export function Cabecalho() {
               )}
             </div>
 
-            <div className="flex items-center gap-1 md:hidden">
+            <div className="ml-auto flex items-center gap-1 md:hidden">
+              <Link
+                href="/tutoriais"
+                className="inline-flex h-8 items-center gap-1 rounded-full bg-white/15 px-2.5 text-[11px] font-semibold text-white/85"
+              >
+                <ShoppingBag className="h-3 w-3" /> Catálogo
+              </Link>
+              <Link
+                href="/tutoriais?promocao=true"
+                className="inline-flex h-8 items-center gap-1 rounded-full bg-white/15 px-2.5 text-[11px] font-semibold text-white/85"
+              >
+                <Sparkles className="h-3 w-3" /> Ofertas
+              </Link>
               {usuario ? (
                 <Link href="/carrinho" className="icon-hover relative inline-flex h-9 w-9 items-center justify-center rounded-full">
-                  <ShoppingCart className="h-5 w-5 text-[var(--color-texto)]" />
+                  <ShoppingCart className="h-5 w-5 text-white/85" />
                   {quantidadeItens > 0 && (
                     <span className="absolute -right-1 -top-0.5 min-w-[18px] rounded-full bg-[var(--color-berry)] text-center text-[10px] font-bold leading-[18px] text-white">
                       {quantidadeItens}
@@ -345,15 +373,15 @@ export function Cabecalho() {
                   )}
                 </Link>
               ) : (
-                <Link href="/login" className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-berry)] px-3 text-sm font-semibold text-white">
-                  <LogIn className="h-4 w-4" /> Entrar
+                <Link href="/login" className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--color-berry)] px-3 text-xs font-semibold text-white">
+                  <LogIn className="h-3.5 w-3.5" /> Entrar
                 </Link>
               )}
             </div>
 
             <button
               type="button"
-              className="icon-hover inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-linha)] bg-[color-mix(in_srgb,var(--color-papel)_76%,transparent)] text-[var(--color-texto)] md:hidden"
+              className="icon-hover inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/85 md:hidden"
               onClick={() => setMenuAberto(true)}
               aria-label="Abrir menu"
             >
@@ -362,27 +390,22 @@ export function Cabecalho() {
           </div>
 
           <div className="mt-1 flex md:hidden">
-            <button
-              type="button"
-              onClick={solicitarLocalizacao}
+            <Link
+              href="/perfil"
               className={`inline-flex max-w-full items-center gap-1.5 truncate px-1 text-left text-[11px] font-bold ${
-                localizacao ? "text-[var(--color-sage)]" : "text-[var(--color-texto-suave)]"
+                dadosLocalizacao ? "text-[var(--color-sage)]" : "text-[var(--color-texto-suave)]"
               }`}
-              aria-label={localizacao ? "Localizacao ativa" : "Usar localizacao"}
-              title={localizacao ? "Localizacao ativa" : "Usar localizacao"}
             >
               <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="truncate">
-                {localizacao ? "Localizacao ativa" : "Usar localizacao"}
-              </span>
-            </button>
+              <span className="truncate">{textoLocalizacao}</span>
+            </Link>
           </div>
           <BuscaAutocomplete
             value={busca}
             onChange={setBusca}
             onSearch={() => setPromocaoAtiva(false)}
             className="mt-2 md:hidden"
-            placeholder="Buscar anuncios"
+            placeholder="Buscar anúncios"
             inputClassName="h-9 bg-[color-mix(in_srgb,var(--color-papel)_92%,transparent)]"
           />
         </div>
@@ -446,14 +469,13 @@ export function Cabecalho() {
                       </Link>
                     );
                   })}
-                  <button
-                    type="button"
-                    onClick={solicitarLocalizacao}
+                  <Link
+                    href="/perfil"
                     className="icon-hover inline-flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[var(--color-texto)] hover:bg-[color-mix(in_srgb,var(--color-papel)_78%,transparent)]"
                   >
                     <MapPin className="h-5 w-5 text-[var(--color-sage)]" aria-hidden />
-                    {localizacao ? "Localizacao ativa" : "Usar localizacao"}
-                  </button>
+                    {textoLocalizacao}
+                  </Link>
                 </nav>
 
                 <div className="border-y border-[var(--color-linha)] p-4">
@@ -473,7 +495,7 @@ export function Cabecalho() {
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="rounded-2xl border border-[var(--color-linha)] bg-[var(--color-papel)] px-8 py-6 text-center shadow-[0_24px_64px_rgba(0,0,0,0.3)]">
             <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[var(--color-linha)] border-t-[var(--color-berry)]" />
-            <p className="text-sm font-bold text-[var(--color-texto)]">Saindo da conta com seguranca, aguarde...</p>
+            <p className="text-sm font-bold text-[var(--color-texto)]">Saindo da conta com segurança, aguarde...</p>
           </div>
         </div>
       )}

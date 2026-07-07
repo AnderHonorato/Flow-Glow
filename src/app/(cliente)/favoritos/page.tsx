@@ -22,6 +22,7 @@ interface Favorito {
     imagemCapaUrl: string;
     destaquePromocional: boolean;
     bombando: boolean;
+    ativo: boolean;
     cidade: string | null;
     estado: string | null;
     distanciaKm: number | null;
@@ -54,9 +55,9 @@ export default function PaginaFavoritos() {
       });
       const dados = await resposta.json();
       if (dados.sucesso) setFavoritos(dados.dados || []);
-      else setErro(dados.erro || "Nao foi possivel carregar seus favoritos.");
+      else setErro(dados.erro || "Não foi possível carregar seus favoritos.");
     } catch {
-      setErro("Erro de conexao ao carregar favoritos.");
+      setErro("Erro de conexão ao carregar favoritos.");
     }
     setCarregando(false);
   }, [accessToken]);
@@ -78,7 +79,7 @@ export default function PaginaFavoritos() {
             Favoritos
           </h1>
           <p className="mt-4 max-w-2xl text-sm text-[var(--color-texto-suave)]">
-            Seus anuncios salvos aparecem aqui. Voce pode remover quando quiser.
+            Seus anúncios salvos aparecem aqui. Você pode remover quando quiser.
           </p>
         </div>
 
@@ -113,67 +114,92 @@ export default function PaginaFavoritos() {
             <Sparkles className="mb-3 h-6 w-6 text-[var(--color-ouro)]" aria-hidden />
             <h2 className="text-lg font-bold">Nenhum favorito ainda</h2>
             <p className="mt-2 text-sm text-[var(--color-texto-suave)]">
-              Toque no coracao dos anuncios para guardar aqui.
+              Toque no coração dos anúncios para guardar aqui.
             </p>
             <Link href="/tutoriais" className="mt-4 inline-flex">
-              <Botao variante="contorno">Ver anuncios</Botao>
+              <Botao variante="contorno">Ver anúncios</Botao>
             </Link>
           </Cartao>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {favoritos.map((favorito) => {
               const tutorial = favorito.tutorial;
+              const indisponivel = !tutorial.ativo;
               const precoAtual = tutorial.precoPromocional || tutorial.preco;
               return (
                 <Cartao key={favorito.id} className="overflow-hidden p-0">
-                  <Link href={`/tutoriais/${tutorial.slug}`} className="group block">
-                    <div
-                      className="relative h-32 bg-cover bg-center sm:h-40"
-                      style={{ backgroundImage: `url(${tutorial.imagemCapaUrl})` }}
-                    >
-                      <div className="absolute right-2 top-2">
-                        <BotaoFavorito tutorialId={tutorial.id} compacto onAlternado={carregar} />
+                  {indisponivel ? (
+                    <>
+                      <div
+                        className="relative h-32 bg-cover bg-center opacity-50 sm:h-40"
+                        style={{ backgroundImage: `url(${tutorial.imagemCapaUrl})` }}
+                      >
+                        <div className="absolute right-2 top-2">
+                          <BotaoFavorito tutorialId={tutorial.id} compacto onAlternado={carregar} />
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-3">
-                      <p className="text-xs font-bold uppercase text-[var(--color-sage)]">
-                        {tutorial.categoria.nome}
-                      </p>
-                      <h2 className="mt-1 line-clamp-2 text-base font-bold group-hover:text-[var(--color-berry)]">
-                        {tutorial.titulo}
-                      </h2>
-                      <p className="mt-1 line-clamp-2 text-sm text-[var(--color-texto-suave)]">
-                        {tutorial.descricaoCurta}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between gap-2">
-                        <span className="text-base font-black text-[var(--color-berry)]">
-                          {formatarReal(precoAtual)}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(evento) => {
-                            evento.preventDefault();
-                            evento.stopPropagation();
-                            adicionarAoCarrinho({
-                              tutorialId: tutorial.id,
-                              titulo: tutorial.titulo,
-                              imagemCapaUrl: tutorial.imagemCapaUrl,
-                              preco: tutorial.preco,
-                              precoPromocional: tutorial.precoPromocional,
-                            });
-                          }}
-                          className="action-reveal bg-[var(--color-berry)] text-white"
-                          aria-label="Adicionar ao carrinho"
-                          title="Adicionar ao carrinho"
-                        >
-                          <ShoppingCart className="h-4 w-4" aria-hidden />
-                          <span className="action-reveal-text text-xs font-bold">
-                            {estaNoCarrinho(tutorial.id) ? "No carrinho" : "Comprar"}
+                      <div className="p-3">
+                        <p className="text-xs font-bold uppercase text-red-500">
+                          Indisponível
+                        </p>
+                        <h2 className="mt-1 line-clamp-2 text-base font-bold text-[var(--color-texto)]/50">
+                          {tutorial.titulo}
+                        </h2>
+                        <p className="mt-1 line-clamp-2 text-sm text-[var(--color-texto-suave)]">
+                          Este anúncio foi removido ou desativado.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <Link href={`/tutoriais/${tutorial.slug}`} className="group block">
+                      <div
+                        className="relative h-32 bg-cover bg-center sm:h-40"
+                        style={{ backgroundImage: `url(${tutorial.imagemCapaUrl})` }}
+                      >
+                        <div className="absolute right-2 top-2">
+                          <BotaoFavorito tutorialId={tutorial.id} compacto onAlternado={carregar} />
+                        </div>
+                      </div>
+                      <div className="p-3">
+                        <p className="text-xs font-bold uppercase text-[var(--color-sage)]">
+                          {tutorial.categoria.nome}
+                        </p>
+                        <h2 className="mt-1 line-clamp-2 text-base font-bold group-hover:text-[var(--color-berry)]">
+                          {tutorial.titulo}
+                        </h2>
+                        <p className="mt-1 line-clamp-2 text-sm text-[var(--color-texto-suave)]">
+                          {tutorial.descricaoCurta}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <span className="text-base font-black text-[var(--color-berry)]">
+                            {formatarReal(precoAtual)}
                           </span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={(evento) => {
+                              evento.preventDefault();
+                              evento.stopPropagation();
+                              adicionarAoCarrinho({
+                                tutorialId: tutorial.id,
+                                titulo: tutorial.titulo,
+                                imagemCapaUrl: tutorial.imagemCapaUrl,
+                                preco: tutorial.preco,
+                                precoPromocional: tutorial.precoPromocional,
+                              });
+                            }}
+                            className="action-reveal bg-[var(--color-berry)] text-white"
+                            aria-label="Adicionar ao carrinho"
+                            title="Adicionar ao carrinho"
+                          >
+                            <ShoppingCart className="h-4 w-4" aria-hidden />
+                            <span className="action-reveal-text text-xs font-bold">
+                              {estaNoCarrinho(tutorial.id) ? "No carrinho" : "Comprar"}
+                            </span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  )}
                 </Cartao>
               );
             })}

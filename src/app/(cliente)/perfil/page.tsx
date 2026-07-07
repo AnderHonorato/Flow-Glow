@@ -19,20 +19,20 @@ import { useAutenticacao } from "@/contexto/autenticacao";
 import { usePreferencias } from "@/contexto/preferencias";
 
 async function recortarImagemPerfil(arquivo: File): Promise<string> {
-  if (!arquivo.type.startsWith("image/")) throw new Error("Escolha uma imagem valida.");
-  if (arquivo.size > 4 * 1024 * 1024) throw new Error("Use uma imagem de ate 4 MB.");
+  if (!arquivo.type.startsWith("image/")) throw new Error("Escolha uma imagem válida.");
+  if (arquivo.size > 4 * 1024 * 1024) throw new Error("Use uma imagem de até 4 MB.");
 
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const leitor = new FileReader();
     leitor.onload = () => resolve(String(leitor.result));
-    leitor.onerror = () => reject(new Error("Nao foi possivel ler a imagem."));
+    leitor.onerror = () => reject(new Error("Não foi possível ler a imagem."));
     leitor.readAsDataURL(arquivo);
   });
 
   const imagem = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Nao foi possivel abrir a imagem."));
+    img.onerror = () => reject(new Error("Não foi possível abrir a imagem."));
     img.src = dataUrl;
   });
 
@@ -44,7 +44,7 @@ async function recortarImagemPerfil(arquivo: File): Promise<string> {
   canvas.height = 384;
 
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Seu navegador nao preparou a imagem.");
+  if (!ctx) throw new Error("Seu navegador não preparou a imagem.");
   ctx.drawImage(imagem, sx, sy, ladoOrigem, ladoOrigem, 0, 0, 384, 384);
 
   return canvas.toDataURL("image/jpeg", 0.84);
@@ -159,7 +159,7 @@ export default function PaginaPerfil() {
         setComplemento(dados.dados.complemento || "");
         setMensagem("CEP encontrado. Confira os dados.");
       } else {
-        setErro(dados.erro || "CEP nao encontrado.");
+        setErro(dados.erro || "CEP não encontrado.");
       }
     } catch {
       setErro("Erro ao consultar o CEP.");
@@ -178,7 +178,7 @@ export default function PaginaPerfil() {
       setFotoPerfilUrl(recortada);
       setMensagem("Foto recortada. Salve o perfil para aplicar.");
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "Nao foi possivel preparar a foto.");
+      setErro(err instanceof Error ? err.message : "Não foi possível preparar a foto.");
     }
     setProcessandoFoto(false);
     evento.target.value = "";
@@ -225,7 +225,7 @@ export default function PaginaPerfil() {
         setErro(dados.erro);
       }
     } catch {
-      setErro("Erro de conexao.");
+      setErro("Erro de conexão.");
     }
 
     setSalvando(false);
@@ -236,7 +236,7 @@ export default function PaginaPerfil() {
     setErro("");
     setMensagem("");
     if (!senhaAtual || !novaSenha || !confirmacaoNovaSenha) {
-      setErro("Informe senha atual, nova senha e confirmacao.");
+      setErro("Informe senha atual, nova senha e confirmação.");
       return;
     }
 
@@ -258,12 +258,12 @@ export default function PaginaPerfil() {
         setSenhaAtual("");
         setNovaSenha("");
         setConfirmacaoNovaSenha("");
-        setMensagem("Senha atualizada com confirmacao da senha atual.");
+        setMensagem("Senha atualizada com confirmação da senha atual.");
       } else {
         setErro(dados.erro);
       }
     } catch {
-      setErro("Erro de conexao.");
+      setErro("Erro de conexão.");
     }
     setSalvando(false);
   }
@@ -292,10 +292,10 @@ export default function PaginaPerfil() {
         }),
       });
       const dados = await resposta.json();
-      if (dados.sucesso) setMensagem("Endereco atualizado.");
+      if (dados.sucesso) setMensagem("Endereço atualizado.");
       else setErro(dados.erro);
     } catch {
-      setErro("Erro de conexao.");
+      setErro("Erro de conexão.");
     }
 
     setSalvando(false);
@@ -323,10 +323,10 @@ export default function PaginaPerfil() {
         await logout();
         router.push("/");
       } else {
-        setErro(dados.erro || "Nao foi possivel excluir a conta.");
+        setErro(dados.erro || "Não foi possível excluir a conta.");
       }
     } catch {
-      setErro("Erro de conexao ao excluir a conta.");
+      setErro("Erro de conexão ao excluir a conta.");
     }
     setExcluindoConta(false);
   }
@@ -340,7 +340,7 @@ export default function PaginaPerfil() {
             <UserRound className="h-4 w-4" aria-hidden />
             Minha conta
           </span>
-          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Perfil, seguranca e preferencias</h1>
+          <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Perfil, segurança e preferências</h1>
         </div>
 
         {mensagem && (
@@ -362,7 +362,7 @@ export default function PaginaPerfil() {
                 <div className="min-w-0 flex-1">
                   <h2 className="text-xl font-bold">Dados pessoais</h2>
                   <p className="mt-1 text-sm text-[var(--color-texto-suave)]">
-                    As mesmas informacoes do cadastro ficam disponiveis para edicao.
+                    As mesmas informações do cadastro ficam disponíveis para edição.
                   </p>
                 </div>
                 <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 py-2 text-sm font-semibold text-[var(--color-texto)] hover:border-[var(--color-berry)] hover:text-[var(--color-berry)]">
@@ -383,20 +383,20 @@ export default function PaginaPerfil() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="flex flex-col gap-1.5">
-                    <span className="text-sm font-semibold text-[var(--color-texto)]">Genero</span>
+                    <span className="text-sm font-semibold text-[var(--color-texto)]">Gênero</span>
                     <select
                       value={genero}
                       onChange={(e) => setGenero(e.target.value)}
                       className="h-10 rounded-lg border border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-3 text-sm text-[var(--color-texto)] outline-none focus:border-[var(--color-berry)] sm:h-11"
                     >
-                      <option value="">Prefiro nao informar</option>
+                      <option value="">Prefiro não informar</option>
                       <option value="feminino">Feminino</option>
                       <option value="masculino">Masculino</option>
-                      <option value="nao-binario">Nao binario</option>
+                      <option value="nao-binario">Não binário</option>
                       <option value="outro">Outro</option>
                     </select>
                   </label>
-                  <CampoTexto rotulo="Profissao" value={profissao} onChange={(e) => setProfissao(e.target.value)} placeholder="Opcional" />
+                  <CampoTexto rotulo="Profissão" value={profissao} onChange={(e) => setProfissao(e.target.value)} placeholder="Opcional" />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <CampoTexto rotulo="WhatsApp" value={whatsapp} onChange={(e) => setWhatsapp(formatarTelefone(e.target.value))} inputMode="tel" />
@@ -404,10 +404,10 @@ export default function PaginaPerfil() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
                   <CampoTexto rotulo="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                  <CampoTexto rotulo="Codigo e-mail" value={codigoConfirmacaoEmail} onChange={(e) => setCodigoConfirmacaoEmail(e.target.value)} placeholder="123456" />
+                  <CampoTexto rotulo="Código e-mail" value={codigoConfirmacaoEmail} onChange={(e) => setCodigoConfirmacaoEmail(e.target.value)} placeholder="123456" />
                 </div>
                 <p className="text-xs leading-relaxed text-[var(--color-texto-suave)]">
-                  Por enquanto a confirmacao de troca de e-mail e ficticia: use o codigo 123456.
+                  Por enquanto a confirmação de troca de e-mail é fictícia: use o código 123456.
                 </p>
                 <Botao type="submit" carregando={salvando} className="sm:w-fit">
                   <Save className="h-4 w-4" aria-hidden />
@@ -417,14 +417,14 @@ export default function PaginaPerfil() {
             </Cartao>
 
             <Cartao>
-              <h2 className="text-xl font-bold">Endereco principal</h2>
+              <h2 className="text-xl font-bold">Endereço principal</h2>
               <form onSubmit={handleSalvarEndereco} className="mt-4 grid gap-4">
                 <CampoTexto rotulo="CEP" value={cep} onChange={(e) => setCep(e.target.value.replace(/\D/g, "").slice(0, 8))} onBlur={handleCepBlur} placeholder="00000000" inputMode="numeric" />
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="sm:col-span-2">
                     <CampoTexto rotulo="Logradouro" value={logradouro} onChange={(e) => setLogradouro(e.target.value)} />
                   </div>
-                  <CampoTexto rotulo="Numero" value={numero} onChange={(e) => setNumero(e.target.value)} />
+                  <CampoTexto rotulo="Número" value={numero} onChange={(e) => setNumero(e.target.value)} />
                 </div>
                 <CampoTexto rotulo="Complemento" value={complemento} onChange={(e) => setComplemento(e.target.value)} />
                 <div className="grid gap-4 sm:grid-cols-3">
@@ -434,7 +434,7 @@ export default function PaginaPerfil() {
                 </div>
                 <Botao type="submit" carregando={salvando} className="sm:w-fit">
                   <Save className="h-4 w-4" aria-hidden />
-                  Salvar endereco
+                  Salvar endereço
                 </Botao>
               </form>
             </Cartao>
@@ -447,7 +447,7 @@ export default function PaginaPerfil() {
               <form onSubmit={trocarSenha} className="mt-4 grid gap-4">
                 <CampoTexto rotulo="Senha atual" type="password" value={senhaAtual} onChange={(e) => setSenhaAtual(e.target.value)} icone={<KeyRound className="h-4 w-4" aria-hidden />} />
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <CampoTexto rotulo="Nova senha" type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} placeholder="8 caracteres, 1 maiuscula e 1 numero" />
+                  <CampoTexto rotulo="Nova senha" type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} placeholder="8 caracteres, 1 maiúscula e 1 número" />
                   <CampoTexto rotulo="Confirmar nova senha" type="password" value={confirmacaoNovaSenha} onChange={(e) => setConfirmacaoNovaSenha(e.target.value)} />
                 </div>
                 <Botao type="submit" variante="secundario" carregando={salvando} className="sm:w-fit">
@@ -461,26 +461,26 @@ export default function PaginaPerfil() {
           <aside className="space-y-5">
             <Cartao destaque>
               <MapPin className="mb-3 h-5 w-5 text-[var(--color-sage)]" aria-hidden />
-              <h2 className="text-lg font-bold">Localizacao</h2>
+              <h2 className="text-lg font-bold">Localização</h2>
               <p className="mt-2 text-sm leading-relaxed text-[var(--color-texto-suave)]">
-                Use sua posicao para organizar filtros por distancia. O acesso e pedido apenas quando voce clicar.
+                Use sua posição para organizar filtros por distância. O acesso é pedido apenas quando você clicar.
               </p>
               {localizacao ? (
                 <div className="mt-4 rounded-lg bg-[color-mix(in_srgb,var(--color-sage)_10%,transparent)] p-3 text-sm font-semibold text-[var(--color-sage)]">
-                  Localizacao ativa
+                  Localização ativa
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-[var(--color-texto-suave)]">Nenhuma localizacao salva.</p>
+                <p className="mt-4 text-sm text-[var(--color-texto-suave)]">Nenhuma localização salva.</p>
               )}
               {erroLocalizacao && <p className="mt-2 text-xs text-red-600">{erroLocalizacao}</p>}
               <div className="mt-4 grid gap-2">
                 <Botao type="button" onClick={solicitarLocalizacao} carregando={carregandoLocalizacao}>
                   <MapPin className="h-4 w-4" aria-hidden />
-                  Usar minha localizacao
+                  Usar minha localização
                 </Botao>
                 {localizacao && (
                   <Botao type="button" variante="fantasma" onClick={limparLocalizacao}>
-                    Remover localizacao
+                    Remover localização
                   </Botao>
                 )}
               </div>
@@ -508,7 +508,7 @@ export default function PaginaPerfil() {
       <Modal
         aberto={confirmarExclusao}
         titulo="Deletar conta"
-        descricao="Esta acao remove perfil, pedidos, comentarios e conversas deste ambiente."
+        descricao="Esta ação remove perfil, pedidos, comentários e conversas deste ambiente."
         onFechar={() => setConfirmarExclusao(false)}
       >
         <div className="grid gap-4">

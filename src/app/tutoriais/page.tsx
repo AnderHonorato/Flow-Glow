@@ -25,25 +25,25 @@ import type { TutorialCard } from "@/tipos";
 
 const opcoesOrdenacao = [
   { valor: "recentes", rotulo: "Mais recentes" },
-  { valor: "preco-asc", rotulo: "Menor preÃ§o" },
-  { valor: "preco-desc", rotulo: "Maior preÃ§o" },
+  { valor: "preco-asc", rotulo: "Menor preço" },
+  { valor: "preco-desc", rotulo: "Maior preço" },
   { valor: "distancia", rotulo: "Mais perto" },
-  { valor: "avaliacao", rotulo: "Melhor avaliaÃ§Ã£o" },
+  { valor: "avaliacao", rotulo: "Melhor avaliação" },
 ];
 
 const distancias = [
   { valor: "", rotulo: "Todas" },
-  { valor: "10", rotulo: "AtÃ© 10 km" },
-  { valor: "25", rotulo: "AtÃ© 25 km" },
-  { valor: "50", rotulo: "AtÃ© 50 km" },
-  { valor: "100", rotulo: "AtÃ© 100 km" },
+  { valor: "10", rotulo: "Até 10 km" },
+  { valor: "25", rotulo: "Até 25 km" },
+  { valor: "50", rotulo: "Até 50 km" },
+  { valor: "100", rotulo: "Até 100 km" },
 ];
 
 const niveis = [
   { valor: "", rotulo: "Todos" },
   { valor: "INICIANTE", rotulo: "Iniciante" },
-  { valor: "INTERMEDIARIO", rotulo: "IntermediÃ¡rio" },
-  { valor: "AVANCADO", rotulo: "AvanÃ§ado" },
+  { valor: "INTERMEDIARIO", rotulo: "Intermediário" },
+  { valor: "AVANCADO", rotulo: "Avançado" },
 ];
 
 function formatarReal(valor: number): string {
@@ -230,11 +230,11 @@ function ConteudoTutoriais() {
               })
             );
           } catch {}
-        } else setErro(dadosT.erro || "Erro ao carregar anÃºncios.");
+        } else setErro(dadosT.erro || "Erro ao carregar anúncios.");
 
         if (dadosC.sucesso) setCategorias(dadosC.dados);
       } catch {
-        setErro("NÃ£o foi possÃ­vel carregar os anÃºncios agora.");
+        setErro("Não foi possível carregar os anúncios agora.");
       }
       if (!silencioso) setCarregando(false);
     }
@@ -256,24 +256,24 @@ function ConteudoTutoriais() {
     somentePromocao,
   ]);
 
-  // Reseta para pÃ¡gina 1 quando os filtros mudam
+  // Reseta para página 1 quando os filtros mudam
   useEffect(() => { setPagina(1); }, [
     busca, distanciaMax, filtroCategoria, nivel, ordenar, precoMax, precoMin, somenteBombando, somentePromocao,
   ]);
 
   const nomeCategoriaAtual = useMemo(() => {
-    if (!filtroCategoria) return "Todos os anÃºncios";
+    if (!filtroCategoria) return "Todos os anúncios";
     return categorias.find((c) => c.slug === filtroCategoria)?.nome || "Categoria";
   }, [categorias, filtroCategoria]);
 
   const filtrosAtivos = [
     filtroCategoria && `Categoria: ${nomeCategoriaAtual}`,
-    somentePromocao && "PromoÃ§Ãµes",
+    somentePromocao && "Promoções",
     somenteBombando && "Bombando",
-    distanciaMax && `AtÃ© ${distanciaMax} km`,
+    distanciaMax && `Até ${distanciaMax} km`,
     nivel && niveis.find((n) => n.valor === nivel)?.rotulo,
     precoMin && `A partir de R$ ${precoMin}`,
-    precoMax && `AtÃ© R$ ${precoMax}`,
+    precoMax && `Até R$ ${precoMax}`,
   ].filter(Boolean) as string[];
 
   function limparFiltros() {
@@ -333,18 +333,18 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="PreÃ§o">
+      <GrupoFiltro titulo="Preço">
         <div className="grid grid-cols-2 gap-2">
           <input
             value={precoMin}
             onChange={(e) => setPrecoMin(normalizarPreco(e.target.value))}
-            placeholder="MÃ­n."
+            placeholder="Mín."
             className="h-10 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 text-sm outline-none focus:border-[var(--color-berry)]"
           />
           <input
             value={precoMax}
             onChange={(e) => setPrecoMax(normalizarPreco(e.target.value))}
-            placeholder="MÃ¡x."
+            placeholder="Máx."
             className="h-10 rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] px-3 text-sm outline-none focus:border-[var(--color-berry)]"
           />
         </div>
@@ -359,7 +359,7 @@ function ConteudoTutoriais() {
               onChange={(e) => setSomentePromocao(e.target.checked)}
               className="h-4 w-4 accent-[var(--color-berry)]"
             />
-            PromoÃ§Ãµes e descontos
+            Promoções e descontos
           </label>
           <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--color-texto)]">
             <input
@@ -373,7 +373,7 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="DistÃ¢ncia">
+      <GrupoFiltro titulo="Distância">
         <div className="mb-3">
           <Botao
             type="button"
@@ -384,7 +384,7 @@ function ConteudoTutoriais() {
             className="w-full justify-center"
           >
             <MapPin className="h-4 w-4" aria-hidden />
-            {localizacao ? "LocalizaÃ§Ã£o ativa" : "Usar localizaÃ§Ã£o"}
+            {localizacao ? "Localização ativa" : "Usar localização"}
           </Botao>
           {erroLocalizacao && <p className="mt-2 text-xs text-red-600">{erroLocalizacao}</p>}
         </div>
@@ -406,7 +406,7 @@ function ConteudoTutoriais() {
         </div>
       </GrupoFiltro>
 
-      <GrupoFiltro titulo="NÃ­vel">
+      <GrupoFiltro titulo="Nível">
         <div className="grid gap-1">
           {niveis.map((opcao) => (
             <button
@@ -440,14 +440,14 @@ function ConteudoTutoriais() {
               </span>
               <h1 className="mt-1 text-xl font-bold sm:text-4xl">{nomeCategoriaAtual}</h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--color-texto-suave)]">
-                Busque por serviÃ§o, cidade, cupom ou conteÃºdo e refine pelos filtros.
+                Busque por serviço, cidade, cupom ou conteúdo e refine pelos filtros.
               </p>
             </div>
             <CampoTexto
               rotulo="Buscar"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Ex.: pele, noivas, SÃ£o Paulo, GLOW20"
+              placeholder="Ex.: pele, noivas, São Paulo, GLOW20"
               icone={<Search className="h-4 w-4" aria-hidden />}
               variante="busca"
             />
@@ -521,7 +521,7 @@ function ConteudoTutoriais() {
             ) : tutoriais.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[var(--color-linha-forte)] bg-[var(--color-papel)] px-4 py-12 text-center">
                 <Sparkles className="mx-auto mb-3 h-6 w-6 text-[var(--color-berry)]" aria-hidden />
-                <h2 className="text-lg font-bold">Nenhum anÃºncio encontrado</h2>
+                <h2 className="text-lg font-bold">Nenhum anúncio encontrado</h2>
                 <p className="mt-2 text-sm text-[var(--color-texto-suave)]">
                   Tente remover um filtro ou buscar por outro termo.
                 </p>
@@ -606,7 +606,7 @@ function ConteudoTutoriais() {
 
                           <div className="mt-4 flex items-center gap-2">
                             <span className="inline-flex items-center gap-1 text-sm font-bold text-[var(--color-berry)]">
-                              Abrir anÃºncio
+                              Abrir anúncio
                               <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                             </span>
                             <button
@@ -638,17 +638,17 @@ function ConteudoTutoriais() {
               </div>
             )}
 
-            {/* PaginaÃ§Ã£o */}
+            {/* Paginação */}
             {totalPaginas > 1 && (
-              <nav className="mt-8 flex items-center justify-center gap-1" aria-label="PaginaÃ§Ã£o">
+              <nav className="mt-8 flex items-center justify-center gap-1" aria-label="Paginação">
                 <button
                   type="button"
                   onClick={() => setPagina((p) => Math.max(1, p - 1))}
                   disabled={pagina === 1}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] text-sm font-medium text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:cursor-not-allowed disabled:opacity-30"
-                  aria-label="PÃ¡gina anterior"
+                  aria-label="Página anterior"
                 >
-                  â€¹
+                  ‹
                 </button>
                 {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
                   <button
@@ -669,9 +669,9 @@ function ConteudoTutoriais() {
                   onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                   disabled={pagina === totalPaginas}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-linha)] bg-[var(--color-papel)] text-sm font-medium text-[var(--color-texto)] hover:border-[var(--color-berry)] disabled:cursor-not-allowed disabled:opacity-30"
-                  aria-label="PrÃ³xima pÃ¡gina"
+                  aria-label="Próxima página"
                 >
-                  â€º
+                  ›
                 </button>
               </nav>
             )}

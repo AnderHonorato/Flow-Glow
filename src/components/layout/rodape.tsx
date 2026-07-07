@@ -22,8 +22,8 @@ export function Rodape() {
               <Marca inversa />
             </div>
             <p className="mx-auto max-w-sm text-xs leading-relaxed text-white/62 sm:mx-0 sm:text-sm">
-              Anuncios de beleza, tutoriais e atendimentos selecionados para comprar,
-              testar e acompanhar em uma experiencia simples.
+              Anúncios de beleza, tutoriais e atendimentos selecionados para comprar,
+              testar e acompanhar em uma experiência simples.
             </p>
           </div>
 
@@ -38,12 +38,12 @@ export function Rodape() {
                   className="inline-flex items-center justify-center gap-2 text-white/72 hover:text-white sm:justify-start"
                 >
                   <ShoppingBag className="h-4 w-4" aria-hidden />
-                  Anuncios
+                  Anúncios
                 </Link>
               </li>
               <li>
                 <Link href="/tutoriais?promocao=true" className="text-white/72 hover:text-white">
-                  Promocoes
+                  Promoções
                 </Link>
               </li>
               <li>
