@@ -447,3 +447,11 @@ canvas {
 a, button, [role="button"], label[for] {
   cursor: pointer;
 }
+
+/* flow-glow-novo-brilho — microinteração de produto sem animação repetitiva. */
+.liquid-button{isolation:isolate;position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .3s ease,filter .25s ease}
+.liquid-button::after{content:'';position:absolute;z-index:-1;inset:-80% -55%;background:linear-gradient(112deg,transparent 40%,rgba(255,255,255,.32) 49%,transparent 59%);transform:translateX(-115%) rotate(13deg);pointer-events:none}
+.liquid-button:hover::after{animation:flow-brilho-passagem .85s ease-out 1}
+.liquid-button:active{transform:translateY(1px) scale(.98)}
+@keyframes flow-brilho-passagem{to{transform:translateX(115%) rotate(13deg)}}
+@media(prefers-reduced-motion:reduce){.liquid-button::after{display:none}.liquid-button{transition:none}}
